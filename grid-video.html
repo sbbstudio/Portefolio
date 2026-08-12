@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+try {
+  if (new URLSearchParams(window.location.search).get('type-test') === 'stacked') {
+    document.documentElement.dataset.typeTest = 'stacked';
+  }
+} catch (error) {}
+</script>
 <title>Rune Øverland — Creative Fullstack Engineer</title>
 <style>
 /* ============================================================
@@ -573,6 +580,46 @@ body.ready .rl { opacity: 1; transform: none; }
   padding-right: 1ch;
 }
 
+/* TYPE TEST — ?type-test=stacked
+   Én samlet setningsblokk i to faktiske linjer. Originalens fire
+   grid-fragmenter skjules bare i testtilstanden.               */
+.card--nyme .nyme__statement {
+  display: none;
+}
+html[data-type-test="stacked"] .card--nyme .nyme__line,
+html[data-type-test="stacked"] .card--nyme .nyme__ticker {
+  display: none;
+}
+html[data-type-test="stacked"] .card--nyme .nyme__statement {
+  grid-column: 1 / 5;
+  grid-row: 1 / 2;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--cell);
+  color: var(--ink);
+  pointer-events: none;
+  z-index: 4;
+}
+html[data-type-test="stacked"] .card--nyme .nyme__statement p {
+  margin: 0;
+  font-size: min(var(--t-display), 7.6vw);
+  font-weight: 500;
+  line-height: .94;
+  letter-spacing: -.03em;
+  white-space: nowrap;
+}
+html[data-type-test="stacked"] .card--nyme .nyme__statement-lead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  width: 100%;
+}
+html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
+  text-align: center;
+}
+
 /* Gauntlet R1: mediet skal kaste lys på flaten rundt seg.
    Samme kilde duplisert bak kolonnen, oppskalert, blurret —
    kortets eget innhold blir kortets lyskilde.                 */
@@ -706,6 +753,37 @@ body.ready .rl { opacity: 1; transform: none; }
 .card--jelsa .card__box {
   background-color: rgba(0, 0, 0, calc(var(--terreng, 0) * .86));
 }
+
+/* CEO 08-13: KAIZEN Studio AI — ORGANISASJONSKARTET. Radens
+   fire ruter leses som et org-kart: rollene står i dempet
+   blekk i sine ruter, og ÉN rute er TENT (kortets eget glass) —
+   den digitale medarbeideren. Ingen ny mekanikk: grid, glass og
+   blekk-hierarkiet forsiden allerede eier. Hover på den tente
+   ruta bærer pilotlinjen.                                      */
+.card--kzai .kz__role {
+  grid-column: var(--rc, 1) / span 1; grid-row: 1 / 2;
+  display: flex; flex-direction: column;
+}
+.card--kzai .kz__role p {
+  margin: 0;
+  font-size: var(--t-meta);
+  line-height: 1.4;
+  color: var(--ink-3);
+}
+.card--kzai .kz__role--lit {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .04));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .10),
+    0 24px 60px rgba(0, 0, 0, .5);
+}
+.card--kzai .kz__role--lit p { color: var(--ink); }
+.card--kzai .kz__role--lit .kz__sub {
+  margin-top: 6px;
+  color: var(--ink-2);
+  opacity: 0;
+  transition: opacity .4s var(--ez);
+}
+.card--kzai .kz__role--lit:hover .kz__sub { opacity: 1; }
 
 /* Noten bor på svart side i rute 4-kolonnen.                   */
 .card__note {
@@ -1192,7 +1270,7 @@ body.ready .rl { opacity: 1; transform: none; }
       <!-- r13: V-formen — THE topp/venstre, APPLICATION som
            ticker over midjen, STARTS WITH bunn/senter,
            THE JOB. topp/høyre.                                  -->
-      <div class="nyme__line iv" style="--lc:1;--lv:flex-start;--d:60ms"><p>THE</p></div>
+      <div class="nyme__line nyme__the iv" style="--lc:1;--lv:flex-start;--d:60ms"><p>THE</p></div>
       <div class="nyme__ticker iv" aria-hidden="true" style="--d:140ms">
         <div class="ticker__track">
           <span class="ticker__seq">APPLICATION</span>
@@ -1201,8 +1279,12 @@ body.ready .rl { opacity: 1; transform: none; }
           <span class="ticker__seq">APPLICATION</span>
         </div>
       </div>
-      <div class="nyme__line iv" style="--lc:2;--le:4;--lv:flex-end;--lj:center;--d:220ms"><p>STARTS WITH</p></div>
-      <div class="nyme__line iv" style="--lc:3;--lv:flex-start;--lj:flex-end;--d:300ms"><p>THE JOB.</p></div>
+      <div class="nyme__line nyme__starts iv" style="--lc:2;--le:4;--lv:flex-end;--lj:center;--d:220ms"><p>STARTS WITH</p></div>
+      <div class="nyme__line nyme__job iv" style="--lc:3;--lv:flex-start;--lj:flex-end;--d:300ms"><p>THE JOB.</p></div>
+      <div class="nyme__statement" aria-label="The application, starts with the job.">
+        <p class="nyme__statement-lead"><span>THE</span><span>APPLICATION,</span></p>
+        <p class="nyme__statement-rest">STARTS WITH THE JOB.</p>
+      </div>
       <div class="card__box iv" style="--d:120ms">
         <div class="card__lead">
           <div class="card__top">
@@ -1298,26 +1380,33 @@ body.ready .rl { opacity: 1; transform: none; }
       </div>
     </article>
 
-    <article class="card card--single" style="--bc:2;--br:1">
+    <article class="card card--single card--kzai" style="--bc:2;--br:1">
       <i class="mline" aria-hidden="true"></i>
       <div class="card__media" aria-hidden="true"></div>
+      <!-- Org-kartet: roller i dempet blekk, én rute tent. -->
+      <div class="cell kz__role iv" style="--rc:1;--d:60ms"><p>Operations</p></div>
+      <div class="cell kz__role kz__role--lit iv" style="--rc:3;--d:180ms">
+        <p>Digital employee</p>
+        <p class="kz__sub">One managed role &mdash; run by KAIZEN Studio</p>
+      </div>
+      <div class="cell kz__role iv" style="--rc:4;--d:120ms"><p>Finance</p></div>
       <div class="card__box">
 
         <div class="card__lead">
           <div class="card__top">
             <span class="card__no">04</span>
             <div class="card__id">
-              <h3>Sitter</h3>
-              <p>Product design<span class="sep">·</span><span class="tbd">cadence</span></p>
+              <h3>KAIZEN Studio AI</h3>
+              <p>Conversion page<span class="sep">·</span>pilot offer</p>
             </div>
           </div>
-          <p class="card__say">Designed around the moment a parent decides.</p>
+          <p class="card__say">One page, one offer, one role.</p>
         </div>
 
         <div class="card__facts"><ul>
-          <li class="tbd">metric</li>
-          <li class="tbd">metric</li>
-          <li class="tbd">metric</li>
+          <li>A managed digital employee for legacy industries</li>
+          <li>Built to sell one pilot, not a catalogue</li>
+          <li class="tbd">pilot metric</li>
         </ul></div>
 
       </div>
