@@ -754,36 +754,8 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
   background-color: rgba(0, 0, 0, calc(var(--terreng, 0) * .86));
 }
 
-/* CEO 08-13: KAIZEN Studio AI — ORGANISASJONSKARTET. Radens
-   fire ruter leses som et org-kart: rollene står i dempet
-   blekk i sine ruter, og ÉN rute er TENT (kortets eget glass) —
-   den digitale medarbeideren. Ingen ny mekanikk: grid, glass og
-   blekk-hierarkiet forsiden allerede eier. Hover på den tente
-   ruta bærer pilotlinjen.                                      */
-.card--kzai .kz__role {
-  grid-column: var(--rc, 1) / span 1; grid-row: 1 / 2;
-  display: flex; flex-direction: column;
-}
-.card--kzai .kz__role p {
-  margin: 0;
-  font-size: var(--t-meta);
-  line-height: 1.4;
-  color: var(--ink-3);
-}
-.card--kzai .kz__role--lit {
-  background: linear-gradient(180deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .04));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .10),
-    0 24px 60px rgba(0, 0, 0, .5);
-}
-.card--kzai .kz__role--lit p { color: var(--ink); }
-.card--kzai .kz__role--lit .kz__sub {
-  margin-top: 6px;
-  color: var(--ink-2);
-  opacity: 0;
-  transition: opacity .4s var(--ez);
-}
-.card--kzai .kz__role--lit:hover .kz__sub { opacity: 1; }
+/* KAIZEN Studio AI-org-kartets CSS fjernet med seksjonen
+   (CEO 08-13, «enn så lenge») — hent fra git ved gjeninnsetting. */
 
 /* Noten bor på svart side i rute 4-kolonnen.                   */
 .card__note {
@@ -1380,37 +1352,8 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
       </div>
     </article>
 
-    <article class="card card--single card--kzai" style="--bc:2;--br:1">
-      <i class="mline" aria-hidden="true"></i>
-      <div class="card__media" aria-hidden="true"></div>
-      <!-- Org-kartet: roller i dempet blekk, én rute tent. -->
-      <div class="cell kz__role iv" style="--rc:1;--d:60ms"><p>Operations</p></div>
-      <div class="cell kz__role kz__role--lit iv" style="--rc:3;--d:180ms">
-        <p>Digital employee</p>
-        <p class="kz__sub">One managed role &mdash; run by KAIZEN Studio</p>
-      </div>
-      <div class="cell kz__role iv" style="--rc:4;--d:120ms"><p>Finance</p></div>
-      <div class="card__box">
-
-        <div class="card__lead">
-          <div class="card__top">
-            <span class="card__no">04</span>
-            <div class="card__id">
-              <h3>KAIZEN Studio AI</h3>
-              <p>Conversion page<span class="sep">·</span>pilot offer</p>
-            </div>
-          </div>
-          <p class="card__say">One page, one offer, one role.</p>
-        </div>
-
-        <div class="card__facts"><ul>
-          <li>A managed digital employee for legacy industries</li>
-          <li>Built to sell one pilot, not a catalogue</li>
-          <li class="tbd">pilot metric</li>
-        </ul></div>
-
-      </div>
-    </article>
+    <!-- KAIZEN Studio AI-seksjonen (04, org-kartet) tatt ut
+         enn så lenge (CEO 08-13) — ligger i git-historikken. -->
 
   </section>
 
