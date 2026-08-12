@@ -48,6 +48,7 @@ body { margin: 0; }
      CEOs skala, 1rem = 16px. Ingen font-size skrives fritt;
      alt plukkes herfra.                                       */
   --t-display: min(9.375rem, 9.9vw); /* 150px / 1.0 — full skala-topp; vw-taket holder linjen ubrutt på smalere vinduer */
+  --t-xxl:     min(6.875rem, 7.3vw); /* 110px / 1.1 — samme trinn som how-i-work sec2-tittelen; vw-brems holder linjen ubrutt */
   --t-xl:      5rem;                 /*  80px / 1.1  */
   --t-h1:      3.75rem;              /*  60px / 1.1  */
   --t-h2:      2.8125rem;            /*  45px / 1.1  */
@@ -504,6 +505,73 @@ body.ready .rl { opacity: 1; transform: none; }
    som på de andre work-seksjonene.                             */
 .card--nyme .card__body { margin-top: auto; }
 .card--nyme .card__link { margin-top: 6px; border-bottom: none; padding-bottom: 0; }
+/* CEO 08-12: placeholder-bildet tilbake — KUN i rute 7. */
+.card--nyme .nyme__ph {
+  grid-column: 3 / 4; grid-row: 2 / 3;
+  position: relative;
+  overflow: hidden;
+}
+.card--nyme .nyme__ph img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+/* CEO 08-12: CTA til undersiden — rute 8, topp/høyre. */
+.card--nyme .nyme__cta {
+  grid-column: 4 / 5; grid-row: 2 / 3;
+  align-self: start;
+  text-align: right;
+}
+.card--nyme .nyme__cta a {
+  display: block; width: fit-content; margin-left: auto;
+  margin-top: 0;   /* delt lenkestil legger 20px topp-marg — her skal cellas 20px være hele avstanden */
+  border-bottom: none; padding-bottom: 0;
+}
+/* CEO 08-12 r12: XXL-utsagnet i rute 1–4 — samme stemme som
+   how-i-work Section 2 (110-trinnet, vekt 500, -.025em).
+   r13: V-form — THE topp/venstre, APPLICATION som TICKER
+   (kontakt-tickerens mekanikk: duplisert spor, lineær tid)
+   tvers over radens midje, STARTS WITH bunn/senter, THE JOB.
+   topp/høyre. Setningen faller ned og reiser seg igjen.        */
+.card--nyme .nyme__line {
+  grid-row: 1 / 2;
+  grid-column: var(--lc, 1) / var(--le, 5);
+  display: flex;
+  align-items: var(--lv, flex-start);
+  justify-content: var(--lj, flex-start);
+  padding: var(--cell);
+  pointer-events: none;
+}
+.card--nyme .nyme__line p {
+  margin: 0;
+  /* CEO 08-12: ett trinn til opp — 150 (--t-display), skala-toppen */
+  font-size: var(--t-display);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+/* Tickeren: KUN i rute 2 (CEO) — ordet ruller gjennom sin ene
+   rute som kontakt-tickeren, klippes rått på rutekantene.
+   Størrelsen følger setningen (--t-xxl). CEO: rett etter THE,
+   topp — samme linje som THE (delt 20px-toppcelle).             */
+.card--nyme .nyme__ticker {
+  grid-column: 2 / 3; grid-row: 1 / 2;
+  align-self: start;
+  padding-top: var(--cell);
+  overflow: hidden;
+  display: flex;
+  pointer-events: none;
+}
+.card--nyme .nyme__ticker .ticker__seq {
+  font-size: var(--t-display);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+  color: var(--ink);
+  gap: 1ch;
+  padding-right: 1ch;
+}
 
 /* Gauntlet R1: mediet skal kaste lys på flaten rundt seg.
    Samme kilde duplisert bak kolonnen, oppskalert, blurret —
@@ -1014,6 +1082,9 @@ body.ready .rl { opacity: 1; transform: none; }
   }
   .card__box { position: relative; }
   .card__note { padding: var(--cell) 0 0; }
+  .card--nyme .nyme__cta { text-align: left; }
+  .card--nyme .nyme__cta a { margin-left: 0; }
+  .card--nyme .nyme__ph img { position: static; height: auto; }
   /* Jelsa-veggen: hover finnes ikke på mobil — sidene VISES,
      to og to.                                                  */
   .card--jelsa { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--cell); }
@@ -1114,10 +1185,24 @@ body.ready .rl { opacity: 1; transform: none; }
          bærer grunnmerket i glass over rute 2–3; identiteten øverst
          til venstre; påstand og note henger RETT UNDER midtstreken.
          Ni-trinns-kjeden bor på undersiden: nyme.html.
-         CEO 08-12 r11: kun det obligatoriske kortet (rute 7) på
-         ren sort flate.                                         -->
-    <article class="card card--nyme" style="--bc:3;--br:2">
+         CEO 08-12 r11: kun det obligatoriske kortet på ren sort
+         flate. r13: V-form i topraden; kortet til RUTE 5.       -->
+    <article class="card card--nyme" style="--bc:1;--br:2">
       <i class="mline" aria-hidden="true"></i>
+      <!-- r13: V-formen — THE topp/venstre, APPLICATION som
+           ticker over midjen, STARTS WITH bunn/senter,
+           THE JOB. topp/høyre.                                  -->
+      <div class="nyme__line iv" style="--lc:1;--lv:flex-start;--d:60ms"><p>THE</p></div>
+      <div class="nyme__ticker iv" aria-hidden="true" style="--d:140ms">
+        <div class="ticker__track">
+          <span class="ticker__seq">APPLICATION</span>
+          <span class="ticker__seq">APPLICATION</span>
+          <span class="ticker__seq">APPLICATION</span>
+          <span class="ticker__seq">APPLICATION</span>
+        </div>
+      </div>
+      <div class="nyme__line iv" style="--lc:2;--le:4;--lv:flex-end;--lj:center;--d:220ms"><p>STARTS WITH</p></div>
+      <div class="nyme__line iv" style="--lc:3;--lv:flex-start;--lj:flex-end;--d:300ms"><p>THE JOB.</p></div>
       <div class="card__box iv" style="--d:120ms">
         <div class="card__lead">
           <div class="card__top">
@@ -1131,6 +1216,12 @@ body.ready .rl { opacity: 1; transform: none; }
         </div>
         <p class="card__body">Every application is built for a single role: the company researched, its needs framed as hypotheses, not facts &mdash; then a tailored CV, a cover letter and a dedicated website that carries the whole argument. No mass sending, no invented experience. You keep the final decision.</p>
         <a class="card__link" href="https://nymestudio.no" target="_blank" rel="noopener">nymestudio.no&nbsp;&rarr;</a>
+      </div>
+      <div class="nyme__ph iv" style="--d:180ms">
+        <img src="assets/nyme/placeholder-success.jpg" alt="Placeholder: handshake over a laptop" />
+      </div>
+      <div class="cell nyme__cta iv" style="--d:240ms">
+        <a href="nyme.html">How NYME works&nbsp;&rarr;</a>
       </div>
     </article>
 
