@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rune Øverland — Creative Fullstack Engineer</title>
+<style>
+/* ============================================================
+   LAB — frittstående. Ingen imports, ingen deps, ingen build.
+   Copy: Copy Draft — runeoverland.no v1.8 (Ready / Contract), ordrett.
+
+   SYSTEMET
+   BG-div          hvit #FFF, padding 10 — rammen hele siden ligger i
+   Grid-div        4×4 hairlines + 6px hvite noder i hvert kryss, fixed
+   Innhold         20px padding innenfor gridlinjene
+   Seksjoner       #000, hvit skrift, samme z-verdi (ingen lagdeling)
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+
+:root {
+  --paper:  #FFFFFF;   /* BG-div */
+  --ground: #000000;   /* seksjoner */
+  --ink:    #FFFFFF;
+  --ink-2:  rgba(255, 255, 255, .52);
+  --ink-3:  rgba(255, 255, 255, .30);
+  --line:   rgba(255, 255, 255, .16);
+
+  --pad:  10px;   /* BG-div padding — avstand til skjermkanten */
+  --cell: 20px;   /* padding inne i grid-div — linje til tekst   */
+  --hair: 1px;
+  --node: 6px;    /* firkanten i hvert kryss                     */
+  --stack: 0px;   /* mellom linjer i samme blokk — linjehøyden er rytmen */
+
+  /* ── TYPESKALA ─────────────────────────────────────────────
+     CEOs skala, 1rem = 16px. Ingen font-size skrives fritt;
+     alt plukkes herfra.                                       */
+  --t-display: min(9.375rem, 8.6vw); /* 150px / 1.0  — vw-taket holder linjen ubrutt */
+  --t-xl:      5rem;                 /*  80px / 1.1  */
+  --t-h1:      3.75rem;              /*  60px / 1.1  */
+  --t-h2:      2.8125rem;            /*  45px / 1.1  */
+  --t-h3:      1.875rem;             /*  30px / 1.2  */
+  --t-h4:      1.31rem;              /*  21px / 1.2  */
+  --t-caption: .9375rem;             /*  15px / 1.2  */
+  --t-meta:    .9375rem;             /*  15px / 1.4  */
+  --t-fine:    .75rem;               /*  12px / 1.2  */
+  --t-body:    1.125rem;             /*  18px / 1.4  */
+  --t-base:    1rem;                 /*  16px / 1.6  */
+
+  /* NETTET: 8 felt per 100vh — 2 rader × 4 kolonner.
+     --row er én rad = en halv modul. Alt som skal ligge på en
+     linje refererer til --row/--gl2, aldri til egne tall.       */
+  --box:  calc(100vh - (var(--pad) * 2));
+  --row:  calc(var(--box) / 2);
+  --gl2:  calc(var(--pad) + var(--row));   /* den ene vannrette linjen i viewporten */
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: ui-sans-serif, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--t-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── BG-DIV ──────────────────────────────────────────────────
+   Alt svart ligger inne i den hvite rammen på 10px.            */
+.page { position: relative; margin: var(--pad); background: var(--ground); }
+
+/* ─── GRID-DIV ────────────────────────────────────────────────
+   Absolutt, ikke fixed: nettet ruller med innholdet. Cellen som
+   «Ads / Film» ligger i, følger listen opp av skjermen.
+   Modulen repeterer hver --box, så hver 100vh er et helt 4×4.  */
+.grid {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+.grid .v {
+  position: absolute; top: 0; bottom: 0;
+  width: var(--hair); background: var(--line);
+}
+.grid .v1 { left: 25%; }  .grid .v2 { left: 50%; }  .grid .v3 { left: 75%; }
+
+/* Horisontale linjer: én per halve modul, hele siden ned.      */
+.grid .rows {
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--line) 0, var(--line) var(--hair),
+    transparent var(--hair), transparent var(--row)
+  );
+}
+
+/* 6×6 hvite firkanter i hvert kryss — samme takt som linjene.   */
+.grid .nodes {
+  position: absolute; top: 0; bottom: 0;
+  width: var(--node);
+  margin-left: calc(var(--node) / -2);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--paper) 0, var(--paper) var(--node),
+    transparent var(--node), transparent var(--row)
+  );
+  background-position: 0 calc(var(--node) / -2);
+}
+.grid .n1 { left: 25%; }  .grid .n2 { left: 50%; }  .grid .n3 { left: 75%; }
+
+/* ─── FELLES ──────────────────────────────────────────────────
+   Hver seksjon deler nøyaktig samme 4-kolonners geometri som
+   gridlinjene. Ingenting plasseres fritt. Alle seksjoner har
+   samme z-verdi — ingen er lagt over noen annen.               */
+.cols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+.cell { min-width: 0; padding: var(--cell); }
+
+.hero, .approach, .work, .contact { z-index: 1; }
+
+.label {
+  font-size: var(--t-meta);
+  line-height: 1.4;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+a { color: inherit; }
+a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+
+/* ─── IN VIEW ─────────────────────────────────────────────────
+   Tidsbasert, ikke scrub — derfor er easing riktig her.
+   Utløses når elementets topp passerer 55 % av skjermen, altså
+   litt før midten. --d er forsinkelsen.                        */
+.iv {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity   .8s cubic-bezier(.22, .61, .36, 1) var(--d, 0ms),
+    transform .8s cubic-bezier(.22, .61, .36, 1) var(--d, 0ms);
+  will-change: opacity, transform;
+}
+.iv.is-in { opacity: 1; transform: none; }
+
+/* ══ 01 · HERO ═══════════════════════════════════════════════
+   Ikke sticky: seksjonen skyves ut som alle andre, så ingenting
+   legger seg over noe. H1 står sentrert i midten av nettet.   */
+
+.hero {
+  position: relative;
+  height: var(--box);
+  background: var(--ground);
+  overflow: hidden;
+}
+.hero .cols { position: absolute; inset: 0; grid-template-rows: repeat(2, minmax(0, 1fr)); }
+
+.hero__eyebrow { grid-column: 4 / 5; grid-row: 1 / 2; align-self: start; text-align: right; }
+
+/* H1 hviler PÅ streken — bunn av rad 1, ingen padding under.
+   Sublinen henger 20px under samme strek, i rad 2.              */
+.hero__display {
+  grid-column: 1 / 5; grid-row: 1 / 2;
+  align-self: end;
+  text-align: center;
+  padding-bottom: 0;
+}
+.hero__sub {
+  grid-column: 1 / 5; grid-row: 2 / 3;
+  align-self: start;
+  text-align: center;
+}
+/* ─── GRUNNLINJE PÅ STREKEN ──────────────────────────────────
+   text-box trimmer boksen til grunnlinjen der den støttes.
+   Der den ikke gjør det, måler skriptet det faktiske avviket og
+   setter --nudge. Ingen hardkodet em-verdi: forskjellige skrifter
+   har forskjellig underlengde, og et gjettet tall er feil i alle
+   nettlesere unntatt den du tilfeldigvis testet i.             */
+.baseline {
+  text-box: trim-both cap alphabetic;
+  transform: translateY(var(--nudge, 0px));
+}
+
+.hero__display h1 {
+  margin: 0;
+  font-size: var(--t-display);
+  line-height: 1.0;
+  letter-spacing: -.038em;
+  font-weight: 500;
+}
+.hero__sub h2 {
+  margin: 0;
+  font-size: var(--t-h2);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+/* Disiplinlisten: kolonne 3+4, fra midtstreken (v2) og ut.
+   Med to rader finnes ikke 3/4-linjen lenger, så blokken hviler
+   på bunnen av rad 2 i stedet for å henge fra en linje.        */
+.hero__aside {
+  grid-column: 3 / 5; grid-row: 2 / 3;
+  align-self: end;
+  padding-bottom: var(--cell);
+}
+.hero__aside dl { margin: 0; display: flex; flex-direction: column; gap: var(--stack); max-width: 46ch; }
+.hero__aside .row { display: flex; gap: .5ch; font-size: var(--t-body); line-height: 1.4; }
+.hero__aside dt { font-weight: 500; }
+.hero__aside dd { margin: 0; color: var(--ink-2); }
+.hero__aside .close { margin: var(--cell) 0 0; display: flex; flex-direction: column; gap: var(--stack); }
+.hero__aside .close p { margin: 0; font-size: var(--t-base); line-height: 1.4; }
+
+.hero__cta { grid-column: 1 / 2; grid-row: 2 / 3; align-self: end; }
+.hero__cta a { text-decoration: none; }
+
+/* Load-reveal: listen står i første skjermbilde, så den kan ikke
+   drives av scroll. Én linje av gangen, 90ms mellom hver.      */
+.rl {
+  --d: calc(var(--i) * 90ms + 240ms);
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity   .7s cubic-bezier(.22, .61, .36, 1) var(--d),
+    transform .7s cubic-bezier(.22, .61, .36, 1) var(--d);
+  will-change: opacity, transform;
+}
+body.ready .rl { opacity: 1; transform: none; }
+
+/* ══ 02 · APPROACH ═══════════════════════════════════════════
+   200vh = to hele moduler. Venstre h2 starter på rad 2 og
+   pinnes der; høyre kolonne passerer forbi.                    */
+
+/* 250vh = 5 rader. Nettet repeterer per rad, ikke per modul, så
+   halve moduler holder fasen — det er gevinsten ved 2 rader.   */
+.approach { position: relative; background: var(--ground); }
+.approach .cols { min-height: calc(var(--row) * 5); align-items: start; }
+
+/* h2 står i rad 1 og pinnes i toppen. En sticky merkelapp hører
+   hjemme øverst: da er hele skjermen under den løpebane for
+   innholdet. Pinnet på midten halverer lesefeltet.             */
+.appr__l {
+  grid-column: 2 / 3;
+  position: sticky;
+  top: var(--pad);
+}
+/* Var H2 (45px) mot høyrekolonnens H3 (30px) — for tett til å
+   lese som hierarki. Nå H1 (60px): nøyaktig dobbelt av 30.     */
+.appr__l h2 {
+  margin: 0;
+  font-size: var(--t-h1);
+  line-height: 1.1;
+  letter-spacing: -.032em;
+  font-weight: 500;
+}
+
+/* Høyre kolonne = kolonne 3+4, fra midtstreken (v2) og ut.
+   Fem rader à en halv modul. Rad 1 er tom — teksten starter under
+   h2 og kommer scrollende inn. Rad 2 og rad 4 er tekst, med en
+   tom rad imellom. Rad 5 er runway.                            */
+.appr__r {
+  grid-column: 3 / 4;
+  padding: 0;
+  display: grid;
+  grid-template-rows: repeat(5, var(--row));
+  align-items: start;
+}
+.appr__r > * { padding: var(--cell); }
+.appr__r > .b1 { grid-row: 2 / 3; }
+.appr__r > .b2 { grid-row: 4 / 5; }
+
+/* Begge avsnittene i samme stemme: hvit, samme størrelse.
+   Én celle av de åtte — kolonne 3 alene, ikke 3+4. En kvart
+   bredde tar ikke 30px brødtekst, så trinnet må ned til H4.    */
+.appr__r > * { text-align: left; }
+.appr__r p {
+  margin: 0;
+  font-size: var(--t-h4);
+  line-height: 1.35;
+  letter-spacing: -.012em;
+  font-weight: 500;
+  color: var(--ink);
+}
+.appr__more {
+  display: inline-block; margin-top: 24px;
+  font-size: var(--t-meta); line-height: 1.4;
+  color: var(--ink-2); text-decoration: none;
+}
+
+/* ══ 03 · WORK ═══════════════════════════════════════════════
+   ÉN komponent, fire ganger. Fire faste slots:
+     nummer      topp venstre
+     navn + meta topp høyre
+     påstand     sentrert, hviler på streken
+     tall        bunn høyre
+   Bildet ligger bakerst som --media. Ingen kilde = ingen
+   attrapp: feltet står svart, og mangelen er synlig.          */
+
+.work { position: relative; background: var(--ground); }
+
+.card {
+  height: var(--box);
+  border-top: var(--hair) solid var(--line);
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+/* Bildeslot. Settes per kort med style="--media:url(...)".    */
+.card__media {
+  position: absolute; inset: 0; z-index: 0;
+  background-image: var(--media, none);
+  background-size: cover; background-position: center;
+}
+.card__media::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,.72) 0%, rgba(0,0,0,.55) 45%, rgba(0,0,0,.30) 100%);
+}
+
+/* HELE kortet i ÉN grid rute. Ruta er en kvart bredde, så
+   typeskalaen ligger to trinn under seksjonsnivå.
+   Space-between: glasspanelet på Top, tallene på Bottom.      */
+.card__box {
+  grid-column: var(--bc, 4) / span 1;
+  grid-row:    var(--br, 1) / span 1;
+  z-index: 1;
+  padding: var(--cell);
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+
+  /* Glasset ligger på HELE stacken. Panelkanten faller på
+     gridlinjene, og de 20px innenfor er den samme avstanden
+     linje-til-tekst som resten av flaten bruker.              */
+  background: rgba(255, 255, 255, .06);
+  border: var(--hair) solid rgba(255, 255, 255, .12);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+/* HIERARKI — fire trinn fra skalaen, ingen naboverdier:
+     12  nummer   etikett, ikke innhold
+     15  meta     kontekst
+     21  påstand  det du skal huske
+     30  navn     ankeret
+   Navn og meta er ÉN enhet (4px), påstanden er en ny (20px).  */
+.card__no {
+  display: block;
+  font-size: var(--t-fine); line-height: 1.2;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3);
+}
+.card__id { margin-top: 10px; }
+.card__id h3 {
+  margin: 0;
+  font-size: var(--t-h3);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+  font-weight: 500;
+}
+.card__id p {
+  margin: 4px 0 0;
+  font-size: var(--t-caption); line-height: 1.3; color: var(--ink-2);
+}
+.card__id .sep { padding: 0 .5ch; color: var(--ink-3); }
+
+.card__say {
+  margin: var(--cell) 0 0;
+  font-size: var(--t-h4);
+  line-height: 1.3;
+  letter-spacing: -.012em;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.card__facts { margin: 0; }
+.card__facts li { list-style: none; font-size: var(--t-meta); line-height: 1.4; color: var(--ink-2); }
+.card__facts ul { margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+
+/* Slot uten kilde. Skal SES som tom, ikke fylles med noe som
+   later som det er data.                                       */
+.tbd { color: var(--ink-3); }
+
+/* ══ 04 · CONTACT ════════════════════════════════════════════ */
+
+.contact { position: relative; background: var(--ground); }
+.contact .cols { min-height: var(--box); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+.contact__h { grid-column: 1 / 4; grid-row: 1 / 2; align-self: end; padding-bottom: 0; }
+.contact__h h2 {
+  margin: 0;
+  font-size: var(--t-h2);
+  line-height: 1.1;
+  letter-spacing: -.032em;
+  font-weight: 500;
+  max-width: 20ch;
+}
+.contact__body { grid-column: 4 / 5; grid-row: 2 / 3; align-self: start; }
+.contact__body p { margin: 0 0 14px; font-size: var(--t-base); line-height: 1.6; color: var(--ink-2); max-width: 38ch; }
+.contact__cta { grid-column: 1 / 2; grid-row: 2 / 3; align-self: end; }
+.contact__cta a { text-decoration: none; }
+
+/* ─── MOBIL — mekanikken kobles ut ───────────────────────────  */
+
+@media (max-width: 1023px) {
+  :root {
+    --pad: 8px; --cell: 16px;
+    --t-display: 13vw;
+    --t-h2: 1.875rem;
+    --t-h3: 1.31rem;
+  }
+  .grid { display: none; }
+  .hero, .card, .contact .cols { height: auto; min-height: 100vh; position: static; }
+  .cols {
+    position: static !important;
+    display: flex; flex-direction: column; gap: 40px;
+    padding: 72px 0; min-height: 0 !important;
+  }
+  .appr__l { position: static; margin-top: 0; }
+  .appr__r { display: flex; flex-direction: column; gap: 48px; padding: 40px 0 0; }
+  .appr__r > * { padding: 0; }
+  .hero__display { text-align: left; }
+  .card__say, .card__name { text-align: left; }
+  .card__facts { text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rl { transition: none; }
+  .iv { opacity: 1; transform: none; transition: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Grid — ruller med innholdet, repeterer hver 100vh -->
+  <div class="grid" aria-hidden="true">
+    <i class="v v1"></i><i class="v v2"></i><i class="v v3"></i>
+    <div class="rows"></div>
+    <div class="nodes n1"></div><div class="nodes n2"></div><div class="nodes n3"></div>
+  </div>
+
+  <!-- ══ 01 · HERO ══════════════════════════════════════════ -->
+  <section class="hero" id="hero">
+    <div class="cols">
+      <div class="cell hero__display">
+        <h1 class="baseline">Fullstack engineer.</h1>
+      </div>
+      <div class="cell hero__sub">
+        <h2>I run every layer myself.</h2>
+      </div>
+
+      <div class="cell hero__aside">
+        <dl>
+          <div class="row rl" style="--i:0"><dt>Ads</dt><dd>— written, bought, measured</dd></div>
+          <div class="row rl" style="--i:1"><dt>Film</dt><dd>— shot and cut</dd></div>
+          <div class="row rl" style="--i:2"><dt>Design</dt><dd>— brand and product</dd></div>
+          <div class="row rl" style="--i:3"><dt>Code</dt><dd>— shipped and running</dd></div>
+          <div class="row rl" style="--i:4"><dt>Agents</dt><dd>— why all of it fits in one person</dd></div>
+        </dl>
+        <div class="close">
+          <p class="rl" style="--i:5">Design is what I’m good at.</p>
+          <p class="rl" style="--i:6">Systems are what I can’t stop building.</p>
+        </div>
+      </div>
+
+      <div class="cell hero__eyebrow label">Rune Øverland</div>
+      <div class="cell hero__cta label"><a href="#approach">Start anywhere →</a></div>
+    </div>
+  </section>
+
+  <!-- ══ 02 · APPROACH — 200vh, sticky h2 på rad 2 ══════════ -->
+  <section class="approach" id="approach">
+    <div class="cols">
+      <div class="cell appr__l">
+        <h2>The system comes with me.</h2>
+      </div>
+
+      <div class="appr__r">
+        <div class="b1 iv" style="--d:120ms">
+          <p>I don’t start from zero. Every project leaves behind a better way to work — clearer decisions, reusable components and stronger checks. The next one starts from there.</p>
+        </div>
+        <div class="b2 iv" style="--d:120ms">
+          <p>The work is strongest when the ad, the product and the system beneath them are built as one. I carry that thread from the first decision to what ships.</p>
+          <a class="appr__more" href="#work">More about how I work →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 03 · WORK — én komponent per prosjekt ══════════════ -->
+  <section class="work" id="work">
+
+    <article class="card" style="--bc:4;--br:1">
+      <div class="card__media" aria-hidden="true"></div>
+      <div class="card__box">
+
+        <div class="card__lead">
+          <span class="card__no">01</span>
+          <div class="card__id">
+            <h3>NYME</h3>
+            <p>AI-led product<span class="sep">·</span><span class="tbd">cadence</span></p>
+          </div>
+          <p class="card__say">It finds the job, writes the application, builds the site.</p>
+        </div>
+
+        <div class="card__facts"><ul>
+          <li class="tbd">metric</li>
+          <li class="tbd">metric</li>
+          <li class="tbd">metric</li>
+        </ul></div>
+
+      </div>
+    </article>
+
+    <article class="card" style="--bc:1;--br:2">
+      <div class="card__media" aria-hidden="true"></div>
+      <div class="card__box">
+
+        <div class="card__lead">
+          <span class="card__no">02</span>
+          <div class="card__id">
+            <h3>SBB Studio</h3>
+            <p>Since 2020<span class="sep">·</span>6–8 projects a year</p>
+          </div>
+          <p class="card__say">Shot the film, then bought the audience for it.</p>
+        </div>
+
+        <div class="card__facts"><ul>
+          <li>Musikkfest 2025</li>
+          <li>1.500+ attendees</li>
+          <li>TikTok Ads, 6.55× ROAS</li>
+        </ul></div>
+
+      </div>
+    </article>
+
+    <article class="card" style="--bc:2;--br:1">
+      <div class="card__media" aria-hidden="true"></div>
+      <div class="card__box">
+
+        <div class="card__lead">
+          <span class="card__no">03</span>
+          <div class="card__id">
+            <h3>Novarra/Jelsa</h3>
+            <p>Evidence systems<span class="sep">·</span><span class="tbd">cadence</span></p>
+          </div>
+          <p class="card__say">Every claim traced back to its source.</p>
+        </div>
+
+        <div class="card__facts"><ul>
+          <li class="tbd">metric</li>
+          <li class="tbd">metric</li>
+          <li class="tbd">metric</li>
+        </ul></div>
+
+      </div>
+    </article>
+
+    <article class="card" style="--bc:3;--br:2">
+      <div class="card__media" aria-hidden="true"></div>
+      <div class="card__box">
+
+        <div class="card__lead">
+          <span class="card__no">04</span>
+          <div class="card__id">
+            <h3>Sitter</h3>
+            <p>Product design<span class="sep">·</span><span class="tbd">cadence</span></p>
+          </div>
+          <p class="card__say">Designed around the moment a parent decides.</p>
+        </div>
+
+        <div class="card__facts"><ul>
+          <li class="tbd">metric</li>
+          <li class="tbd">metric</li>
+          <li class="tbd">metric</li>
+        </ul></div>
+
+      </div>
+    </article>
+
+  </section>
+
+  <!-- ══ 04 · CONTACT ═══════════════════════════════════════ -->
+  <section class="contact" id="contact">
+    <div class="cols">
+      <div class="cell contact__h">
+        <h2 class="baseline">I built the system alone. The next step is together.</h2>
+      </div>
+      <div class="cell contact__body">
+        <p>I’ve valued the time I’ve spent working on my own. It gave me the freedom to pursue every question, learn across disciplines and build a way of working I trust.</p>
+        <p>But a way of working proves its value when it works for more than one person. I want to see what happens when other people challenge it, build on it and make it their own.</p>
+        <p>Now I’m ready to bring that way of working to the right company and see how far we can take it together.</p>
+      </div>
+      <div class="cell contact__cta label"><a href="#contact">Start a conversation →</a></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── IN VIEW ───────────────────────────────────────────────
+     Bunnen av observasjonsfeltet trekkes opp til 55 % av
+     skjermen, så elementet slår inn litt før midten. Én gang. */
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -45% 0px', threshold: 0 });
+    Array.prototype.forEach.call(document.querySelectorAll('.iv'), function (el) { io.observe(el); });
+  } else {
+    Array.prototype.forEach.call(document.querySelectorAll('.iv'), function (el) { el.classList.add('is-in'); });
+  }
+
+  /* ── LOAD-REVEAL ───────────────────────────────────────────
+     Disiplinlisten står i første skjermbilde. Utløses av at
+     siden åpner, ikke av scroll.                              */
+  requestAnimationFrame(function () { document.body.classList.add('ready'); });
+
+  /* ── GRUNNLINJE ────────────────────────────────────────────
+     Måler avstanden fra elementets bunn til siste grunnlinje og
+     dytter teksten ned med akkurat den. Et nullstort inline-block
+     med vertical-align:baseline sitter PÅ grunnlinjen, så toppen
+     av det er linjen. Der text-box virker blir avviket 0 og
+     ingenting flytter seg — samme fil, riktig i begge.        */
+  function seatBaselines() {
+    Array.prototype.forEach.call(document.querySelectorAll('.baseline'), function (el) {
+      el.style.setProperty('--nudge', '0px');
+      var probe = document.createElement('span');
+      probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+      el.appendChild(probe);
+      var gap = el.getBoundingClientRect().bottom - probe.getBoundingClientRect().top;
+      el.removeChild(probe);
+      el.style.setProperty('--nudge', (gap > 0.5 ? gap : 0).toFixed(2) + 'px');
+    });
+  }
+  seatBaselines();
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(seatBaselines); }
+  var rt; window.addEventListener('resize', function () {
+    clearTimeout(rt); rt = setTimeout(seatBaselines, 120);
+  });
+})();
+</script>
+
+</body>
+</html>

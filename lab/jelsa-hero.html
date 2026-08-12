@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work Index — HeroInfinityScroll-port (lab)</title>
+<style>
+/* ============================================================
+   LAB — frittstående. Ingen imports, ingen deps, ingen build.
+
+   KOMPONENT-HARVEST: HeroInfinityScroll (Jelsadokumentene /
+   @kaizen/design-system) portet til porteføljens grammatikk.
+   Kilde dekodet (Source Mechanics Harvest, ikke frihånd):
+     · Sentral uendelig medie-rail: kort absolutt i 50%/50%,
+       transform translate3d(-50%, -50% + offset*step) — glid
+       skjer fordi NODEN persisterer og offset-varen endres
+       (kildens unwrapped-index-nøkkel → her: node-pool som
+       resirkuleres i endene med transition:none ved teleport)
+     · Wheel-akkumulator: 240/sensitivity px per steg (kilde
+       Jelsa: sensitivity 4 = 60px/steg), begge retninger
+     · loopTitles: aktiv tittel PINNET til senterlinjen,
+       balansert vindu over/under, glir per steg
+     · Klamme-fokusvindu [ ] rundt senter, transition på mål
+     · Aktiv = grayscale(0)/opacity .95; inaktiv = grayscale(1)
+       /opacity .48 på img, .72 på kort
+   Temaet er porteføljens: hvit ramme, sort grunn, nettet,
+   CEOs typeskala. Items = porteføljens fire cases.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+
+:root {
+  --paper:  #FFFFFF;
+  --ground: #000000;
+  --ink:    #FFFFFF;
+  --ink-2:  rgba(255, 255, 255, .52);
+  --ink-3:  rgba(255, 255, 255, .30);
+  --line:   rgba(255, 255, 255, .16);
+
+  --pad:  10px;
+  --cell: 20px;
+  --hair: 1px;
+  --node: 6px;
+
+  --ez: cubic-bezier(.22, .61, .36, 1);
+
+  /* CEOs typeskala — ingen frie størrelser */
+  --t-display: min(9.375rem, 9.9vw);
+  --t-xl:      5rem;
+  --t-h1:      3.75rem;
+  --t-h2:      2.8125rem;
+  --t-h3:      1.875rem;
+  --t-h4:      1.31rem;
+  --t-caption: .9375rem;
+  --t-meta:    .9375rem;
+  --t-fine:    .75rem;
+  --t-body:    1.125rem;
+  --t-base:    1rem;
+
+  --box:  calc(100vh - (var(--pad) * 2));
+  --row:  calc(var(--box) / 2);
+
+  /* Rail-geometri (fra kilden, skalert til nettet):
+     step = avstand mellom kort-sentre. Kilden harmoniserte
+     korthøyder i 206–220-båndet med gap = step − korthøyde.   */
+  --rail-step: calc(var(--row) * .62);
+  --glide: 780ms;   /* kildens forlengede glid (globals.css)   */
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: ui-sans-serif, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--t-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;   /* komponent-demo: én flate, wheel eies av railen */
+}
+
+.page { position: relative; margin: var(--pad); background: var(--ground); }
+
+/* ─── NETTET ─────────────────────────────────────────────────── */
+.grid { position: absolute; inset: 0; z-index: 40; pointer-events: none; }
+.grid .v { position: absolute; top: 0; bottom: 0; width: var(--hair); background: var(--line); }
+.grid .v1 { left: 25%; } .grid .v2 { left: 50%; } .grid .v3 { left: 75%; }
+.grid .rows {
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(to bottom,
+    var(--line) 0, var(--line) var(--hair),
+    transparent var(--hair), transparent var(--row));
+}
+.grid .nodes {
+  position: absolute; top: 0; bottom: 0;
+  width: var(--node); margin-left: calc(var(--node) / -2);
+  background-image: repeating-linear-gradient(to bottom,
+    var(--paper) 0, var(--paper) var(--node),
+    transparent var(--node), transparent var(--row));
+  background-position: 0 calc(var(--node) / -2);
+}
+.grid .n1 { left: 25%; } .grid .n2 { left: 50%; } .grid .n3 { left: 75%; }
+
+/* ─── LYS I SVARTET (porteføljens R3-doktrine) ───────────────── */
+.hero { position: relative; z-index: 1; height: var(--box); overflow: hidden; }
+.hero::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(1400px 900px at 50% 42%,
+    #161616 0%, #0c0c0c 42%, #050505 72%, #000 100%);
+}
+
+.hero .cols {
+  position: absolute; inset: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+.cell { padding: var(--cell); }
+
+/* Chrome — porteføljens møblement (15/12), i nettets ruter      */
+.hx__brand { grid-column: 1 / 2; grid-row: 1 / 2; align-self: start; }
+.hx__brand a { color: var(--ink-2); text-decoration: none; font-size: var(--t-fine); letter-spacing: .14em; text-transform: uppercase; transition: color .3s var(--ez); }
+.hx__brand a:hover { color: var(--ink); }
+.hx__eyebrow { grid-column: 4 / 5; grid-row: 1 / 2; align-self: start; text-align: right;
+  font-size: var(--t-fine); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+
+/* Meta venstre: aktivt nummer + kategori/disiplin               */
+.hx__meta { grid-column: 1 / 2; grid-row: 2 / 3; align-self: end; }
+.hx__meta .no { font-size: var(--t-h3); font-weight: 500; letter-spacing: -.02em; line-height: 1.2; display: block; }
+.hx__meta .cat { font-size: var(--t-meta); color: var(--ink-2); line-height: 1.4; margin-top: 6px; display: block; }
+.hx__meta .disc { font-size: var(--t-meta); color: var(--ink-3); line-height: 1.4; display: block; }
+
+/* Count høyre bunn                                              */
+.hx__count { grid-column: 4 / 5; grid-row: 2 / 3; align-self: end; text-align: right;
+  font-size: var(--t-meta); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+/* ─── RAILEN — kildens motorikk ──────────────────────────────── */
+.hx__rail { position: absolute; inset: 0; z-index: 1; }
+.hx__card {
+  position: absolute; left: 50%; top: 50%;
+  width: var(--w, 220px);
+  transform: translate3d(-50%, calc(-50% + (var(--o, 0) * var(--rail-step))), 0);
+  transition: opacity var(--glide) var(--ez), transform var(--glide) var(--ez);
+  opacity: .72;
+}
+.hx__card.is-active { opacity: 1; }
+.hx__card.no-glide { transition: none; }   /* resirkulering i endene */
+.hx__card figure {
+  margin: 0; overflow: hidden; position: relative;
+  aspect-ratio: var(--ar, 3 / 2);
+  background: linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+}
+.hx__card figure.tint { background: linear-gradient(135deg, var(--tint), rgba(0,0,0,.55)); background-blend-mode: multiply; }
+.hx__card img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: grayscale(1); opacity: .48;
+  transition: filter var(--glide) var(--ez), opacity var(--glide) var(--ez);
+}
+.hx__card.is-active img { filter: grayscale(0); opacity: .95; }
+
+/* ─── KLAMMENE — fokusvinduet ────────────────────────────────── */
+.hx__focus { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.hx__focus span {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  font-size: var(--t-display); font-weight: 200; line-height: 1; color: var(--ink);
+  transition: left var(--glide) var(--ez), right var(--glide) var(--ez);
+}
+.hx__focus .l { left: calc(50% - var(--bracket-gap, 220px)); }
+.hx__focus .r { right: calc(50% - var(--bracket-gap, 220px)); }
+
+/* ─── TITTEL-LAGET — loopTitles: aktiv pinnet til senterlinjen ─ */
+.hx__titles {
+  position: absolute; left: 0; right: 0; top: 50%; z-index: 3;
+  transform: translateY(-50%);
+  text-align: center; pointer-events: none;
+  mix-blend-mode: normal;
+}
+.hx__titles .stack {
+  display: flex; flex-direction: column;
+  transition: transform var(--glide) var(--ez);
+}
+.hx__titles span {
+  display: block; height: var(--title-row, 5.5rem); line-height: var(--title-row, 5.5rem);
+  font-size: var(--t-xl); font-weight: 500; letter-spacing: -.032em;
+  color: var(--ink-3);
+  transition: color var(--glide) var(--ez), opacity var(--glide) var(--ez);
+  opacity: 0;
+  white-space: nowrap;
+}
+.hx__titles span.near { opacity: 1; }
+.hx__titles span.on { color: var(--ink); opacity: 1; }
+
+/* Hint nederst i midten                                          */
+.hx__hint { position: absolute; left: 50%; bottom: calc(var(--cell) * 1.5); transform: translateX(-50%);
+  z-index: 3; font-size: var(--t-fine); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hx__card, .hx__card img, .hx__titles .stack, .hx__titles span, .hx__focus span { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="grid" aria-hidden="true">
+    <div class="rows"></div>
+    <div class="v v1"></div><div class="v v2"></div><div class="v v3"></div>
+    <div class="nodes n1"></div><div class="nodes n2"></div><div class="nodes n3"></div>
+  </div>
+
+  <section class="hero" id="hx">
+    <div class="hx__rail" aria-label="Work index rail"></div>
+
+    <div class="hx__focus" aria-hidden="true"><span class="l">[</span><span class="r">]</span></div>
+
+    <div class="hx__titles" aria-hidden="true"><div class="stack"></div></div>
+
+    <div class="cols">
+      <div class="cell hx__brand"><a href="grid-video.html">← Rune Øverland</a></div>
+      <div class="cell hx__eyebrow">.Work Index</div>
+      <div class="cell hx__meta">
+        <span class="no">01</span>
+        <span class="cat">Category</span>
+        <span class="disc">Discipline</span>
+      </div>
+      <div class="cell hx__count"><span class="cur">01</span> / <span class="tot">04</span></div>
+    </div>
+
+    <div class="hx__hint">Scroll</div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* Porteføljens fire cases som items — Jelsa-bildet er ekte
+     (fra Jelsadokumentene-repoet), resten ærlige placeholders
+     med tint til media er valgt.                                */
+  var ITEMS = [
+    { title: "NYME",          category: "Product",   discipline: "AI job-application engine", number: "01",
+      tint: "#8fa08f", ar: "3 / 2", w: 300 },
+    { title: "SBB Studio",    category: "Film + Ads", discipline: "Shot the film, bought the audience", number: "02",
+      img: "assets/reel-glow.jpg", ar: "4 / 5", w: 176 },
+    { title: "Novarra/Jelsa", category: "Evidence",  discipline: "Every claim traced to its source", number: "03",
+      img: "assets/jelsa/windworks.jpg", ar: "3 / 2", w: 300 },
+    { title: "Sitter",        category: "Product design", discipline: "The moment a parent decides", number: "04",
+      tint: "#c9b98e", ar: "1 / 1", w: 220 }
+  ];
+
+  var N = ITEMS.length;
+  /* Kildens RAIL_OFFSETS: −7..+8 = 16 slots. Node-poolen
+     persisterer; ved steg endres --o og noden GLIR (kildens
+     unwrapped-key-innsikt). Slots utenfor vinduet resirkuleres
+     til motsatt ende med transition avslått.                    */
+  var OFF_MIN = -7, OFF_MAX = 8;
+
+  var rail = document.querySelector(".hx__rail");
+  var stack = document.querySelector(".hx__titles .stack");
+  var focusL = document.querySelector(".hx__focus .l");
+  var metaNo = document.querySelector(".hx__meta .no");
+  var metaCat = document.querySelector(".hx__meta .cat");
+  var metaDisc = document.querySelector(".hx__meta .disc");
+  var countCur = document.querySelector(".hx__count .cur");
+  var countTot = document.querySelector(".hx__count .tot");
+  var hero = document.getElementById("hx");
+
+  countTot.textContent = String(N).padStart(2, "0");
+
+  function mod(v, n) { return ((v % n) + n) % n; }
+
+  /* Bygg node-pool: én node per rail-index i vinduet             */
+  var base = 0;                 /* aktiv unwrapped rail-index      */
+  var nodes = [];               /* { el, img, fig, railIndex }     */
+
+  function dressNode(node) {
+    var item = ITEMS[mod(node.railIndex, N)];
+    node.el.style.setProperty("--w", item.w + "px");
+    node.el.style.setProperty("--ar", item.ar);
+    if (item.img) {
+      node.fig.classList.remove("tint");
+      node.fig.style.removeProperty("--tint");
+      node.img.src = item.img;
+      node.img.style.display = "";
+    } else {
+      node.fig.classList.add("tint");
+      node.fig.style.setProperty("--tint", item.tint);
+      node.img.removeAttribute("src");
+      node.img.style.display = "none";
+    }
+  }
+
+  for (var o = OFF_MIN; o <= OFF_MAX; o++) {
+    var el = document.createElement("div");
+    el.className = "hx__card";
+    var fig = document.createElement("figure");
+    var img = document.createElement("img");
+    img.alt = "";
+    fig.appendChild(img);
+    el.appendChild(fig);
+    rail.appendChild(el);
+    var node = { el: el, img: img, fig: fig, railIndex: o };
+    dressNode(node);
+    el.style.setProperty("--o", o);
+    nodes.push(node);
+  }
+
+  /* Tittel-stack: balansert vindu — kilden rendrer et odde,
+     symmetrisk vindu så aktiv rad er eksakt midten.             */
+  var TITLE_WIN = 3;            /* rader synlige over/under        */
+  var titleSpans = [];
+  for (var t = -TITLE_WIN; t <= TITLE_WIN; t++) {
+    var s = document.createElement("span");
+    stack.appendChild(s);
+    titleSpans.push(s);
+  }
+
+  function render() {
+    var activeItem = ITEMS[mod(base, N)];
+
+    nodes.forEach(function (node) {
+      var off = node.railIndex - base;
+      if (off < OFF_MIN) { node.railIndex += (OFF_MAX - OFF_MIN + 1); off = node.railIndex - base;
+        node.el.classList.add("no-glide"); dressNode(node); }
+      else if (off > OFF_MAX) { node.railIndex -= (OFF_MAX - OFF_MIN + 1); off = node.railIndex - base;
+        node.el.classList.add("no-glide"); dressNode(node); }
+      node.el.style.setProperty("--o", off);
+      node.el.classList.toggle("is-active", off === 0);
+      if (node.el.classList.contains("no-glide")) {
+        /* teleport uten glid, så re-aktiver transition neste frame */
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { node.el.classList.remove("no-glide"); });
+        });
+      }
+    });
+
+    titleSpans.forEach(function (span, i) {
+      var off = i - TITLE_WIN;
+      var item = ITEMS[mod(base + off, N)];
+      span.textContent = item.title;
+      span.classList.toggle("on", off === 0);
+      span.classList.toggle("near", Math.abs(off) === 1);
+    });
+
+    /* Klammene tracker aktiv-kortets bredde (kildens oppførsel)   */
+    var gap = (activeItem.w / 2) + 90;
+    focusL.parentElement.style.setProperty("--bracket-gap", gap + "px");
+
+    metaNo.textContent = activeItem.number;
+    metaCat.textContent = activeItem.category;
+    metaDisc.textContent = activeItem.discipline;
+    countCur.textContent = activeItem.number;
+  }
+
+  render();
+
+  /* Wheel-akkumulator — kildens giring: 240/sensitivity px per
+     steg; Jelsa kjører sensitivity 4 = 60px akkumulert per steg. */
+  var STEP_PX = 60;
+  var acc = 0;
+  var raf = null;
+
+  function step(dir) { base += dir; render(); }
+
+  hero.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    acc += e.deltaY;
+    if (raf) return;
+    raf = requestAnimationFrame(function () {
+      raf = null;
+      while (acc >= STEP_PX) { acc -= STEP_PX; step(1); }
+      while (acc <= -STEP_PX) { acc += STEP_PX; step(-1); }
+    });
+  }, { passive: false });
+
+  /* Touch: samme akkumulator på drag                             */
+  var touchY = null;
+  hero.addEventListener("touchstart", function (e) { touchY = e.touches[0].clientY; }, { passive: true });
+  hero.addEventListener("touchmove", function (e) {
+    if (touchY === null) return;
+    var dy = touchY - e.touches[0].clientY;
+    touchY = e.touches[0].clientY;
+    acc += dy;
+    while (acc >= STEP_PX) { acc -= STEP_PX; step(1); }
+    while (acc <= -STEP_PX) { acc += STEP_PX; step(-1); }
+  }, { passive: true });
+
+  /* Piltaster                                                    */
+  window.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowDown" || e.key === "ArrowRight") { step(1); }
+    if (e.key === "ArrowUp" || e.key === "ArrowLeft") { step(-1); }
+  });
+})();
+</script>
+</body>
+</html>

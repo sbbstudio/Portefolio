@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NYME — how it works</title>
+<style>
+/* ═══ NYME UNDERSIDE — kjedens hjem ═══════════════════════════
+   Flyttet fra forsiden (CEO 08-11): forsiden holder 100vh per
+   work-seksjon; ni-trinns-kjeden er dybdeinnhold og får hele
+   flaten her. Pipeline-CSS, markup og state-maskin er tatt
+   ordrett med fra grid-video.html — Gauntlet-polishen intakt.  */
+
+:root {
+  --paper:  #FFFFFF;
+  --ground: #000000;
+  --ink:    #FFFFFF;
+  --ink-2:  rgba(255, 255, 255, .52);
+  --ink-3:  rgba(255, 255, 255, .30);
+  --line:   rgba(255, 255, 255, .16);
+
+  --pad:  10px;
+  --cell: 20px;
+  --hair: 1px;
+
+  --ez: cubic-bezier(.22, .61, .36, 1);
+
+  --t-h3:      1.875rem;
+  --t-h4:      1.31rem;
+  --t-caption: .9375rem;
+  --t-meta:    .9375rem;
+  --t-fine:    .75rem;
+  --t-body:    1.125rem;
+
+  --accent: #FF4A00;   /* TEST (CEO 08-12, fra how-i-work): aktiv/hover i jump-lista */
+}
+
+/* ═══ NAV — portert fra how-i-work (CEO 08-12: samme nav på
+   alle sidene). Undersiden er mørk hele veien og har ingen
+   hero å henge på — ryggen er derfor SORT (ground + hårlinje)
+   og slår på straks man har scrollet; retningsstyrt hide som
+   på de andre. Jump-lista peker på sidens to stopp.           */
+.nav {
+  position: fixed;
+  top: var(--pad); left: var(--pad); right: var(--pad);
+  z-index: 50;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  transition: transform .45s var(--ez), background-color .3s var(--ez);
+}
+.nav.is-hidden { transform: translateY(calc(-100% - var(--pad) - 2px)); }
+.nav.is-paper {
+  background: var(--ground);
+  box-shadow: 0 calc(var(--pad) * -1) 0 0 var(--ground);
+  padding-top: calc(var(--cell) - var(--pad));
+  padding-bottom: var(--cell);
+  border-bottom: var(--hair) solid var(--line);
+}
+.nav .cell {
+  min-width: 0; padding: var(--cell);
+  font-size: var(--t-h4); line-height: 1.3;
+  letter-spacing: -.012em; font-weight: 500;
+}
+.nav a { text-decoration: none; color: var(--ink); transition: color .3s var(--ez); }
+.nav__links a[aria-current="page"] { opacity: .45; }
+.nav__name { grid-column: 1 / 2; }
+.nav__links { grid-column: 2 / 3; display: flex; flex-wrap: wrap; gap: 6px 1.25ch; }
+.nav .nav__jumps {
+  grid-column: 3 / 4;
+  display: flex; flex-direction: column;
+  align-items: flex-start; gap: 0;
+  font-size: var(--t-meta);
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.nav__jumps button {
+  margin: 0; padding: 0;
+  background: none; border: 0; cursor: pointer;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  white-space: nowrap;
+  transition: color .3s var(--ez);
+}
+.nav__jumps .jno { padding-right: .75ch; font-variant-numeric: tabular-nums; }
+.nav__jumps button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.nav .nav__jumps button.is-here,
+.nav .nav__jumps button:hover { color: var(--accent); }
+.nav__cta { grid-column: 4 / 5; text-align: right; }
+.nav__cta .arrow { display: inline-block; }
+/* MOBIL ≤1023 — samme nav-grep som how-i-work/forsiden: rygg
+   ALLTID (her sort — sidens materiale), navn + CTA på topplinja,
+   sidelenkene under. Jump-lista er desktop-instrument.         */
+@media (max-width: 1023px) {
+  /* REM-ROTEN (CEO 08-12 rev 2): 16px ved 390, flyter med
+     formatet — typeskalaen skalerer på ett tall.               */
+  html { font-size: clamp(13px, calc(100vw / 24.375), 18px); }
+  :root { --pad: 8px; --cell: 1rem; }
+  .nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    background: var(--ground);
+    box-shadow: 0 calc(var(--pad) * -1) 0 0 var(--ground);
+    border-bottom: var(--hair) solid var(--line);
+  }
+  .nav .cell { font-size: var(--t-meta); line-height: 1.4; }
+  .nav__name  { grid-column: 1 / 2; grid-row: 1; }
+  .nav__cta   { grid-column: 2 / 3; grid-row: 1; }
+  .nav__links { grid-column: 1 / 3; grid-row: 2; padding-top: 0; }
+  .nav .nav__jumps { display: none; }   /* matcher desktop-selektorens vekt */
+  .nav.is-paper { padding-top: 0; padding-bottom: 0; }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── LYS I SVARTET — Gauntlet R1 på undersiden ───────────────
+   Runde 1-konvergens (2 av 3 kritikere): flat #000 uten
+   lysmodell leses som fravær, ikke materiale. Portert ORDRETT
+   fra forsidens oppskrift (én kilde med ekte falloff + grain
+   maskert av samme lysgeometri) — fixed, ikke absolute: siden
+   er ett langt scroll-dokument, så kilden er studiolampen
+   innholdet passerer gjennom.                                  */
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(1300px 850px at 50% 34%,
+    #181818 0%, #0c0c0c 40%, #050505 72%, #000 100%);
+}
+body::after {
+  content: "";
+  position: fixed; inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: .06;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='160'%20height='160'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-mask-image: radial-gradient(1300px 850px at 50% 34%, #000 0%, rgba(0,0,0,.55) 50%, rgba(0,0,0,.18) 80%, transparent 100%);
+  mask-image: radial-gradient(1300px 850px at 50% 34%, #000 0%, rgba(0,0,0,.55) 50%, rgba(0,0,0,.18) 80%, transparent 100%);
+}
+
+/* Én sentrert kolonne — samme bredde-klasse som kjedens to
+   ruter på forsiden (~halve flaten).                           */
+.wrap {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--cell);
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+}
+
+.top {
+  display: flex; justify-content: flex-end; align-items: baseline;
+  font-size: var(--t-fine); line-height: 1.2;
+  letter-spacing: .14em; text-transform: uppercase;
+  /* Ekstra topp-luft så wordmarket går klar av den fixede naven. */
+  padding: calc(var(--cell) * 4) 0 calc(var(--cell) * 4);
+}
+.top a { color: var(--ink-2); text-decoration: none; transition: color .3s var(--ez); }
+.top a:hover { color: var(--ink); }
+.top .brand svg { display: block; width: 96px; height: auto; }
+
+/* Modul-linja (.mline) er mobilnettets instrument — usynlig
+   på desktop.                                                  */
+.mline { display: none; }
+/* MOBILNETTET (modulgrid, CEO 08-12 rev 2/3): formatets to
+   vertikaler på wrap-kanten + modul-linje med noder ved hver
+   modulgrense. Blekket løftet så nettet SYNES på mørk flate.   */
+@media (max-width: 1023px) {
+  .wrap { position: relative; margin: 0 var(--pad); max-width: none; }
+  .wrap::before, .wrap::after {
+    content: '';
+    position: absolute; top: 0; bottom: 0;
+    width: var(--hair);
+    background: rgba(255, 255, 255, .3);
+    pointer-events: none;
+  }
+  .wrap::before { left: 0; }
+  .wrap::after  { right: 0; }
+  .intro, .app, .card__pipe, .close { position: relative; }
+  .mline {
+    display: block;
+    position: absolute; top: 0;
+    left: calc(var(--cell) * -1); right: calc(var(--cell) * -1);
+    height: var(--hair);
+    background: rgba(255, 255, 255, .3);
+    pointer-events: none;
+  }
+  .mline::before, .mline::after {
+    content: '';
+    position: absolute;
+    top: calc(6px / -2 + var(--hair) / 2);
+    width: 6px; height: 6px;
+    background: #FFFFFF;
+  }
+  .mline::before { left: calc(6px / -2); }
+  .mline::after  { right: calc(6px / -2); }
+}
+/* Mobilnaven er to rader høy — wordmarket trenger mer klarering
+   enn desktopens cell*4. (Må stå ETTER .top i kaskaden.)       */
+@media (max-width: 1023px) {
+  .top { padding-top: calc(var(--cell) * 8); }
+}
+
+.intro { margin: 0 0 calc(var(--cell) * 3); }
+.intro h1 {
+  margin: 0 0 var(--cell);
+  font-size: var(--t-h3); line-height: 1.2;
+  letter-spacing: -.025em; font-weight: 500;
+}
+.intro p {
+  margin: 0 0 14px;
+  font-size: var(--t-meta); line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 46ch;
+}
+.intro a {
+  display: inline-block;
+  margin-top: var(--cell);
+  font-size: var(--t-meta);
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, .3);
+  padding-bottom: 2px;
+  transition: border-color .3s var(--ez);
+}
+.intro a:hover { border-bottom-color: var(--ink); }
+
+/* ── APP — produktet i hånden (CEO-test 08-12) ───────────────
+   Tre ekte skjermopptak fra NYME-appen i telefonens eget
+   format: feeden, innsiden av en annonse, maskineriet. Rammen
+   er nettets egen grammatikk — hårlinje + 6px hjørnenoder,
+   samme familie som forsidens nettnoder — ingen tegnet telefon.
+   Klippene spiller når de er i syne og pauser ellers.          */
+.app { margin: 0 0 calc(var(--cell) * 4); }
+.app__cap {
+  margin: 0 0 calc(var(--cell) * 1.5);
+  font-size: var(--t-fine); line-height: 1.2;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-2);
+}
+.app__row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--cell);
+}
+.app__item { margin: 0; min-width: 0; }
+.app__frame {
+  position: relative;
+  border: var(--hair) solid rgba(255, 255, 255, .3);
+}
+.app__frame video {
+  display: block;
+  width: 100%; height: auto;
+  aspect-ratio: 1170 / 2532;
+  background: #0c0c0c;
+}
+.app__frame::before, .app__frame::after,
+.app__frame .node::before, .app__frame .node::after {
+  content: '';
+  position: absolute;
+  width: 6px; height: 6px;
+  background: #FFFFFF;
+  z-index: 1;
+}
+.app__frame::before { top: -3px; left: -3px; }
+.app__frame::after  { top: -3px; right: -3px; }
+.app__frame .node::before { bottom: -3px; left: -3px; }
+.app__frame .node::after  { bottom: -3px; right: -3px; }
+.app__item figcaption {
+  margin: 12px 0 0;
+  font-size: var(--t-fine); line-height: 1.4;
+}
+.app__item figcaption b {
+  display: block;
+  font-weight: 500;
+  font-size: var(--t-caption);
+  color: var(--ink);
+}
+.app__item figcaption span { color: rgba(255, 255, 255, .42); }
+/* Mobil: raden blir et snap-spor — ett klipp i fokus, neste
+   stikker inn fra kanten. Sporet blør ut til wrap-kanten
+   (rails), 3px topp/bunn-luft så hjørnenodene ikke klippes.    */
+@media (max-width: 1023px) {
+  .app__row {
+    display: flex;
+    gap: var(--cell);
+    margin: 0 calc(var(--cell) * -1);
+    padding: 3px var(--cell);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .app__row::-webkit-scrollbar { display: none; }
+  .app__item { flex: 0 0 64%; scroll-snap-align: center; }
+}
+
+/* ── PIPELINE — scroll-drevet (CEO-test 08-11) ───────────────
+   Tidsmaskinen er byttet ut: hvert trinn fullføres når det
+   passerer lampelinjen (~62% av viewport) på vei opp, og
+   ANGRES når du scroller tilbake — kjeden ligger under
+   fingeren din, ikke på en klokke. Transitions beholdes som
+   demping, så hakene fortsatt TEGNES. Run-out-rommet under
+   linjen leveres nå av close-seksjonen, ikke død padding.      */
+.card__pipe {
+  position: relative; z-index: 2;
+  padding: var(--cell) var(--cell) calc(var(--cell) * 6);
+  display: flex; flex-direction: column;
+  flex: 1;
+}
+.pipe__cap {
+  margin: 0 0 clamp(32px, 5vh, 48px);
+  text-align: center;
+  font-size: var(--t-body); line-height: 1.8;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-2);
+}
+.pipe__cap span { display: block; }
+.pipe__list {
+  margin: auto 0 0; padding: 0; list-style: none;
+  position: relative;
+  flex: none;
+  display: flex; flex-direction: column;
+  gap: clamp(56px, 8vh, 96px);
+}
+/* R2-konvergens (3 av 3): umodulert 1px-linje leses som
+   wireframe. Sporet får lysets egen geometri — sterkest der
+   lampen står (øvre del), dør mot endene. Samme falloff-logikk
+   som flatens kilde, ikke en ny effekt.                        */
+.pipe__list::before {
+  content: "";
+  position: absolute;
+  left: calc(50% - .5px); top: 11px; bottom: 11px;
+  width: 1px;
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, .38) 0%,
+    rgba(255, 255, 255, .28) 45%,
+    rgba(255, 255, 255, .16) 100%);
+}
+.pipe__list::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - .5px); top: 11px; bottom: 11px;
+  width: 1px;
+  background: var(--paper);
+  transform: scaleY(var(--pp, 0));
+  transform-origin: top;
+  transition: transform .7s var(--ez);
+}
+.pipe__step {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 22px 1fr;
+  gap: 14px;
+  align-items: center;
+  font-size: var(--t-fine); line-height: 1.3;
+}
+/* R3-konvergens (3 av 3, tredje runde på rad): gapene mellom
+   nodene er udifferensiert luft. Registreringsmerke på halv
+   avstand — SAMME familie som forsidens 6px-nettnoder, vårt
+   eget formspråk, ikke lånt. Merket bærer øyet gjennom fallet. */
+.pipe__step + .pipe__step::before {
+  content: "";
+  position: absolute;
+  left: calc(50% - 1.5px);
+  top: calc(clamp(56px, 8vh, 96px) / -2 - 1.5px);
+  width: 3px; height: 3px;
+  background: rgba(255, 255, 255, .45);
+}
+.pipe__step b { font-size: var(--t-caption); }
+.pipe__step svg { display: block; }
+.pipe__step .ring {
+  fill: var(--ground);
+  stroke: rgba(255, 255, 255, .35);
+  stroke-width: 1;
+  transition: stroke .4s var(--ez);
+}
+.pipe__step .tick {
+  fill: none;
+  stroke: var(--paper);
+  stroke-width: 1.5;
+  stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 12;
+  stroke-dashoffset: 12;
+  transition: stroke-dashoffset .45s var(--ez) .15s;
+}
+/* R2/R3: noden skal leses som lyssatt objekt, ikke default-
+   skygge. Lyspunktet GRADERES med lampens falloff — nodene
+   øverst (nærmest kilden) lyser mest, de nederste minst.
+   Ærlig fysikk, ikke oppfunnet hierarki: rekkefølgen på
+   trinnene er lik, det er LYSET som faller.                    */
+.pipe__step.is-done .ring { stroke: var(--paper); }
+.pipe__step.is-done .tick { stroke-dashoffset: 0; }
+.pipe__step.is-done svg { filter: drop-shadow(0 0 7px rgba(255, 255, 255, .38)); }
+.pipe__step:nth-child(n+4).is-done svg { filter: drop-shadow(0 0 6px rgba(255, 255, 255, .26)); }
+.pipe__step:nth-child(n+7).is-done svg { filter: drop-shadow(0 0 5px rgba(255, 255, 255, .16)); }
+.pipe__step b {
+  font-weight: 500;
+  text-align: right;
+  color: rgba(255, 255, 255, .45);
+  transition: color .4s var(--ez);
+}
+.pipe__step span {
+  position: relative; top: 1px;
+  /* R1-kritikk (K2): rollen løsnet optisk fra navnet på .32 —
+     paret skal leses som ÉN bundet enhet. Løftet mot navnets
+     .45; done-tilstanden (.52) beholder sitt trinn.            */
+  color: rgba(255, 255, 255, .42);
+  transition: color .4s var(--ez);
+}
+.pipe__step.is-done b { color: var(--ink); }
+/* R2-konvergens (3 av 3): rollene druknet selv i done-tilstand
+   (.52 på 12px mot sort). Løftet lokalt til .62 — undersidens
+   egen verdi; forsidens token-trapp er urørt der den bor.      */
+.pipe__step.is-done span { color: rgba(255, 255, 255, .62); }
+.pipe__fork {
+  position: relative; height: 88px; flex: none;
+  margin-left: calc(var(--cell) * -1); margin-right: calc(var(--cell) * -1);
+}
+.pipe__fork span {
+  position: absolute;
+  background: var(--paper);
+}
+.fork__stem { left: calc(50% - .5px); top: -11px; width: 1px; height: 43px; transform: scaleY(0); transform-origin: top; }
+.fork__bus  { left: 25%; width: 50%; top: 32px; height: 1px; transform: scaleX(0); transform-origin: center; }
+.fork__d1   { left: calc(25% - .5px); top: 32px; width: 1px; height: 56px; transform: scaleY(0); transform-origin: top; }
+.fork__d2   { left: calc(50% - .5px); top: 32px; width: 1px; height: 56px; transform: scaleY(0); transform-origin: top; }
+.fork__d3   { left: calc(75% - .5px); top: 32px; width: 1px; height: 56px; transform: scaleY(0); transform-origin: top; }
+.pipe--out .pipe__fork span { transform: none; }
+.pipe--out .fork__stem { transition: transform .2s var(--ez); }
+.pipe--out .fork__bus  { transition: transform .4s var(--ez) .18s; }
+.pipe--out .fork__d1   { transition: transform .25s var(--ez) .3s; }
+.pipe--out .fork__d2   { transition: transform .25s var(--ez) .42s; }
+.pipe--out .fork__d3   { transition: transform .25s var(--ez) .56s; }
+.pipe__out {
+  margin: 6px calc(var(--cell) * -1) 0;
+  display: grid; grid-template-columns: 1fr 2fr 2fr 2fr 1fr;
+  font-size: var(--t-fine); line-height: 1.3;
+}
+.pipe__out .itm {
+  grid-row: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  opacity: .3;
+  transition: opacity .5s var(--ez);
+}
+.pipe--out .pipe__out .itm { opacity: 1; }
+.pipe--out .pipe__out .itm:nth-child(1) { transition-delay: .45s; }
+.pipe--out .pipe__out .itm:nth-child(2) { transition-delay: .57s; }
+.pipe--out .pipe__out .itm:nth-child(3) { transition-delay: .69s; }
+.pipe__out .itm:nth-child(1) { grid-column: 2; }
+.pipe__out .itm:nth-child(2) { grid-column: 3; }
+.pipe__out .itm:nth-child(3) { grid-column: 4; }
+.pipe__out .itm svg { display: block; }
+.pipe__out .itm svg .sheet { fill: #fff; stroke: rgba(65, 65, 62, .16); stroke-width: .78; }
+.pipe__out .itm svg line,
+.pipe__out .itm svg rect:not(.sheet) { fill: none; stroke: rgba(65, 65, 62, .42); stroke-width: .78; }
+.pipe__out .itm svg .hvy { stroke: #41413e; stroke-width: 1.17; }
+.pipe__out .itm b { font-weight: 500; color: var(--ink); }
+.pipe--out .pipe__new {
+  opacity: 1; transform: none;
+  transition: opacity .5s var(--ez), transform .5s var(--ez);
+}
+.pipe__new {
+  margin: 40px 0 0;
+  font-size: var(--t-fine); line-height: 1.3;
+  text-align: center;
+  color: var(--ink-2);
+  opacity: 0; transform: translateY(5px);
+}
+.pipe--out .pipe__new { transition-delay: .95s; }
+
+/* ── CLOSE — landingspunkt etter kjeden ──────────────────────
+   Scrollen trenger et sted å slutte som ikke er død luft:
+   én rolig seksjon, samme lampe-økonomi (ingen ny lyskilde),
+   claim + samme mail-CTA som forsidens Contact. Høyden er
+   run-out-rommet som lar de siste trinnene og viften passere
+   lampelinjen.                                                 */
+.close {
+  min-height: 72vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center;
+  padding: calc(var(--cell) * 2) var(--cell);
+}
+/* Mobil: modul-linja er grensa — modulen åpner med luft under
+   den. (Står ETTER .card__pipe/.close i kaskaden med vilje.)   */
+@media (max-width: 1023px) {
+  .intro, .app, .card__pipe, .close { padding-top: calc(var(--cell) * 3); }
+}
+.close h2 {
+  margin: 0 0 var(--cell);
+  font-size: var(--t-h4); line-height: 1.35;
+  letter-spacing: -.015em; font-weight: 500;
+  max-width: 30ch;
+}
+.close > a {
+  display: inline-block;
+  margin-top: var(--cell);
+  font-size: var(--t-meta);
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, .3);
+  padding-bottom: 2px;
+  transition: border-color .3s var(--ez);
+}
+.close > a:hover { border-bottom-color: var(--ink); }
+
+/* ── FOOTER — kolofonen som står på alt ──────────────────────
+   Portert fra forsiden (05 · FOOTER): én rad, flat sort uten
+   lyskilde — siden dør mot samme nullpunkt. Full bredde utenfor
+   640px-kolonnen; navn / nav / © / mail i samme fine-trinn og
+   sporing som forsiden. Nav-lenkene peker hjem.                */
+.footer {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 3ch; flex-wrap: wrap;
+  padding: calc(var(--cell) * 2) var(--cell) var(--cell);
+  font-size: var(--t-fine); line-height: 1.4;
+}
+.footer__name { letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+.footer__nav { display: flex; gap: 3ch; }
+.footer__nav a, .footer__mail a {
+  color: var(--ink-2);
+  text-decoration: none;
+  letter-spacing: .14em; text-transform: uppercase;
+  transition: color .3s var(--ez);
+}
+.footer__nav a:hover, .footer__mail a:hover { color: var(--ink); }
+.footer__right { display: flex; gap: 3ch; align-items: baseline; }
+.footer__c { color: var(--ink-3); letter-spacing: .14em; }
+.footer__mail a { text-transform: none; letter-spacing: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pipe__list::after, .pipe__step .tick { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV — samme system som forsiden/how-i-work (CEO 08-12) ══ -->
+<nav class="nav" aria-label="Main">
+  <div class="cell nav__name"><a href="grid-video.html">Rune &Oslash;verland</a></div>
+  <div class="cell nav__links">
+    <a href="grid-video.html">Home</a>
+    <a href="how-i-work.html">How I work</a>
+  </div>
+  <div class="cell nav__jumps" aria-label="Sections on this page">
+    <button type="button" data-jump="1"><span class="jno">01</span><span class="jt">The app</span></button>
+    <button type="button" data-jump="2"><span class="jno">02</span><span class="jt">Pipeline</span></button>
+    <button type="button" data-jump="3"><span class="jno">03</span><span class="jt">Contact</span></button>
+  </div>
+  <div class="cell nav__cta"><a href="mailto:mail2overland@gmail.com">Start a conversation <span class="arrow">&rarr;</span></a></div>
+</nav>
+
+<div class="wrap">
+
+  <!-- Tilbake-lenka UT (CEO 08-12, nav-porten) — navnet i naven
+       er hjemveien nå. NYME-wordmarket blir stående (kanon).   -->
+  <div class="top">
+    <span class="brand" aria-hidden="true">
+      <svg viewBox="-40 -740 2722 800" role="img" aria-label="NYME">
+        <g fill="var(--paper)">
+          <path d="M72.99951171875 0.0V-700.0H280.6025390625L471.0489501953125 -71.80126953125H486.9490966796875V-700.0H593.8507080078125V0.0H386.2476806640625L195.80126953125 -628.5487060546875H179.901123046875V0.0Z"/>
+          <path d="M896.3994140625 0.0V-253.59912109375L652.7998046875 -700.0H774.9515380859375L942.5501708984375 -382.501220703125H958.4503173828125L1126.0489501953125 -700.0H1248.20068359375L1004.60107421875 -253.59912109375V0.0Z"/>
+          <path d="M1306.99951171875 0.0V-700.0H1510.00244140625L1662.8502197265625 -71.80126953125H1678.7503662109375L1831.59814453125 -700.0H2034.60107421875V0.0H1929.699462890625V-623.6485595703125H1913.79931640625L1761.6015625 0.0H1579.9990234375L1427.80126953125 -623.6485595703125H1411.901123046875V0.0Z"/>
+          <path d="M2155.99951171875 0.0V-700.0H2596.5501708984375V-601.698486328125H2264.201171875V-401.4508056640625H2568.5501708984375V-303.1492919921875H2264.201171875V-98.301513671875H2601.8502197265625V0.0Z"/>
+        </g>
+      </svg>
+    </span>
+  </div>
+
+  <div class="intro">
+    <i class="mline" aria-hidden="true"></i>
+    <h1>It finds the job, writes the application, builds the site.</h1>
+    <p>NYME finds promising roles early and starts working the moment one appears. One thorough application while the role is fresh, not fifty generic ones a week later.</p>
+    <p>Each run starts with the company: what it ships, what the role is really for and where the candidate may genuinely fit. Those conclusions remain hypotheses, not facts. Nine stages turn the work into a CV, cover letter and dedicated website. Nothing mass-sent. Nothing invented. The final decision stays with the candidate.</p>
+    <a href="https://nymestudio.no" target="_blank" rel="noopener">nymestudio.no&nbsp;&rarr;</a>
+  </div>
+
+  <!-- Appen i hånden (CEO-test 08-12): tre ekte skjermopptak —
+       feeden, innsiden av en annonse, maskineriet. Klippene fra
+       ~/Desktop/NYME klipp; utvalg 01/04/07 av ni.              -->
+  <section class="app" id="app" aria-label="The NYME app">
+    <i class="mline" aria-hidden="true"></i>
+    <p class="app__cap">The app &mdash; live recordings</p>
+    <div class="app__row">
+      <figure class="app__item">
+        <div class="app__frame">
+          <span class="node" aria-hidden="true"></span>
+          <video src="assets/nyme/01-feed.mp4" poster="assets/nyme/01-feed-poster.jpg" muted loop playsinline preload="metadata"></video>
+        </div>
+        <figcaption><b>Feed</b><span>Every match scored against your profile.</span></figcaption>
+      </figure>
+      <figure class="app__item">
+        <div class="app__frame">
+          <span class="node" aria-hidden="true"></span>
+          <video src="assets/nyme/04-annonsen.mp4" poster="assets/nyme/04-annonsen-poster.jpg" muted loop playsinline preload="metadata"></video>
+        </div>
+        <figcaption><b>Inside a role</b><span>Gaps named, skills matched &mdash; you confirm or reject.</span></figcaption>
+      </figure>
+      <figure class="app__item">
+        <div class="app__frame">
+          <span class="node" aria-hidden="true"></span>
+          <video src="assets/nyme/07-ops.mp4" poster="assets/nyme/07-ops-poster.jpg" muted loop playsinline preload="metadata"></video>
+        </div>
+        <figcaption><b>Ops</b><span>What&rsquo;s scraped, queued and rejected &mdash; per source.</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Agentkjeden — hele NYME-pipelinen (CIO-kanon v3.8):
+       én orkestrator, ni trinn, tre leveranser.                -->
+  <div class="card__pipe">
+    <i class="mline" aria-hidden="true"></i>
+    <p class="pipe__cap"><span>One orchestrator</span><span>Nine stages</span><span>Three deliverables</span></p>
+    <ol class="pipe__list" id="pipe">
+      <li class="pipe__step"><b>Liz</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>screens the role</span></li>
+      <li class="pipe__step"><b>Lina</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>frames what the role may need</span></li>
+      <li class="pipe__step"><b>Sophie</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>researches the company</span></li>
+      <li class="pipe__step"><b>Eva</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>keeps your facts straight</span></li>
+      <li class="pipe__step"><b>Sentinel</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>verifies every claim</span></li>
+      <li class="pipe__step"><b>Petra</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>finds your angle</span></li>
+      <li class="pipe__step"><b>Nora</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>writes the application</span></li>
+      <li class="pipe__step"><b>Astrid</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>stress-tests the draft</span></li>
+      <li class="pipe__step"><b>Reviewer</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>checks the full package</span></li>
+    </ol>
+    <div class="pipe__fork" aria-hidden="true">
+      <span class="fork__stem"></span>
+      <span class="fork__bus"></span>
+      <span class="fork__d1"></span>
+      <span class="fork__d2"></span>
+      <span class="fork__d3"></span>
+    </div>
+    <div class="pipe__out">
+      <span class="itm"><svg width="72" height="92" viewBox="0 0 56 72" aria-hidden="true">
+        <rect class="sheet" x=".5" y=".5" width="55" height="71"/>
+        <line x1="8" y1="7.5" x2="18" y2="7.5"/>
+        <line x1=".5" y1="13.5" x2="55.5" y2="13.5"/>
+        <rect x="8.5" y="21.5" width="39" height="15"/>
+        <line x1="8" y1="46.5" x2="26" y2="46.5"/><line x1="30" y1="46.5" x2="48" y2="46.5"/>
+        <line x1="8" y1="52.5" x2="26" y2="52.5"/><line x1="30" y1="52.5" x2="48" y2="52.5"/>
+        <line x1="8" y1="58.5" x2="26" y2="58.5"/><line x1="30" y1="58.5" x2="48" y2="58.5"/>
+      </svg><b>Website</b></span>
+      <span class="itm"><svg width="72" height="92" viewBox="0 0 56 72" aria-hidden="true">
+        <rect class="sheet" x=".5" y=".5" width="55" height="71"/>
+        <line class="hvy" x1="8" y1="10" x2="30" y2="10"/>
+        <line x1="8" y1="16.5" x2="22" y2="16.5"/>
+        <line x1="8" y1="28.5" x2="48" y2="28.5"/>
+        <line x1="8" y1="33.5" x2="48" y2="33.5"/>
+        <line x1="8" y1="38.5" x2="48" y2="38.5"/>
+        <line x1="8" y1="50.5" x2="48" y2="50.5"/>
+        <line x1="8" y1="55.5" x2="48" y2="55.5"/>
+        <line x1="8" y1="60.5" x2="32" y2="60.5"/>
+      </svg><b>CV</b></span>
+      <span class="itm"><svg width="72" height="92" viewBox="0 0 56 72" aria-hidden="true">
+        <rect class="sheet" x=".5" y=".5" width="55" height="71"/>
+        <line x1="8" y1="8.5" x2="24" y2="8.5"/>
+        <line x1="38" y1="8.5" x2="48" y2="8.5"/>
+        <line x1="8" y1="13.5" x2="20" y2="13.5"/>
+        <line x1="8" y1="25.5" x2="48" y2="25.5"/>
+        <line x1="8" y1="30.5" x2="48" y2="30.5"/>
+        <line x1="8" y1="35.5" x2="48" y2="35.5"/>
+        <line x1="8" y1="40.5" x2="48" y2="40.5"/>
+        <line x1="8" y1="45.5" x2="48" y2="45.5"/>
+        <line x1="8" y1="50.5" x2="36" y2="50.5"/>
+        <line class="hvy" x1="8" y1="62" x2="22" y2="62"/>
+      </svg><b>Cover letter</b></span>
+    </div>
+    <p class="pipe__new">A new package for every role</p>
+  </div>
+
+  <!-- Close — landingspunkt etter scrollen. Copy = utkast
+       (samme CTA som forsidens Contact), CEO dømmer.           -->
+  <section class="close" id="contact">
+    <i class="mline" aria-hidden="true"></i>
+    <h2>I built NYME to move early without cutting corners.</h2>
+    <a href="mailto:mail2overland@gmail.com">Start a conversation&nbsp;&rarr;</a>
+  </section>
+
+</div>
+
+<!-- Kolofon — samme footer som forsiden, står på alt.          -->
+<footer class="footer">
+  <div class="footer__name">Rune &Oslash;verland</div>
+  <nav class="footer__nav" aria-label="Footer">
+    <a href="grid-video.html#approach">Approach</a>
+    <a href="grid-video.html#work">Work</a>
+    <a href="how-i-work.html">How I work</a>
+    <a href="grid-video.html#contact">Contact</a>
+  </nav>
+  <div class="footer__right">
+    <div class="footer__c">&copy; 2026</div>
+    <div class="footer__mail"><a href="mailto:mail2overland@gmail.com">mail2overland@gmail.com</a></div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Scroll-drevet kjede: lampelinjen står på 62% av viewport.
+     Et trinn er fullført når nodens senter har passert linjen;
+     scroller du opp igjen, angres det. Leveranse-viften åpner
+     når alle ni er fullført OG viften selv når linjen — og
+     lukker igjen på vei opp. rAF-throttlet.                    */
+  var pipe = document.getElementById('pipe');
+  if (pipe) {
+    var steps = pipe.querySelectorAll('.pipe__step');
+    var n = steps.length;
+    var wrap = pipe.closest('.card__pipe');
+    var out = wrap.querySelector('.pipe__out');
+    var done = function (k) {
+      for (var i = 0; i < n; i++) { steps[i].classList.toggle('is-done', i < k); }
+      pipe.style.setProperty('--pp', n > 1 ? Math.max(0, (k - 1) / (n - 1)) : 0);
+    };
+    if (reduce) {
+      done(n);
+      wrap.classList.add('pipe--out');
+    } else {
+      var raf = null;
+      var update = function () {
+        raf = null;
+        var line = window.innerHeight * .62;
+        var k = 0;
+        for (var i = 0; i < n; i++) {
+          if (steps[i].getBoundingClientRect().top + 11 <= line) { k = i + 1; }
+        }
+        done(k);
+        var open = k === n && out.getBoundingClientRect().top <= line;
+        wrap.classList.toggle('pipe--out', open);
+      };
+      var queue = function () {
+        if (raf === null) { raf = requestAnimationFrame(update); }
+      };
+      window.addEventListener('scroll', queue, { passive: true });
+      window.addEventListener('resize', queue);
+      update();
+    }
+  }
+
+  /* App-klippene spiller kun i syne (og aldri ved reduced
+     motion — da står posterne). Tre samtidige dekodere er
+     unødig; IO gjør sporet gratis utenfor viewport.            */
+  var vids = Array.prototype.slice.call(document.querySelectorAll('.app video'));
+  if (vids.length && !reduce) {
+    if ('IntersectionObserver' in window) {
+      var vio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.play().catch(function () {}); }
+          else { e.target.pause(); }
+        });
+      }, { threshold: .25 });
+      vids.forEach(function (v) { vio.observe(v); });
+    } else {
+      vids.forEach(function (v) { v.play().catch(function () {}); });
+    }
+  }
+
+  /* ── NAV — portert fra how-i-work (CEO 08-12) ────────────────
+     Ingen hero her: sort rygg + retningsstyrt hide straks man
+     har scrollet. Jump 1 = Pipeline, 2 = Contact.              */
+  var nav = document.querySelector('.nav');
+  var navJumps = Array.prototype.slice.call(document.querySelectorAll('.nav__jumps button'));
+  var navTargets = ['app', 'pipe', 'contact'].map(function (id) { return document.getElementById(id); });
+  var navPad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pad')) || 10;
+  if (nav) {
+    var navLastY = window.scrollY, navTick = false;
+    var onNavScroll = function () {
+      if (navTick) { return; }
+      navTick = true;
+      requestAnimationFrame(function () {
+        navTick = false;
+        var y = window.scrollY;
+        nav.classList.toggle('is-hidden', y > navLastY && y > 40);
+        nav.classList.toggle('is-paper', y > 40);
+        navLastY = y;
+        var active = 0;
+        navTargets.forEach(function (el, i) {
+          if (el && el.getBoundingClientRect().top <= window.innerHeight * 0.45) { active = i + 1; }
+        });
+        navJumps.forEach(function (b) {
+          b.classList.toggle('is-here', parseInt(b.dataset.jump, 10) === active);
+        });
+      });
+    };
+    window.addEventListener('scroll', onNavScroll, { passive: true });
+    onNavScroll();
+    navJumps.forEach(function (b) {
+      b.addEventListener('click', function () {
+        var el = navTargets[parseInt(b.dataset.jump, 10) - 1];
+        if (!el) { return; }
+        window.scrollTo({
+          top: el.getBoundingClientRect().top + window.scrollY - navPad,
+          behavior: reduce ? 'auto' : 'smooth'
+        });
+      });
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

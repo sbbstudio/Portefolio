@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KAIZEN — Arbeid som skalerer</title>
+<style>
+/* ============================================================
+   LAB — frittstående. Ingen imports, ingen deps, ingen build.
+   Flate: KAIZEN AI Landing page (kaizenstudio.no root).
+
+   GJENBRUK (CEO 08-11, «40 % av Porschen»): systemet fra
+   porteføljens grid-video.html — hvit ramme, sorte moduler,
+   JMB-låsene, glasskortet, lyskilde+grain, ticker, split-reveal.
+   Per riffet notert i kilden: HER MED NETTET SKJULT — geometrien
+   styrer fortsatt alt, men linjene tegnes ikke.
+
+   COPY: Lesekopi v0.3 (godkjent 2026-08-11) ordrett. Fire
+   kontakt-CTA-er (RING OSS / SEND EN E-POST) står i HOLD til
+   CEO bekrefter eksakt tel/mailto (Engineer Map v0.3 hold[]) —
+   de rendres som knapper uten adresse.
+
+   SYSTEMET
+   BG-div          hvit #FFF, padding 10 — rammen hele siden ligger i
+   Moduler         100vh = 2 rader × 4 kolonner (usynlig nett)
+   Innhold         20px padding innenfor gridlinjene, henger under strek
+   Seksjoner       #000, hvit skrift — AVTALEN på hvit flate (bruddet)
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { margin: 0; }
+
+:root {
+  --paper:  #FFFFFF;
+  --ground: #000000;
+  --ink:    #FFFFFF;
+  --ink-2:  rgba(255, 255, 255, .52);
+  --ink-3:  rgba(255, 255, 255, .30);
+  --line:   rgba(255, 255, 255, .16);
+
+  --pad:  10px;
+  --cell: 20px;
+  --hair: 1px;
+  --stack: 0px;
+  /* CEO 08-11: marg på hver side — 4 × --cell (regel 5: alt er
+     multipler av den ene spacing-verdien).                     */
+  --marg: calc(var(--cell) * 4);
+
+  --ez: cubic-bezier(.22, .61, .36, 1);
+
+  /* TYPESKALA — CEOs tolv trinn, 1rem = 16px. */
+  --t-display: min(9.375rem, 9.9vw);
+  --t-xl:      5rem;
+  --t-h1:      3.75rem;
+  --t-h2:      2.8125rem;
+  --t-h3:      1.875rem;
+  --t-h4:      1.31rem;
+  --t-caption: .9375rem;
+  --t-meta:    .9375rem;
+  --t-fine:    .75rem;
+  --t-body:    1.125rem;
+  --t-base:    1rem;
+
+  /* NETTET: 8 felt per 100vh — 2 rader × 4 kolonner. Skjult her,
+     men all plassering refererer fortsatt til --row.            */
+  --box:  calc(100vh - (var(--pad) * 2));
+  --row:  calc(var(--box) / 2);
+
+  --lh-body: calc(var(--row) / 17);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: ui-sans-serif, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--t-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page { position: relative; margin: var(--pad); background: var(--ground); }
+
+/* ─── HJELPEGRID (CEO 08-11) ─────────────────────────────────
+   Ikke design — arbeidslys. Margstrekene + de fire kolonnene
+   MELLOM margene + radlinjene hver --row. Tast G slår av/på.   */
+.hgrid {
+  position: absolute; inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  display: none;
+}
+body.gridon .hgrid { display: block; }
+.hgrid .field {
+  position: absolute; top: 0; bottom: 0;
+  left: var(--marg); right: var(--marg);
+  border-left: var(--hair) solid var(--line);
+  border-right: var(--hair) solid var(--line);
+}
+.hgrid .field i {
+  position: absolute; top: 0; bottom: 0;
+  width: var(--hair); background: var(--line);
+}
+.hgrid .field .v1 { left: 25%; }
+.hgrid .field .v2 { left: 50%; }
+.hgrid .field .v3 { left: 75%; }
+.hgrid .rows {
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--line) 0, var(--line) var(--hair),
+    transparent var(--hair), transparent var(--row)
+  );
+}
+
+/* ─── LYS I SVARTET — gjenbrukt Gauntlet-mekanikk ────────────
+   Én lyskilde per seksjon med ekte falloff; grain maskeres av
+   samme geometri. Heroens kilde driver svakt mot pekeren.      */
+.hero::before, .steder::before, .metode::before, .contact::before {
+  content: "";
+  position: absolute; inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+/* Gauntlet R2 (A): én global, nesten umerkelig kilde — flaten
+   skal leses som ÉN sort flate der typografien er motivet.     */
+.hero::before {
+  background: radial-gradient(2200px 1400px at calc(35% + var(--lx, 0px)) calc(40% + var(--ly, 0px)),
+    #0e0e0e 0%, #060606 55%, #000 90%);
+}
+/* Gauntlet R2 (B): glasset trenger motlys — kilden flyttet bak
+   panelfeltet og løftet, så materialet har noe å bryte.        */
+.steder::before {
+  background: radial-gradient(1500px 950px at 55% 68%,
+    #202020 0%, #0e0e0e 45%, #050505 75%, #000 100%);
+}
+.metode::before {
+  background: radial-gradient(1500px 950px at 45% 78%,
+    #1e1e1e 0%, #0e0e0e 45%, #050505 75%, #000 100%);
+}
+.contact::before {
+  background: radial-gradient(1300px 850px at 78% 22%,
+    #1a1a1a 0%, #0c0c0c 40%, #050505 72%, #000 100%);
+}
+.hero::after, .steder::after, .metode::after, .contact::after {
+  content: "";
+  position: absolute; inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: .06;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='160'%20height='160'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.hero::after {
+  opacity: .04;
+  -webkit-mask-image: radial-gradient(2200px 1400px at calc(35% + var(--lx, 0px)) calc(40% + var(--ly, 0px)), #000 0%, rgba(0,0,0,.4) 50%, transparent 85%);
+  mask-image: radial-gradient(2200px 1400px at calc(35% + var(--lx, 0px)) calc(40% + var(--ly, 0px)), #000 0%, rgba(0,0,0,.4) 50%, transparent 85%);
+}
+.steder::after {
+  -webkit-mask-image: radial-gradient(1300px 850px at 72% 30%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+  mask-image: radial-gradient(1300px 850px at 72% 30%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+}
+.metode::after {
+  -webkit-mask-image: radial-gradient(1300px 850px at 28% 60%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+  mask-image: radial-gradient(1300px 850px at 28% 60%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+}
+.contact::after {
+  -webkit-mask-image: radial-gradient(1300px 850px at 78% 22%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+  mask-image: radial-gradient(1300px 850px at 78% 22%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+}
+
+/* ─── FELLES ───────────────────────────────────────────────── */
+.cols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  /* CEO 08-11: felles marg — kolonnene lever MELLOM margene,
+     samme felt som hjelpegridden tegner.                       */
+  padding-inline: var(--marg);
+}
+.cell { min-width: 0; padding: var(--cell); }
+
+.hero, .avtalen, .steder, .metode, .contact { position: relative; z-index: 1; }
+
+.label {
+  font-size: var(--t-meta);
+  line-height: 1.4;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+a { color: inherit; }
+a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+
+.iv {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity   .8s var(--ez) var(--d, 0ms),
+    transform .8s var(--ez) var(--d, 0ms);
+  will-change: opacity, transform;
+}
+.iv.is-in { opacity: 1; transform: none; }
+
+/* ══ 01 · HERO ═══════════════════════════════════════════════
+   Ren type på sort — ingen foto-avhengighet. Rad 1: KAIZEN-
+   merket venstre, nav høyre. Under streken: displayet ARBEID SOM
+   SKALERER over kolonne 1–3, intro-stacken i rute 8.           */
+
+.hero {
+  height: var(--box);
+  background: var(--ground);
+  overflow: hidden;
+}
+.hero .cols { position: absolute; inset: 0; grid-template-rows: repeat(2, minmax(0, 1fr)); }
+
+.hero__mark { grid-column: 1 / 2; grid-row: 1 / 2; align-self: start; color: var(--ink); }
+.hero__nav  { grid-column: 3 / 5; grid-row: 1 / 2; align-self: start; text-align: right; }
+.hero__nav a { text-decoration: none; margin-left: 2.5ch; transition: color .3s var(--ez); }
+.hero__nav a:hover { color: var(--ink); }
+
+.hero__display {
+  grid-column: 1 / 4;
+  grid-row: 2 / 3;
+  align-self: start;
+}
+.hero__display h1 {
+  margin: 0;
+  font-size: var(--t-display);
+  line-height: 1.0;
+  letter-spacing: -.032em;
+  font-weight: 500;
+  text-transform: uppercase;
+  /* Gauntlet R1 (A): versalhøyden skal dele optisk topplinje med
+     støttelinjen i rute 8 — samme henge-avstand fra streken.    */
+  text-box: trim-both cap alphabetic;
+}
+
+/* Gauntlet R1 (A): støttelinjen flyttet til bunnlinjen i venstre
+   felt — displayet spenner nå mellom strek og kant. Aside = kun
+   brødstacken, ankret mot bunn.                                */
+.hero__open { grid-column: 1 / 3; grid-row: 2 / 3; align-self: end; }
+.hero__open p { margin: 0; font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; color: var(--ink); text-box: trim-both cap alphabetic; }
+.hero__aside {
+  grid-column: 4 / 5; grid-row: 2 / 3;
+  align-self: stretch;
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.hero__aside .body { display: flex; flex-direction: column; gap: 14px; }
+.hero__aside .body p { margin: 0; font-size: var(--t-meta); line-height: 1.5; color: var(--ink-2); max-width: 34ch; }
+/* Gauntlet R2 (A): siste tekstlinje deler baseline med
+   «Frigjør mer kapasitet.» — begge trimmes til alphabetic.     */
+.hero__aside .body p:last-child { text-box: trim-both cap alphabetic; }
+.hero__aside .body .hold { color: var(--ink); }
+
+.rl {
+  --d: calc(var(--i) * 90ms + 240ms);
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity   .7s var(--ez) var(--d),
+    transform .7s var(--ez) var(--d);
+  will-change: opacity, transform;
+}
+body.ready .rl { opacity: 1; transform: none; }
+
+/* ══ 02 · AVTALEN — bruddet ══════════════════════════════════
+   Samme mekanikk som porteføljens Section 2: HVIT flate, blekket
+   snus lokalt. Påstanden som H1-stemme øverst, brødet i rute 7,
+   «Se eksempler» som exit nederst til høyre.                   */
+.avtalen {
+  background: var(--paper);
+  --ink: #050505;
+  --ink-2: rgba(5, 5, 5, .55);
+  --ink-3: rgba(5, 5, 5, .30);
+  color: var(--ink);
+}
+.avtalen::before, .avtalen::after { content: none; }
+/* CEO 08-12: tilbake på 100vh = to rader. Påstanden topp på
+   20px-linja; streken på radlinja (50vh); tekstene henger under. */
+.avtalen .cols {
+  height: var(--box);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+.avt__label { display: none; }  /* full målebredde til påstanden — samme som porteføljens hvite flate */
+.avt__claim {
+  grid-column: 1 / 5; grid-row: 1 / 2;
+  align-self: start;
+}
+.avt__claim h2 {
+  margin: 0;
+  font-size: var(--t-xl);
+  line-height: 1.05;
+  letter-spacing: -.028em;
+  font-weight: 500;
+  color: var(--ink);
+  text-box: trim-both cap alphabetic;  /* cap-toppen måler 20px fra kanten */
+}
+/* CEO 08-12 (rev): teksten HENGER UNDER streken — JMB-låsen.
+   Brødet/prisen/exiten toppankret i rad 2, 20px under streken. */
+.avt__body { grid-column: 1 / 3; grid-row: 2 / 3; align-self: start; }
+.avt__body p { margin: 0; font-size: var(--t-body); line-height: 1.5; color: var(--ink-2); max-width: 44ch; }
+.avt__price { grid-column: 3 / 4; grid-row: 2 / 3; align-self: start; }
+.avt__price p { margin: 0; font-size: var(--t-body); line-height: 1.5; color: var(--ink-2); max-width: 38ch; }
+.avt__price strong { color: var(--ink); font-weight: 500; }
+.avt__body p, .avt__price p, .avt__cta a { text-box: trim-both cap alphabetic; }  /* cap-toppen måler 20px fra streken */
+.avt__cta { grid-column: 4 / 5; grid-row: 2 / 3; align-self: start; text-align: right; }
+.avt__cta a { display: block; }
+/* Streken — på radlinja (50vh fra modultopp), marg til marg. */
+.avt__rule {
+  position: absolute;
+  left: var(--marg); right: var(--marg);
+  top: var(--row);
+  border-top: var(--hair) solid var(--ink-3);
+}
+.avt__cta a { text-decoration: none; }
+.avt__cta .arrow, .met__cta .arrow { display: inline-block; transition: transform .35s var(--ez); }
+.avt__cta a:hover .arrow, .met__cta a:hover .arrow { transform: translateX(.5ch); }
+
+/* ══ 03 · TRE STEDER Å BEGYNNE — BENTO (CEO 08-11) ═══════════
+   Mosaikk over hele modulen: 01 Tilbud som stor 2×2-flis i
+   senter-venstre, 02/03 stablet i høyre kolonne, spørsmålsruta
+   nede til venstre under labelen. Én spacing-verdi: --cell som
+   gap OG ytterkant (regel 5). Glasskortets hierarki beholdes;
+   den store flisen løftes to trinn (45/30).                    */
+.steder { background: var(--ground); overflow: hidden; }
+/* CEO 08-12 polish: kortene FYLLER rutene — kantene ligger PÅ
+   gridlinjene (marg / 25-50-75-vertikalene / radlinjene), ikke
+   20px innenfor. Sømmen artikuleres i glasset, ikke med gap.   */
+.steder .cols {
+  height: var(--box);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  padding-inline: var(--marg);
+}
+/* Gauntlet R2 (B): venstrekolonnen er ÉN komposisjon over begge
+   rader — label topp, spørsmålet mot midtstreken, knappene mot
+   bunnkanten. Ingen død modul.                                 */
+.sted__label { display: none; }
+.steder .b1 { grid-column: 2 / 4; grid-row: 1 / 3; }
+.steder .b2 { grid-column: 4 / 5; grid-row: 1 / 2; }
+.steder .b3 { grid-column: 4 / 5; grid-row: 2 / 3; }
+.steder .sted__ask { grid-column: 1 / 2; grid-row: 1 / 3; }
+/* Den åpne spørsmålskolonnen henger 20px under modultoppen og
+   slipper 20px før bunnen — samme takt som kortenes innmat.    */
+.steder .sted__label { padding: 0; }
+.steder .sted__ask { padding: var(--cell) var(--cell) var(--cell) 0; }
+
+/* Den store flisen: navnet på h2-trinnet, påstanden på h3 —
+   samme stige, to trinn opp. Brødet får lesebredde.            */
+/* Gauntlet R1 (B): glasset må BÆRE 2x2-flaten — samme materiale
+   som de små, men løftet så tomrommet leses som holdt rom.      */
+.steder .b1 {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .11), rgba(255, 255, 255, .055));
+}
+.steder .b1 .card__id h3 { font-size: var(--t-h2); }
+.steder .b1 .card__say { font-size: var(--t-h3); line-height: 1.2; letter-spacing: -.025em; }
+.steder .b1 .card__body { max-width: 44ch; }
+
+.card__box {
+  z-index: 1;
+  padding: var(--cell);
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .04));
+  /* Flush mot nabofliser: sømmen er en inset hairline-ring +
+     topplys — ikke ytre skygge som blør over naboene.          */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .16),
+    inset 0 0 0 var(--hair) rgba(255, 255, 255, .07);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.card__no {
+  display: block;
+  font-size: var(--t-fine); line-height: 1.2;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3);
+}
+.card__id { text-align: right; }
+.card__id h3 {
+  margin: 0;
+  font-size: var(--t-h3);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+  font-weight: 500;
+}
+.card__say {
+  margin: var(--cell) 0 0;
+  text-align: right;
+  font-size: var(--t-h4);
+  line-height: 1.3;
+  letter-spacing: -.012em;
+  font-weight: 500;
+  color: var(--ink);
+}
+.card__body {
+  margin: 0;
+  font-size: var(--t-meta); line-height: 1.5;
+  color: var(--ink-2);
+}
+.card__tag {
+  margin: var(--cell) 0 0;
+  font-size: var(--t-meta); line-height: 1.4;
+  font-style: italic;
+  color: var(--ink-2);
+}
+
+/* Rute 8: spørsmålet + de to knappene. tel/mailto er OPEN-CEO —
+   knappene rendres uten adresse (peker til kontaktseksjonen).  */
+.sted__ask { grid-column: 4 / 5; grid-row: 2 / 3; align-self: stretch;
+  display: flex; flex-direction: column; justify-content: space-between; }
+.sted__ask h3 { margin: 0; font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; }
+.sted__ask p { margin: 14px 0 0; font-size: var(--t-meta); line-height: 1.5; color: var(--ink-2); max-width: 30ch; }
+.cta-stack { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.cta-stack a {
+  display: inline-block;
+  font-size: var(--t-meta);
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, .3);
+  padding-bottom: 2px;
+  transition: border-color .3s var(--ez);
+}
+.cta-stack a:hover { border-bottom-color: var(--ink); }
+
+/* ══ 04 · FRA AVTALE TIL DRIFT ═══════════════════════════════
+   Fire steg i rute 5–8, hengende under streken — prosessen ER
+   raden. Intro øverst; kontroll-lenken høyre topp.             */
+.metode { background: var(--ground); overflow: hidden; }
+.metode .cols {
+  height: var(--box);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  padding-inline: var(--marg);
+}
+.met__label { grid-column: 1 / 2; grid-row: 1 / 2; align-self: start; }
+.met__intro { grid-column: 2 / 4; grid-row: 1 / 2; align-self: end; }
+.met__intro p { margin: 0; font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; color: var(--ink); max-width: 44ch; }
+.met__cta { grid-column: 4 / 5; grid-row: 1 / 2; align-self: end; text-align: right; }
+.met__cta a { text-decoration: none; font-size: var(--t-meta); line-height: 1.3; color: var(--ink-2); transition: color .3s var(--ez); display: inline-block; text-box: trim-both cap alphabetic; }
+/* Gauntlet R1 (B): intro og lenke deler bunnlinje — trim begge. */
+.met__intro p { text-box: trim-both cap alphabetic; }
+.met__cta a:hover { color: var(--ink); }
+
+/* Gauntlet R1 (B): stegene er glasskortets jobb — samme panel
+   som bentoen, ikke flate tekstkolonner på sort.               */
+.met__step { grid-row: 2 / 3; padding: var(--cell); min-width: 0;
+  display: flex; flex-direction: column;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .04));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .10),
+    inset 0 0 0 var(--hair) rgba(255, 255, 255, .07);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+.met__step.s1 { grid-column: 1 / 2; }
+.met__step.s2 { grid-column: 2 / 3; }
+.met__step.s3 { grid-column: 3 / 4; }
+.met__step.s4 { grid-column: 4 / 5; }
+.met__step .card__no { margin-bottom: var(--cell); }
+.met__step h3 { margin: 0; font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; }
+.met__step p { margin: 10px 0 0; font-size: var(--t-meta); line-height: 1.5; color: var(--ink-2); max-width: 30ch; }
+/* Gauntlet R2 (B): taggen følger brødet — innholdsmassen samles
+   i topp, voidet blir ETT felles bånd over alle fire.          */
+.met__step .card__tag { margin-top: var(--cell); }
+
+/* ══ 05 · BARE SPØR + KOLOFON ════════════════════════════════
+   Porteføljens Contact-modell: to hele 100vh-moduler (4 rader).
+   Modul 1: tom rad + tekstraden. Modul 2: kolofon + ticker.    */
+.contact { background: var(--ground); overflow: hidden; }
+.contact .cols {
+  min-height: calc(var(--box) * 2);
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+}
+.contact__h { grid-column: 1 / 3; grid-row: 2 / 3; align-self: start; }
+.contact__h h2 { text-box: trim-both cap alphabetic; }
+.contact__h h2 {
+  margin: 0;
+  font-size: var(--t-h1);
+  line-height: 1.1;
+  letter-spacing: -.032em;
+  font-weight: 500;
+  max-width: 20ch;
+}
+
+.split .w { display: inline-block; white-space: nowrap; }
+.split .ch {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(.35em);
+  transition:
+    opacity   .55s var(--ez) calc(var(--ci) * 14ms),
+    transform .55s var(--ez) calc(var(--ci) * 14ms);
+  will-change: opacity, transform;
+}
+.split.is-in .ch { opacity: 1; transform: none; }
+
+.contact__body { grid-column: 3 / 4; grid-row: 2 / 3; align-self: start; }
+.contact__body p { margin: 0 0 14px; font-size: var(--t-body); line-height: 1.5; color: var(--ink-2); max-width: 38ch; }
+.contact__body p + p { font-size: var(--t-base); line-height: 1.6; }
+
+.contact__cta { grid-column: 4 / 5; grid-row: 2 / 3; align-self: start; text-align: right; }
+.contact__cta .cta-stack { align-items: flex-end; }
+/* Gauntlet R1 (C): to streker over hverandre leste som skjemafelt
+   — her løses affordance som barens contact-CTA: stemme + pil.  */
+.contact__cta .cta-stack a {
+  font-size: var(--t-h4); letter-spacing: -.012em; text-transform: none;
+  border-bottom: none; padding-bottom: 0;
+}
+.contact__cta .arrow { display: inline-block; transition: transform .35s var(--ez); }
+.contact__cta a:hover .arrow { transform: translateX(.5ch); }
+
+/* TICKER — de tre arbeidsflytene, lineær tid.                  */
+/* Gauntlet R1 (C): sidens siste kraftord — full hvit, og venstre
+   klipp skjer mot sidekanten (gjennom margen), så kuttet leses
+   som bevegelse, ikke som feil.                                */
+.contact__ticker {
+  grid-column: 1 / 5; grid-row: 4 / 5;
+  align-self: stretch;
+  margin-inline: calc(var(--marg) * -1);
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+.ticker__track {
+  display: flex;
+  flex: none;
+  animation: tick 40s linear infinite;
+}
+.ticker__seq {
+  display: flex; flex: none;
+  white-space: nowrap;
+  gap: 1.5ch;
+  padding-right: 1.5ch;
+  font-size: calc(var(--row) / 2);
+  line-height: 1;
+  letter-spacing: -.02em;
+  font-weight: 500;
+  color: var(--ink);
+}
+@keyframes tick {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.contact__colophon {
+  grid-column: 4 / 5; grid-row: 3 / 4; align-self: stretch;
+  display: grid; grid-template-rows: repeat(2, 1fr);
+  font-size: var(--t-fine); line-height: 1.4;
+}
+.contact__colophon .footer__name { grid-area: 1 / 1; align-self: start; }
+.colo__mid {
+  grid-area: 1 / 1; align-self: end;
+  display: flex; flex-direction: column; gap: 10px;
+}
+/* Gauntlet R2 (C): © bor i kolofonens egen modul — lukket rytme
+   navn/nav/bunnlinje, ingenting lekker over modulgrensen.      */
+.contact__colophon .contact__c { grid-area: 2 / 1; align-self: end; }
+.contact__c {
+  font-size: var(--t-fine); line-height: 1.4;
+  color: var(--ink-3); letter-spacing: .14em;
+}
+.footer__name { letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+.footer__nav { display: flex; flex-wrap: wrap; gap: 6px 2.5ch; }
+.footer__nav a, .footer__mail {
+  color: var(--ink-2);
+  text-decoration: none;
+  letter-spacing: .14em; text-transform: uppercase;
+  transition: color .3s var(--ez);
+}
+.footer__nav a:hover, .footer__mail:hover { color: var(--ink); }
+.footer__mail { text-transform: none; letter-spacing: 0; }
+
+/* ─── MOBIL — mekanikken kobles ut ─────────────────────────── */
+@media (max-width: 1023px) {
+  :root {
+    --pad: 8px; --cell: 16px; --marg: 16px;
+    --t-display: 13vw;
+    --t-h1: 1.875rem;
+    --t-h3: 1.31rem;
+  }
+  .hero, .avtalen .cols, .steder .cols, .metode .cols, .contact .cols {
+    height: auto; min-height: 100vh; position: static;
+  }
+  .cols {
+    position: static !important;
+    display: flex; flex-direction: column; gap: 40px;
+    padding: 72px 0; min-height: 0 !important;
+  }
+  .hgrid { display: none !important; }
+  .avt__rule { display: none; }  /* baseline-streken hører desktop-målet til */
+  .hero__nav { text-align: left; }
+  .card__say, .card__id { text-align: left; }
+  .contact__cta { text-align: left; }
+  .contact__cta .cta-stack { align-items: flex-start; }
+  .contact__ticker { min-height: 72px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rl { transition: none; }
+  .iv { opacity: 1; transform: none; transition: none; }
+  .split .ch { opacity: 1; transform: none; transition: none; }
+  .ticker__track { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Hjelpegrid — arbeidslys, ikke design. Tast G slår av/på. -->
+  <div class="hgrid" aria-hidden="true">
+    <div class="rows"></div>
+    <div class="field"><i class="v1"></i><i class="v2"></i><i class="v3"></i></div>
+  </div>
+
+  <!-- ══ 01 · HERO ══════════════════════════════════════════ -->
+  <section class="hero" id="topp">
+    <div class="cols">
+      <div class="cell hero__mark label">KAIZEN</div>
+      <nav class="cell hero__nav label" aria-label="Hoved">
+        <a href="#arbeidsflyter">Arbeidsflyter</a>
+        <a href="#metode">Metode</a>
+        <!-- Om oss: rute i nav-copyen, flaten finnes ikke ennå -->
+        <a href="#kontakt">Om oss</a>
+        <a href="#kontakt">Kontakt</a>
+      </nav>
+
+      <div class="cell hero__display">
+        <h1 class="split">Arbeid som skalerer</h1>
+      </div>
+
+      <div class="cell hero__open">
+        <p class="rl" style="--i:0">Frigjør mer kapasitet.</p>
+      </div>
+
+      <div class="cell hero__aside">
+        <div class="body">
+          <p class="rl" style="--i:1">KAIZEN bygger AI-agenter som tar ansvar for konkrete arbeidsflyter i systemene dere bruker. De lærer av hvordan dere arbeider, og utvikles videre i takt med virksomheten.</p>
+          <p class="rl hold" style="--i:2">Agentene holder flyten i gang, mens dere beholder kontrollen.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 02 · AVTALEN — hvit flate, bruddet ═════════════════ -->
+  <section class="avtalen" id="avtalen">
+    <div class="cols">
+      <div class="cell avt__label label iv" style="--d:0ms">Avtalen</div>
+      <div class="cell avt__claim iv" style="--d:80ms">
+        <h2>Vi finner arbeidet som spiser uka deres, og tar det bort. Virker det ikke, betaler dere ikke.</h2>
+      </div>
+      <div class="cell avt__body iv" style="--d:160ms">
+        <p>Vi ser på hvordan dere jobber i dag, og finner ut hva som er verdt å ta først. Det kan være tilbudene som tar for lang tid, eller e-posten ingen rekker å svare på. Hva vi bygger, blir vi enige om sammen.</p>
+      </div>
+      <div class="cell avt__price iv" style="--d:240ms">
+        <p>Installasjonen koster <strong>9 900 kroner</strong>. Vi bygger så mange agenter som oppgaven krever, og setter dem opp i systemene dere bruker, eller skal ta i bruk. Dere forholder dere til noen få. De koordinerer resten i bakgrunnen.</p>
+      </div>
+      <div class="cell avt__cta label iv" style="--d:320ms">
+        <a href="#arbeidsflyter">Se eksempler <span class="arrow">→</span></a>
+      </div>
+      <div class="avt__rule iv" style="--d:400ms" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- ══ 03 · TRE STEDER Å BEGYNNE — glasskortene ═══════════ -->
+  <section class="steder" id="arbeidsflyter">
+    <div class="cols">
+      <div class="card__box b1 iv" style="--d:80ms">
+        <div class="card__lead">
+          <div class="card__top">
+            <span class="card__no">01</span>
+            <div class="card__id"><h3>Tilbud</h3></div>
+          </div>
+          <p class="card__say">Forespørselen kom inn. Tilbudet gjorde ikke.</p>
+        </div>
+        <div>
+          <p class="card__body">Agenten henter grunnlaget fra systemene dere bruker, skriver et utkast og sender det til godkjenning. Når dere godkjenner, sender agenten tilbudet og følger opp til kunden svarer.</p>
+          <p class="card__tag">Dere godkjenner. Agenten følger opp.</p>
+        </div>
+      </div>
+
+      <div class="card__box b2 iv" style="--d:160ms">
+        <div class="card__lead">
+          <div class="card__top">
+            <span class="card__no">02</span>
+            <div class="card__id"><h3>Margin</h3></div>
+          </div>
+          <p class="card__say">Oppdraget ser lønnsomt ut. Helt til timene telles.</p>
+        </div>
+        <div>
+          <p class="card__body">Agenten kobler tilbudet, timene og fakturaen. Øker timebruken eller kostnadene, får dere én beskjed med hva som har endret seg.</p>
+          <p class="card__tag">Dere ser det tidsnok til å ta en beslutning.</p>
+        </div>
+      </div>
+
+      <div class="card__box b3 iv" style="--d:240ms">
+        <div class="card__lead">
+          <div class="card__top">
+            <span class="card__no">03</span>
+            <div class="card__id"><h3>Betaling</h3></div>
+          </div>
+          <p class="card__say">Fakturaen er sendt. Oppfølgingen blir liggende.</p>
+        </div>
+        <div>
+          <p class="card__body">Agenten ser hva som har forfalt, forbereder oppfølgingen og stopper når kunden svarer. Spørsmål og avvik går til dere.</p>
+          <p class="card__tag">Agenten tar rutinen. Dere tar unntakene.</p>
+        </div>
+      </div>
+
+      <div class="cell sted__ask iv" style="--d:320ms">
+        <div class="label">Tre steder å begynne</div>
+        <div>
+          <h3>Et spørsmål er nok</h3>
+          <p>Har dere en idé, eller lurer dere bare på om AI kan hjelpe med noe i bedriften? Ring eller send en e-post. Dere trenger ikke vite hva som skal bygges.</p>
+        </div>
+        <!-- OPEN-CEO: eksakt tel/mailto holdes per Engineer Map
+             v0.3 hold[] — knappene peker foreløpig til #kontakt. -->
+        <div class="cta-stack">
+          <a href="#kontakt">Ring oss</a>
+          <a href="#kontakt">Send en e-post</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 04 · FRA AVTALE TIL DRIFT ══════════════════════════ -->
+  <section class="metode" id="metode">
+    <div class="cols">
+      <div class="cell met__label label iv" style="--d:0ms">Fra avtale til drift</div>
+      <div class="cell met__intro iv" style="--d:80ms">
+        <p>Vi starter med oppgaven dere vil løse. Sammen avklarer vi hva agentene skal gjøre, hvilke systemer de skal arbeide i og hva dere skal godkjenne før de settes i drift.</p>
+      </div>
+      <!-- Kontroll-/FAQ-flaten er egen underside (ikke bygget) -->
+      <div class="cell met__cta iv" style="--d:160ms">
+        <a href="#kontakt">Hva skjer hvis en agent gjør feil? <span class="arrow">→</span></a>
+      </div>
+
+      <div class="met__step s1 iv" style="--d:120ms">
+        <span class="card__no">01</span>
+        <h3>Vi blir enige</h3>
+        <p>Vi går gjennom en vanlig arbeidsuke med dere og skriver ned hva agentene skal gjøre.</p>
+        <p class="card__tag">Dere godkjenner listen.</p>
+      </div>
+      <div class="met__step s2 iv" style="--d:200ms">
+        <span class="card__no">02</span>
+        <h3>Vi bygger</h3>
+        <p>Agentene settes opp i systemene dere allerede bruker, og gjør jobben der.</p>
+        <p class="card__tag">Vi gjør jobben.</p>
+      </div>
+      <div class="met__step s3 iv" style="--d:280ms">
+        <span class="card__no">03</span>
+        <h3>Vi kjører dem sammen</h3>
+        <p>Vi går gjennom listen med dere mens agentene står i faktisk arbeid.</p>
+        <p class="card__tag">Dere ser dem gå.</p>
+      </div>
+      <div class="met__step s4 iv" style="--d:360ms">
+        <span class="card__no">04</span>
+        <h3>Jobben er gjort</h3>
+        <p>Står alt på listen, er jobben gjort. Mener dere noe annet, får dere ingen faktura.</p>
+        <p class="card__tag">Dere avgjør.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 05 · BARE SPØR + KOLOFON ═══════════════════════════ -->
+  <section class="contact" id="kontakt">
+    <div class="cols">
+      <div class="cell contact__h">
+        <h2 class="split">Bare spør.</h2>
+      </div>
+
+      <div class="cell contact__body">
+        <p class="iv" style="--d:0ms">Første steg kan være ett spørsmål. Ring eller send en e-post. Vi svarer på det dere lurer på og sier fra hvis AI ikke er riktig vei.</p>
+        <p class="iv" style="--d:120ms">Ser vi noe som er verdt å ta videre, forklarer vi hva neste steg kan være. Vi tar ikke på oss arbeid vi ikke tror vi kan levere.</p>
+      </div>
+
+      <!-- OPEN-CEO: tel/mailto holdes — knappene står uten adresse. -->
+      <div class="cell contact__cta iv" style="--d:240ms">
+        <div class="cta-stack">
+          <a href="#kontakt">Ring oss <span class="arrow">&rarr;</span></a>
+          <a href="#kontakt">Send en e-post <span class="arrow">&rarr;</span></a>
+        </div>
+      </div>
+
+      <div class="cell contact__colophon">
+        <div class="footer__name">KAIZEN</div>
+        <div class="colo__mid">
+          <nav class="footer__nav" aria-label="Bunn">
+            <a href="#arbeidsflyter">Arbeidsflyter</a>
+            <a href="#metode">Metode</a>
+            <a href="#kontakt">Kontakt</a>
+          </nav>
+        </div>
+        <div class="contact__c">© 2026</div>
+      </div>
+
+      <div class="cell contact__ticker" aria-hidden="true">
+        <div class="ticker__track">
+          <span class="ticker__seq">Tilbud Margin Betaling&nbsp;</span>
+          <span class="ticker__seq">Tilbud Margin Betaling&nbsp;</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Hjelpegrid — på som standard i lab; G toggler. */
+  document.body.classList.add('gridon');
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'g' || e.key === 'G') { document.body.classList.toggle('gridon'); }
+  });
+
+  /* Bokstav-splitt — gjenbrukt fra porteføljen. */
+  Array.prototype.forEach.call(document.querySelectorAll('.split'), function (el) {
+    var words = el.textContent.split(' ');
+    el.textContent = '';
+    var ci = 0;
+    words.forEach(function (word, wi) {
+      var w = document.createElement('span');
+      w.className = 'w';
+      for (var i = 0; i < word.length; i++) {
+        var c = document.createElement('span');
+        c.className = 'ch';
+        c.style.setProperty('--ci', ci++);
+        c.textContent = word.charAt(i);
+        w.appendChild(c);
+      }
+      el.appendChild(w);
+      if (wi < words.length - 1) { el.appendChild(document.createTextNode(' ')); }
+    });
+  });
+
+  /* In view — hero trigges av load, resten av scroll. */
+  var targets = document.querySelectorAll('.iv, .split');
+  var heroSplits = document.querySelectorAll('.hero .split');
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -45% 0px', threshold: 0 });
+    Array.prototype.forEach.call(targets, function (el) {
+      if (el.closest('.hero')) { return; }
+      io.observe(el);
+    });
+  } else {
+    Array.prototype.forEach.call(targets, function (el) { el.classList.add('is-in'); });
+  }
+
+  requestAnimationFrame(function () {
+    document.body.classList.add('ready');
+    Array.prototype.forEach.call(heroSplits, function (el) { el.classList.add('is-in'); });
+  });
+
+  /* Pekerlys — heroens kilde driver svakt mot pekeren. */
+  var hero = document.querySelector('.hero');
+  if (hero && !reduce && window.matchMedia('(pointer: fine)').matches) {
+    var tx = 0, ty = 0, cx = 0, cy = 0, raf = null;
+    function step() {
+      raf = requestAnimationFrame(function () {
+        cx += (tx - cx) * .06;
+        cy += (ty - cy) * .06;
+        hero.style.setProperty('--lx', cx.toFixed(1) + 'px');
+        hero.style.setProperty('--ly', cy.toFixed(1) + 'px');
+        if (Math.abs(tx - cx) + Math.abs(ty - cy) > .5) { step(); } else { raf = null; }
+      });
+    }
+    hero.addEventListener('pointermove', function (e) {
+      var r = hero.getBoundingClientRect();
+      tx = ((e.clientX - r.left) / r.width - .30) * 80;
+      ty = ((e.clientY - r.top) / r.height - .34) * 60;
+      if (!raf) { step(); }
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rune Øverland — How I work</title>
+<style>
+/* ============================================================
+   LAB — frittstående. Ingen imports, ingen deps, ingen build.
+   Underside: HOW I WORK. Copy = Creative Director Loop 3,
+   CEO-godkjent, ordrett.
+
+   SYSTEMET (arvet fra grid-video.html, forsidens kanon)
+   BG-div          hvit #FFF, padding 10 — rammen hele siden ligger i
+   Grid-div        2 rader × 4 kolonner per 100vh, 6px noder i kryss
+   Innhold         20px padding innenfor gridlinjene (--cell)
+
+   SCENEN (CEO 08-12): heroen er én sticky scene med SEKS
+   tilstander — stasjon 0 (den godkjente hero-layouten, urørt)
+   + 01–05. Scroll-snap på modulgrensene bytter tekst diskret;
+   ingen scrub, ingen halvveis-tilstander. Progress-bar ligger
+   på midtstreken (scenens baseline) og fyller hakk for hakk;
+   tallene 01–05 på samme linje er jump-lenker. Etter 05 ruller
+   Contact (sort crescendo) OVER scenen som et teppe — verdenen
+   slippes aldri, den dekkes. Fem halvmodul-seksjoner erstattet
+   av én komponent, fem tekster.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+
+/* CEO 08-12: ingen snap — fri scroll. Diskret-modellen bæres
+   av tekstbyttet alene: terskelen ligger halvveis mellom
+   stasjonene, så scenen viser alltid én hel tilstand uansett
+   hvor scrollen hviler.                                        */
+
+:root {
+  --paper:  #FFFFFF;   /* BG-div + flaten                        */
+  --ground: #000000;   /* sorte moduler (Contact, footer)        */
+  --ink:    #050505;   /* sort blekk på hvit flate               */
+  --ink-2:  rgba(5, 5, 5, .55);
+  --ink-3:  rgba(5, 5, 5, .34);
+  --line:   rgba(5, 5, 5, .14);   /* hairlines: sort på hvitt    */
+  --accent: #FF4A00;   /* TEST (CEO 08-12): fast hover/aktiv-    */
+                       /* farge — eneste ikke-monokrome token    */
+
+  --pad:  10px;   /* BG-div padding — avstand til skjermkanten */
+  --cell: 20px;   /* padding inne i grid-div — linje til tekst   */
+  --hair: 1px;
+  --node: 6px;    /* firkanten i hvert kryss                     */
+
+  --ez: cubic-bezier(.22, .61, .36, 1);
+
+  /* ── TYPESKALA ─────────────────────────────────────────────
+     CEOs skala, 1rem = 16px. Ingen font-size skrives fritt;
+     alt plukkes herfra. Kopiert fra grid-video.html.           */
+  --t-display: min(9.375rem, 9.9vw);
+  --t-xxl:     min(6.875rem, 7.3vw); /* 110px / 1.1 — NYTT trinn på CEO-ordre 08-12 (sec2-tittelen); vw-brems som display */
+  --t-xl:      5rem;                 /*  80px / 1.1  */
+  --t-h1:      3.75rem;              /*  60px / 1.1  */
+  --t-h2:      2.8125rem;            /*  45px / 1.1  */
+  --t-h3:      1.875rem;             /*  30px / 1.2  */
+  --t-h4:      1.31rem;              /*  21px / 1.2  */
+  --t-caption: .9375rem;             /*  15px / 1.2  */
+  --t-meta:    .9375rem;             /*  15px / 1.4  */
+  --t-fine:    .75rem;               /*  12px / 1.2  */
+  --t-body:    1.125rem;             /*  18px / 1.4  */
+  --t-base:    1rem;                 /*  16px / 1.6  */
+
+  --box:  calc(100vh - (var(--pad) * 2));
+  --row:  calc(var(--box) / 2);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: ui-sans-serif, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--t-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── BG-DIV ────────────────────────────────────────────────── */
+.page { position: relative; margin: var(--pad); background: var(--paper); }
+
+/* ─── GRID-DIV ────────────────────────────────────────────────
+   Ordrett fra forsiden, med blekket snudd: sorte hairlines og
+   sorte noder på hvit flate.
+   CEO 08-12 (endelig): nettet bor I seksjonene — én instans i
+   scenen, én i Section 2. Ingen overlapp lenger, så nettet
+   ruller MED innholdet (forsidens kanon) i vanlig scroll, og
+   står bom stille mens scenen står sticky. Footeren er sort —
+   der trengs ikke nett.                                        */
+.grid {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+.grid .v {
+  position: absolute; top: 0; bottom: 0;
+  width: var(--hair); background: var(--line);
+}
+.grid .v1 { left: 25%; }  .grid .v2 { left: 50%; }  .grid .v3 { left: 75%; }
+
+.grid .rows {
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--line) 0, var(--line) var(--hair),
+    transparent var(--hair), transparent var(--row)
+  );
+}
+
+.grid .nodes {
+  position: absolute; top: 0; bottom: 0;
+  width: var(--node);
+  margin-left: calc(var(--node) / -2);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #050505 0, #050505 var(--node),
+    transparent var(--node), transparent var(--row)
+  );
+  background-position: 0 calc(var(--node) / -2);
+}
+.grid .n1 { left: 25%; }  .grid .n2 { left: 50%; }  .grid .n3 { left: 75%; }
+
+/* ─── FELLES ────────────────────────────────────────────────── */
+.cols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+.cell { min-width: 0; padding: var(--cell); }
+
+.contact, .footer { position: relative; }
+
+/* Modul-linja (.mline) er mobilnettets instrument — usynlig
+   på desktop, der bor nettet i .grid.                          */
+.mline { display: none; }
+
+.label {
+  font-size: var(--t-meta);
+  line-height: 1.4;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+a { color: inherit; }
+a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+
+/* ═══ NAV — ren tekst, scroll-down-hide (CEO 08-12 r2) ═══════
+   Fixed i papirrammen, på sidens eget nett: navn i rute 1,
+   siden i rute 2, jump-liste (vertikal) i rute 3, CTA i rute 4.
+   Ren sort #000, ingen hover-tilstander. Glir opp og ut når man
+   scroller NED, tilbake når man scroller opp eller er i toppen.*/
+/* CEO 08-12: glassmorfismen UT — naven er ren tekst på flaten. */
+.nav {
+  position: fixed;
+  top: var(--pad); left: var(--pad); right: var(--pad);
+  z-index: 50;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  transition: transform .45s var(--ez), background-color .3s var(--ez);
+}
+.nav.is-hidden { transform: translateY(calc(-100% - var(--pad) - 2px)); }
+/* Utenfor hero-scenen får naven hvit rygg (CEO 08-12), så den
+   lander lesbart når man scroller opp i Section 2 / footer.
+   Box-shadow fyller papirrammens 10px over, så ryggen går
+   helt til skjermkanten uten synlig fuge.                      */
+.nav.is-paper {
+  background: var(--paper);
+  box-shadow: 0 calc(var(--pad) * -1) 0 0 var(--paper);
+  /* 20px luft over og under teksten på den hvite ryggen:
+     rammen gir 10 over (fylt av skyggen), så +10 her.          */
+  padding-top: calc(var(--cell) - var(--pad));
+  padding-bottom: var(--cell);
+  border-bottom: var(--hair) solid var(--line);
+}
+
+/* CEO 08-12 (runde 5): egen H5-stemme til naven — 21-trinnet
+   (--t-h4) i 500, vanlig sats. Referansen er «Strategic design
+   partner»-satsen: medium vekt, rolig, full sort. Body 1 var
+   fortsatt for lite som møblement her.                         */
+.h5 { font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; }
+.nav .cell { font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; }
+.nav a { text-decoration: none; transition: color .3s var(--ez); }
+
+.nav__name { grid-column: 1 / 2; }
+.nav__links { grid-column: 2 / 3; display: flex; flex-wrap: wrap; gap: 6px 1.25ch; }
+/* REGEL (CEO 08-12): siden du STÅR PÅ dempes i naven —
+   aria-current="page" settes på lenka til aktiv side; alle
+   andre sidelenker står i full opacity.                        */
+.nav__links a[aria-current="page"] { opacity: .45; }
+
+/* Jump-lenkene: VERTIKAL liste fra rute 3, gap 0 — linjehøyden
+   er rytmen. 15-trinnet (CEO 08-12: enda mindre),
+   ren sort, ingen tilstander.                                  */
+.nav .nav__jumps {
+  grid-column: 3 / 4;
+  display: flex; flex-direction: column;
+  align-items: flex-start; gap: 0;
+  font-size: var(--t-meta);
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.nav__jumps button {
+  margin: 0; padding: 0;
+  background: none; border: 0; cursor: pointer;
+  font: inherit;
+  text-align: left;
+  color: #000;
+  white-space: nowrap;
+}
+.nav__jumps .jno { padding-right: .75ch; font-variant-numeric: tabular-nums; }
+.nav__jumps button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+/* Aktiv posisjon på siden = aksent (CEO 08-12: grå for lite
+   kontrast). Samme farge som fast hover.                       */
+.nav .nav__jumps button.is-here,
+.nav .nav__jumps button:hover { color: var(--accent); }
+.nav__cta { grid-column: 4 / 5; text-align: right; }
+.nav__cta .arrow { display: inline-block; }
+
+/* Blekk: ren sort #000, ingen hover-funksjon (CEO 08-12).
+   NB: over den sorte footeren forsvinner naven — åpen CEO-dom. */
+.nav a { color: #000; }
+
+/* ─── IN VIEW — tidsbasert, ikke scrub ──────────────────────── */
+.iv {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity   .8s var(--ez) var(--d, 0ms),
+    transform .8s var(--ez) var(--d, 0ms);
+  will-change: opacity, transform;
+}
+.iv.is-in { opacity: 1; transform: none; }
+
+/* ─── GRUNNLINJE PÅ STREKEN — fra forsiden ──────────────────── */
+.baseline {
+  text-box: trim-both cap alphabetic;
+  transform: translateY(var(--nudge, 0px));
+}
+
+/* ── BOKSTAV-SPLITT — fra forsiden ─────────────────────────── */
+.split .w { display: inline-block; white-space: nowrap; }
+.split .ch {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(.35em);
+  transition:
+    opacity   .55s var(--ez) calc(var(--ci) * 14ms),
+    transform .55s var(--ez) calc(var(--ci) * 14ms);
+  will-change: opacity, transform;
+}
+.split.is-in .ch { opacity: 1; transform: none; }
+
+/* ══ SCENEN — sticky hero + fem stasjoner ════════════════════
+   CEO 08-12 (endelig): KUN scenen er sticky. Wrapperen eier
+   scrollhøyden: 5 hele moduler — én per stasjon (0–4). Etter
+   04 slipper scenen og siden beveger seg videre i vanlig flyt:
+   Section 2 og footeren kommer UTENOM wrappen, ingen overlapp.
+   (Teppene forkastet — de dekket aldri de øverste 10px, foto-
+   stripa i toppen var den stickye scenens bunn som ble stående
+   i rammebåndet.) Alt i hele --box-multipler.                  */
+.stage-wrap {
+  position: relative;
+  height: calc(var(--box) * 5);
+}
+.snap { height: var(--box); }
+
+.stage {
+  position: sticky;
+  top: var(--pad);
+  height: var(--box);
+  overflow: hidden;       /* CEO 08-11: fotoet bor I rutene —
+                             scale/cursor-glidningen flyter aldri
+                             utover modulboksen                  */
+  z-index: 1;
+}
+.stage .cols { position: absolute; inset: 0; grid-template-rows: repeat(2, minmax(0, 1fr)); }
+
+/* Møblement — NAVen (fixed) eier topplinja nå; scenens gamle
+   hjem-lenke og eyebrow er ute (CEO 08-12, nav-testen).
+   Scroll-hintet bor i rute 8, topp/høyre — hengende under
+   midtstreken. Kun synlig på stasjon 0: stasjonene 01–04 har
+   frost i ruta, og baren bærer progresjonen derfra.            */
+.stage__scroll {
+  grid-column: 4 / 5; grid-row: 2 / 3;
+  align-self: start; text-align: right;
+  color: rgba(255, 255, 255, .72);
+  transition: opacity .5s var(--ez);
+}
+.stage__scroll.is-gone { opacity: 0; }
+.stage .cell { position: relative; z-index: 1; }
+
+/* CEO 08-11: foto over hele modulen — alle 8 ruter, strek-til-
+   strek. Innholdet ligger oppå; blekket snus til hvitt for
+   lesbarhet mot sjøflaten.                                     */
+.stage__media {
+  grid-column: 1 / 5;
+  grid-row: 1 / 3;
+  background: url("assets/hiw-hero.jpg") center / cover no-repeat;
+  /* CEO 08-11, finte 3: cursor-dybde. Scale 1.02 gir
+     bevegelsesmonn uten synlig beskjæringstap; JS lerper
+     translate mot pekeren (maks ~12px, treg easing).           */
+  transform: scale(1.02) translate(var(--mx, 0px), var(--my, 0px));
+  will-change: transform;
+}
+/* CEO 08-11, finte 1: rute-for-rute-avdekking ved load.
+   Reduced motion: ingen fliser.                                */
+.stage__tiles {
+  grid-column: 1 / 5; grid-row: 1 / 3;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  pointer-events: none;
+}
+.stage__tiles i {
+  background: var(--paper);
+  animation: tile-clear 1s var(--ez) both;
+}
+.stage__tiles i:nth-child(1) { animation-delay: .25s; }
+.stage__tiles i:nth-child(2) { animation-delay: .42s; }
+.stage__tiles i:nth-child(3) { animation-delay: .59s; }
+.stage__tiles i:nth-child(4) { animation-delay: .76s; }
+.stage__tiles i:nth-child(5) { animation-delay: .505s; }
+.stage__tiles i:nth-child(6) { animation-delay: .675s; }
+.stage__tiles i:nth-child(7) { animation-delay: .845s; }
+.stage__tiles i:nth-child(8) { animation-delay: 1.015s; }
+@keyframes tile-clear { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .stage__tiles { display: none; }
+}
+
+/* ── STASJONENE — én komponent, seks tekster ────────────────
+   Hver stasjon er et eget lag over fotoet, samme 2×4-nett som
+   scenen. Diskret bytte: aktiv stasjon (.is-on) revealer med
+   forsidens .iv-språk (opp fra under, forskjøvet per celle);
+   utgående faller raskt og uten delay — det er alltid maks én
+   stemme på scenen.                                            */
+.st {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  pointer-events: none;
+}
+.st.is-on { pointer-events: auto; }
+.st .cell {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity   .25s var(--ez) 0ms,
+    transform .25s var(--ez) 0ms;
+  will-change: opacity, transform;
+}
+.st.is-on .cell {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity   .5s var(--ez) var(--d, 0ms),
+    transform .5s var(--ez) var(--d, 0ms);
+}
+
+/* Stasjon 0 = den godkjente hero-layouten, urørt.              */
+.st__display {
+  grid-column: 1 / 3;
+  grid-row: 2 / 3;
+  align-self: start;
+}
+.st__display h1 {
+  margin: 0;
+  font-size: var(--t-xl); /* CEO 08-11: løftet ett trinn, 60→80 */
+  line-height: 1.1;
+  letter-spacing: -.025em;
+  font-weight: 500;
+  color: #fff;
+  text-wrap: balance;
+  /* CEO 08-12: XL skal ligge NÆRMERE streken enn 20px-regelen —
+     cap-trim + negativt trekk. Ett tall å skru: -10px ≈ 10px
+     optisk avstand fra streken til versalhøyden.               */
+  text-box: trim-both cap alphabetic;
+  margin-top: -10px;
+}
+
+/* Frost-ruta — CEO-godkjent glassflate, strek-til-strek.
+   Gjenbrukes av stasjonene: der teksten trenger to kolonner
+   frostes rute 7 OG 8 — samme panel, samme posisjon.           */
+.st__frost {
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  background: rgba(255, 255, 255, .12);
+}
+.st__body   { grid-column: 3 / 4; grid-row: 2 / 3; }
+.st__body-b { grid-column: 4 / 5; grid-row: 2 / 3; }
+
+.st p { margin: 0 0 14px; font-size: var(--t-base); line-height: 1.6; color: rgba(255, 255, 255, .78); max-width: 38ch; }
+/* To body-trinn i frosten (CEO 08-11): påstand 18, støtte 16.  */
+.st p.lead { font-size: var(--t-body); line-height: 1.5; }
+
+/* Stasjonene 01–04: utsagnet alene i H1-posisjonen (rute 5–6).
+   Nummer-linja over fjernet (CEO 08-12) — jump-lista i naven
+   bærer nummereringen. XL (80) som stasjon 0: hele scenen er
+   ett design og snakker i én størrelse (CEO 08-12).            */
+.st__h { grid-column: 1 / 3; grid-row: 2 / 3; align-self: start; }
+.st__h h2 {
+  margin: 0;
+  font-size: var(--t-xl);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+  font-weight: 500;
+  color: #fff;
+  text-wrap: balance;
+  max-width: 16ch;
+  /* Samme sete som stasjon 0: cap-trim + samme negative trekk. */
+  text-box: trim-both cap alphabetic;
+  margin-top: -10px;
+}
+
+/* ── PROGRESS-BAREN — instrumentet på midtstreken ───────────
+   CEO 08-12: baren ligger på hele baselinjen (radlinja, 50vh
+   av scenen). Fyllet er 2px hvitt over nettets egen hairline
+   og vokser hakk for hakk — stasjon/5. Tallene over streken
+   fjernet (CEO 08-12) — baren bærer progresjonen alene.        */
+.stage__bar {
+  position: absolute;
+  left: 0; right: 0;
+  top: var(--row);
+  z-index: 3;
+  pointer-events: none;
+}
+.stage__bar .fill {
+  position: absolute;
+  left: 0; top: -1px;
+  height: 2px;
+  width: 0%;
+  background: #fff;
+  transition: width .8s var(--ez);
+}
+
+/* ══ SECTION 2 + 3 — sentrerte utsagn på papiret ═════════════
+   CEO 08-12 (eksperiment): Approach-satsen forkastet samme dag
+   — bilde og caption UT. I stedet: utsagnet flyter center
+   center på åpen flate, 21-trinnet (tre hakk ned fra 60).
+   To seksjoner, samme stemme, speilvendt plassering:
+   Section 2 = rad 1 (øvre halvdel), Section 3 = rad 2 (nedre).
+   Referansebilde fra CEO: sentrert tekstblokk på åpent felt.  */
+.sec2-wrap { position: relative; }
+.sec2 {
+  position: relative;
+  height: var(--box);
+  background: var(--paper);
+}
+.sec2 .cols { position: absolute; inset: 0; grid-template-rows: repeat(2, minmax(0, 1fr)); }
+
+/* Én delt sentrerings-komponent — like stemmer deler klasse.  */
+.sec-center {
+  grid-column: 1 / 5;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+.sec-center h2, .sec-center p {
+  margin: 0;
+  font-size: var(--t-h4);
+  line-height: 1.4;
+  letter-spacing: -.012em;
+  font-weight: 500;
+  color: var(--ink);
+  max-width: 44ch;   /* CEO 08-12: 8–9 ord per linje, aldri hele ruten */
+  text-wrap: balance;
+}
+/* CEO 08-12: én rad ned, innenfor «rute 5 og 6» = de to
+   midterste rutene i nedre rad (kolonne 2–3). .cell gir
+   20px-paddingen; sentrert inni boksen.                       */
+.sec2 .sec-center, .sec3 .sec-center { grid-row: 2 / 3; grid-column: 2 / 4; }
+
+/* Tittelen «I follow the signal.» — center center i de to
+   midterste rutene ØVRE rad (rute 2–3). CEO 08-12: HELT i
+   kanten, ingen padding — .cell-paddingen nulles, og JS
+   (fitTitle) skalerer fonten så lengste linje treffer
+   gridlinjene eksakt. --t-xxl er fallback uten JS.            */
+.sec2__title {
+  grid-row: 1 / 2; grid-column: 2 / 4;
+  padding: 0;
+  display: flex; justify-content: center; align-items: center;
+  text-align: center;
+}
+.sec2__title h2 {
+  margin: 0;
+  font-size: var(--t-xxl);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+/* Punchlinen — ett trinn opp (30) i samme stemme; skal bære
+   mer enn brødet over, uten å konkurrere med tittelen i sec2.
+   Får stå på ÉN linje (44ch-capen gjelder brødet, ikke
+   punchen) — men aldri bredere enn cellen.                    */
+.sec-center .sec3__punch { font-size: var(--t-h3); line-height: 1.2; max-width: 100%; }
+
+/* Section 3 bærer teppet nå — siste flate før footeren:
+   sticky i en wrap på 2 moduler, footeren (negativ margin,
+   z over) sklir som teppe over den pinnede flaten.
+   CEO 08-12: BG-VIDEO med scroll-scrub (Swim 12 hopp) —
+   re-enkodet -g 1 (keyframe per frame) for jevn scrubbing.
+   Blekket snus til hvitt over videoen — heroens grammatikk.
+   Materialrytmen: video → hvitt → video → sort.               */
+/* CEO 08-12: sec3 = 150vh — POENGET er scroll-rom: den ekstra
+   halvmodulen ligger UNDER folden som teppe-bane, så footeren
+   bruker første halvdel av reisen sin på usynlig video før den
+   rører hooken. Pinner på toppen som sec2; tekst i rad 1–2.   */
+.sec3-wrap { position: relative; height: calc(var(--box) * 2.5); }
+.sec3 {
+  position: sticky;
+  top: var(--pad);
+  height: calc(var(--box) * 1.5);
+  background: var(--ground);
+  overflow: hidden;
+  --ink: #FFFFFF;
+  --ink-2: rgba(255, 255, 255, .55);
+  color: var(--ink);
+}
+.sec3__bg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+/* Sort scrim over videoen (CEO 08-12: kvaliteten skal dempes)
+   — flatt mørkelag + tyngde mot kantene; ETT tall å skru på.  */
+.sec3::after {
+  content: '';
+  position: absolute; inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(120% 90% at 50% 45%, transparent 22%, rgba(5, 5, 5, .88) 100%),
+    rgba(5, 5, 5, .40);
+  pointer-events: none;
+}
+/* 150vh = TRE innerrader à 0,5 modul, på nettets linjer.
+   Teksten bor i rad 1–2 (CEO: flyttet opp) — samme ruter som
+   sec2; nederste halvmodul er ren video/teppe-bane.           */
+.sec3 .cols { position: absolute; inset: 0; grid-template-rows: repeat(3, minmax(0, 1fr)); z-index: 41; }
+
+
+/* ══ FOOTER — forsidens siste modul, ordrett ═════════════════
+   CEO 08-12: samme footer som hovedsiden og HELT dekkende —
+   ett helt 100vh-modul (kolofonrad + tickerrad), portert fra
+   grid-video.html: kolofon-kortet i rute 4 (navn topp, lenkene
+   på rutas midtlinje, mail mot bunnen), © 2026 alene i ruta
+   under, ticker i rute 5–6 mot bunnkanten, rå klipping.
+   Teppet (CEO-go 08-12, reverserer «overlappene forkastet»):
+   footeren trekkes opp én modul med negativ margin og sklir
+   over den pinnede Section 3 — opak sort rygg, z over papiret. */
+.footer {
+  background: var(--ground);
+  position: relative;
+  z-index: 2;
+  margin-top: calc(var(--box) * -1);
+  overflow: hidden;
+  --ink:   #FFFFFF;
+  --ink-2: rgba(255, 255, 255, .52);
+  --ink-3: rgba(255, 255, 255, .30);
+  color: var(--ink);
+}
+.footer .cols {
+  height: var(--box);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+.footer__colophon {
+  grid-column: 4 / 5; grid-row: 1 / 2; align-self: stretch;
+  display: grid; grid-template-rows: repeat(2, 1fr);
+  font-size: var(--t-fine); line-height: 1.4;
+}
+.footer__colophon .footer__name { grid-area: 1 / 1; align-self: start; }
+.colo__mid {
+  grid-area: 1 / 1; align-self: end;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.footer__colophon .footer__mail { grid-area: 2 / 1; align-self: end; }
+.footer__c {
+  grid-column: 4 / 5; grid-row: 2 / 3; align-self: end;
+  font-size: var(--t-fine); line-height: 1.4;
+  color: var(--ink-3); letter-spacing: .14em;
+}
+.footer__name { letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+.footer__nav { display: flex; flex-wrap: wrap; gap: 6px 2.5ch; }
+.footer__nav a, .footer__mail {
+  color: var(--ink-2);
+  text-decoration: none;
+  letter-spacing: .14em; text-transform: uppercase;
+  transition: color .3s var(--ez);
+}
+.footer__nav a:hover, .footer__mail:hover { color: var(--ink); }
+.footer__mail { text-transform: none; letter-spacing: 0; }
+
+/* TICKER — portert fra forsiden. Lineær tid: på en ticker er
+   farten konstant per definisjon.                              */
+.footer__ticker {
+  grid-column: 1 / 3; grid-row: 2 / 3;
+  align-self: stretch;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+.ticker__track {
+  display: flex;
+  flex: none;
+  animation: tick 40s linear infinite;
+}
+.ticker__seq {
+  display: flex; flex: none;
+  white-space: nowrap;
+  gap: 1.5ch;
+  padding-right: 1.5ch;
+  /* Ordene uten bindestrek, store nok til å dekke halve ruta —
+     størrelsen er geometri (row/2), ikke et skalatrinn.        */
+  font-size: calc(var(--row) / 2);
+  line-height: 1;
+  letter-spacing: -.02em;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+@keyframes tick {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ─── MOBIL ≤1023 — modulgrid, ikke avskrudd grid ────────────
+   CEO 08-12 (rev 2, terningkast 3 på v1): gridsystemet LEVER på
+   mobil. Müller-Brockmann: smalt format = færre kolonner, men
+   nettet består — modulene bærer linjene. Grammatikk:
+   · formatets to vertikaler ligger på papirkanten hele veien
+   · hver modul åpner med egen nettlinje + noder i kryssene
+   · innholdet bor I modulen med romslig vertikal luft
+   · typeskalaen er rem på flytende rot — teksten skalerer
+     med formatet, ingen faste px.                              */
+@media (max-width: 1023px) {
+  /* REM-ROTEN: 16px ved 390 (designbredden), flyter med
+     formatet ned til 13 og opp til 18. Hele skalaen henger på
+     denne — ett tall styrer all tekst.                         */
+  html { font-size: clamp(13px, calc(100vw / 24.375), 18px); }
+
+  :root {
+    --pad: 8px;
+    --cell: 1rem;                          /* 16 ved 390, skalerer */
+    --box: calc(100svh - (var(--pad) * 2));  /* svh: stabil under URL-feltet */
+    /* CEO rev 3: nettet skal SYNES på mobil — mindre flate gir
+       mindre linje å lese, så blekket går opp ett hakk.        */
+    --line: rgba(5, 5, 5, .24);
+    --t-xxl: 2.8125rem;   /* 110 → 45-trinnet, flyter med roten  */
+    --t-xl:  2.8125rem;   /*  80 → 45                            */
+    --t-h1:  2.8125rem;   /*  60 → 45                            */
+    --t-h2:  1.875rem;    /*  45 → 30                            */
+  }
+  .grid { display: none; }   /* 4-kolonne-nettet er desktop-geometri */
+  .snap { display: none; }
+
+  /* MOBILNETTET — formatets vertikaler + modul-linjene.        */
+  .page::before, .page::after {
+    content: '';
+    position: absolute; top: 0; bottom: 0;
+    width: var(--hair);
+    background: var(--line);
+    z-index: 40; pointer-events: none;
+  }
+  .page::before { left: 0; }
+  .page::after  { right: 0; }
+
+  .mline {
+    display: block;
+    position: absolute; top: 0; left: 0; right: 0;
+    height: var(--hair);
+    background: var(--line);
+    z-index: 40; pointer-events: none;
+  }
+  .mline::before, .mline::after {
+    content: '';
+    position: absolute;
+    top: calc(var(--node) / -2 + var(--hair) / 2);
+    width: var(--node); height: var(--node);
+    background: #050505;
+  }
+  .mline::before { left: calc(var(--node) / -2); }
+  .mline::after  { right: calc(var(--node) / -2); }
+  /* Mørke moduler: linja og nodene snur blekket.               */
+  .sec3 .mline, .footer .mline { background: rgba(255, 255, 255, .34); }
+  .sec3 .mline::before, .sec3 .mline::after,
+  .footer .mline::before, .footer .mline::after { background: #FFFFFF; }
+
+  /* NAV — hvit rygg ALLTID: navn + CTA på topplinja, side-
+     lenkene under. Jump-lista er desktop-instrument.           */
+  .nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    background: var(--paper);
+    box-shadow: 0 calc(var(--pad) * -1) 0 0 var(--paper);
+    border-bottom: var(--hair) solid var(--line);
+  }
+  .nav .cell { font-size: var(--t-meta); line-height: 1.4; padding: var(--cell); }
+  .nav__name  { grid-column: 1 / 2; grid-row: 1; }
+  .nav__cta   { grid-column: 2 / 3; grid-row: 1; }
+  .nav__links { grid-column: 1 / 3; grid-row: 2; padding-top: 0; }
+  .nav .nav__jumps { display: none; }   /* matcher desktop-selektorens vekt */
+  .nav.is-paper { padding-top: 0; padding-bottom: 0; }
+
+  /* HERO — fotomodul på én --box; stasjon 0 mot bunnen, over
+     SAMME boks (ikke inset:0 mot siden — det dekket alt).      */
+  .stage-wrap { height: auto; }
+  .stage { position: relative; height: auto; overflow: visible; }
+  .stage .cols {
+    position: relative;
+    display: block;
+    height: var(--box);
+    padding: 0;
+  }
+  .stage__media { position: absolute; inset: 0; transform: none; }
+  .stage__tiles, .stage__bar, .stage__scroll { display: none; }
+
+  /* STASJONENE 01–04 — én modul hver: åpner på egen nettlinje,
+     romslig luft (cell-multipler), tittel + brød i modulen.    */
+  .st {
+    position: relative;
+    display: flex; flex-direction: column; gap: 1.5rem;
+    padding: calc(var(--cell) * 4) 0;
+    pointer-events: auto;
+  }
+  .st .cell { opacity: 1 !important; transform: none !important; }
+  .st--0 {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: var(--box);
+    justify-content: flex-end;
+    padding: 0 0 var(--cell);
+  }
+  .st:not(.st--0) { background: var(--paper); }
+  .st:not(.st--0) .st__h h2 { color: var(--ink); }
+  .st:not(.st--0) p { color: var(--ink-2); }
+  .st:not(.st--0) .st__frost { backdrop-filter: none; -webkit-backdrop-filter: none; background: none; }
+
+  /* SEC 2/3 — utsagnsmoduler, senter senter som referansen og
+     desktopen; fit-mekanikken er desktop — her taler tokenet
+     (rem, flyter med roten).                                   */
+  .sec2 .cols, .sec3 .cols, .footer .cols {
+    position: static;
+    display: flex; flex-direction: column; gap: 2.5rem;
+    height: auto;
+    padding: calc(var(--cell) * 5) 0;
+  }
+  .sec2 .cols, .sec3 .cols { align-items: center; text-align: center; }
+  .sec2__title { padding: var(--cell); }   /* tilbake i ruta — kant-fit er desktop */
+  .sec2, .sec3 { height: auto; }
+  .sec3 { position: relative; top: auto; overflow: visible; }
+  .sec3::after { display: none; }   /* scrim er videoens instrument */
+  .sec2-wrap, .sec3-wrap { height: auto; }
+  .sec3__bg { display: none; }   /* videoen lastes ikke på mobil — sort modul, hvitt blekk */
+
+  /* FOOTER — kolofonmodul (CEO rev 3: «trenger mer jobb»).
+     Fine-trinnet (12) er desktop-kortets stemme — for spinkelt
+     som mobilmodul. Grammatikk: navnelabel oppe, lenkene som
+     VERTIKAL liste i nav-stemmen (21-trinnet), mail under i
+     dempet blekk, tickeren som bunninstrument, © til slutt.    */
+  .footer { margin-top: 0; overflow: visible; }
+  .footer .cols { gap: 2.5rem; padding-bottom: calc(var(--cell) * 2); }
+  .footer__colophon { display: flex; flex-direction: column; gap: 1.5rem; }
+  /* Desktop-gridens align-self: end (mid/mail) betyr HØYRE i
+     flex-kolonne — alt venstrestilles på mobil.                */
+  .footer__colophon .footer__name,
+  .footer__colophon .colo__mid,
+  .footer__colophon .footer__mail { align-self: flex-start; }
+  .footer__nav { flex-direction: column; gap: .65rem; }
+  .footer__nav a {
+    font-size: var(--t-h4); line-height: 1.3;
+    letter-spacing: -.012em; font-weight: 500;
+    text-transform: none;
+    color: var(--ink);
+  }
+  .footer__mail {
+    font-size: var(--t-h4); line-height: 1.3;
+    letter-spacing: -.012em; font-weight: 500;
+    color: var(--ink-2);
+  }
+  .footer__mail, .footer__c { text-align: left; }
+  .footer__c { align-self: flex-start; }
+  .footer__ticker { align-self: stretch; overflow: hidden; }
+  /* Tickerens desktop-størrelse er geometri (row/2 ≈ 200px) —
+     på mobil finnes ikke modulen; ned på skalaen: 45.          */
+  .ticker__seq { font-size: var(--t-h1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iv { opacity: 1; transform: none; transition: none; }
+  .split .ch { opacity: 1; transform: none; transition: none; }
+  .st .cell, .st.is-on .cell { transition: none; }
+  .stage__bar .fill { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ══ NAV — glass, scroll-down-hide ═══════════════════════ -->
+  <nav class="nav" aria-label="Main">
+    <div class="cell nav__name"><a href="grid-video.html">Rune &Oslash;verland</a></div>
+    <div class="cell nav__links">
+      <a href="grid-video.html">Home</a>
+      <a href="how-i-work.html" aria-current="page">How I work</a>
+    </div>
+    <div class="cell nav__jumps" aria-label="Sections on this page">
+      <button type="button" data-jump="1"><span class="jno">01</span><span class="jt">Curiosity</span></button>
+      <button type="button" data-jump="2"><span class="jno">02</span><span class="jt">Collaboration</span></button>
+      <button type="button" data-jump="3"><span class="jno">03</span><span class="jt">Practice</span></button>
+      <button type="button" data-jump="4"><span class="jno">04</span><span class="jt">Ownership</span></button>
+      <button type="button" data-jump="5"><span class="jno">05</span><span class="jt">Learning loop</span></button>
+    </div>
+    <div class="cell nav__cta"><a href="mailto:mail2overland@gmail.com">Start a conversation <span class="arrow">&rarr;</span></a></div>
+  </nav>
+
+  <!-- ══ SCENEN — sticky, 5 stasjoner ════════════════════════ -->
+  <section class="stage-wrap" id="hero">
+
+    <div class="stage">
+      <!-- Nettet bor i seksjonen — står når scenen står -->
+      <div class="grid" aria-hidden="true">
+        <i class="v v1"></i><i class="v v2"></i><i class="v v3"></i>
+        <div class="rows"></div>
+        <div class="nodes n1"></div><div class="nodes n2"></div><div class="nodes n3"></div>
+      </div>
+      <div class="cols">
+        <div class="stage__media" role="img" aria-label="Rune at a summit over the sea"></div>
+        <div class="stage__tiles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+        <div class="cell stage__scroll label" aria-hidden="true">Scroll &darr;</div>
+      </div>
+
+      <!-- Stasjon 0 — den godkjente heroen, urørt layout -->
+      <div class="st st--0 is-on" id="st-0">
+        <div class="cell st__display" style="--d:1450ms">
+          <h1>I care about how the work gets made.</h1>
+        </div>
+        <div class="cell st__body st__frost" style="--d:1850ms">
+          <p class="lead">A strong result is rarely one brilliant decision. It comes from people who learn, share, test and make the idea better than it arrived.</p>
+        </div>
+      </div>
+
+      <!-- Stasjon 01 · Curiosity -->
+      <div class="st" id="st-1">
+        <i class="mline" aria-hidden="true"></i>
+        <div class="cell st__h" style="--d:0ms">
+          <h2>I learn when the result asks more of me.</h2>
+        </div>
+        <div class="cell st__body st__frost" style="--d:80ms">
+          <p class="lead">I never set out to collect disciplines. One problem kept leading to the next.</p>
+          <p>DJing led me to Resolume and 3D because I wanted the music and visuals to belong together. Producing events led me to websites, ads and analytics because I wanted the whole experience to hold together from first impression to a full room. Now the same curiosity drives how I work with AI.</p>
+        </div>
+        <div class="cell st__body-b st__frost" style="--d:160ms">
+          <p class="lead">I don&rsquo;t collect skills for the list. I learn because I care about the result.</p>
+        </div>
+      </div>
+
+      <!-- Stasjon 02 · Collaboration -->
+      <div class="st" id="st-2">
+        <i class="mline" aria-hidden="true"></i>
+        <div class="cell st__h" style="--d:0ms">
+          <h2>Good ideas move between people.</h2>
+        </div>
+        <div class="cell st__body st__frost" style="--d:80ms">
+          <p class="lead">They rarely arrive finished. One person sees the problem, another names what is missing, and someone else&rsquo;s unfinished thought unlocks the next move.</p>
+        </div>
+        <div class="cell st__body-b st__frost" style="--d:160ms">
+          <p>My role is often to keep that movement alive. I want specialists who challenge me, people who care enough to disagree and a room where changing your mind means the work is stronger.</p>
+        </div>
+      </div>
+
+      <!-- Stasjon 03 · Practice -->
+      <div class="st" id="st-3">
+        <i class="mline" aria-hidden="true"></i>
+        <div class="cell st__h" style="--d:0ms">
+          <h2>High standards need a way forward.</h2>
+        </div>
+        <div class="cell st__body st__frost" style="--d:80ms">
+          <p class="lead">Perfectionism used to turn care into a loop. I could see what was missing, but I did not always know when to stop.</p>
+          <p>Now I put more of that energy into the process around the work: clear scope, visible decisions, reusable scaffolds and evals. New ideas are captured without pulling an active sprint sideways.</p>
+          <p>The goal is not process for its own sake. It is to make work I can stand behind and still get it into the real world.</p>
+        </div>
+      </div>
+
+      <!-- Stasjon 04 · Ownership -->
+      <div class="st" id="st-4">
+        <i class="mline" aria-hidden="true"></i>
+        <div class="cell st__h" style="--d:0ms">
+          <h2>I don&rsquo;t need to stand in front of the work.</h2>
+        </div>
+        <div class="cell st__body st__frost" style="--d:80ms">
+          <p>I want the people I work with to understand my contribution. Beyond that, I don&rsquo;t need the credit. If my idea becomes the team&rsquo;s idea and the work succeeds, that is enough. I know when I have done good work, and I can admit when I haven&rsquo;t.</p>
+        </div>
+        <div class="cell st__body-b st__frost" style="--d:160ms">
+          <p>When something ships, I stay with it. I watch what happens, learn from what doesn&rsquo;t hold and patch quickly. Nothing is perfect at launch. Ownership means making sure it gets better.</p>
+        </div>
+      </div>
+
+      <!-- Instrumentet: bar på midtstreken -->
+      <div class="stage__bar" aria-hidden="true">
+        <i class="fill"></i>
+      </div>
+    </div>
+
+    <!-- Scroll-moduler 1–4 bak den stickye scenen -->
+    <div class="snap" aria-hidden="true"></div>
+    <div class="snap" aria-hidden="true"></div>
+    <div class="snap" aria-hidden="true"></div>
+    <div class="snap" aria-hidden="true"></div>
+
+  </section>
+
+  <!-- ══ SECTION 2 — 05 · Learning loop på papiret ══════════ -->
+  <div class="sec2-wrap">
+    <section class="sec2" id="learning-loop">
+      <i class="mline" aria-hidden="true"></i>
+      <!-- Nettet bor i seksjonen — ruller med den, forsidens kanon -->
+      <div class="grid" aria-hidden="true">
+        <i class="v v1"></i><i class="v v2"></i><i class="v v3"></i>
+        <div class="rows"></div>
+        <div class="nodes n1"></div><div class="nodes n2"></div><div class="nodes n3"></div>
+      </div>
+      <div class="cols">
+        <!-- To linjer med hardt brudd: lengste linje («the
+             signal.») fittes til rutekanten av JS — én linje
+             ville gitt MINDRE tekst, ikke større.             -->
+        <div class="cell sec2__title iv" style="--d:0ms">
+          <h2>I follow<br>the signal.</h2>
+        </div>
+        <div class="cell sec-center iv" style="--d:120ms">
+          <p>Ticket sales made the feedback immediate. I could see which pages converted, which ads moved tickets and what needed to change. Each round made the campaign sharper.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ══ SECTION 3 — utsagn over scrubbet svømme-video ══════ -->
+  <div class="sec3-wrap">
+    <section class="sec3">
+      <i class="mline" aria-hidden="true"></i>
+      <!-- Swim 12 hopp, kuttet på 12s (CEO: før hopper nr 2),
+           -g 1-enkodet for scrub. Scrolles frem av sec3Scrub. -->
+      <!-- preload="none": display:none stopper IKKE nedlasting
+           på mobil — desktop-scrubben flipper til auto i JS.  -->
+      <video class="sec3__bg" src="assets/sec3-swim.mp4" muted playsinline preload="none" aria-hidden="true"></video>
+      <div class="grid" aria-hidden="true">
+        <i class="v v1"></i><i class="v v2"></i><i class="v v3"></i>
+        <div class="rows"></div>
+        <div class="nodes n1"></div><div class="nodes n2"></div><div class="nodes n3"></div>
+      </div>
+      <div class="cols">
+        <!-- CEO 08-12: identisk oppsett som Section 2 — fittet
+             kjempetittel rute 2–3 oppe, blokken rute 5–6 nede.
+             Hvitt blekk over videoen. (Splitt-testen The/work
+             i rute 1/4 forkastet samme dag.)                  -->
+        <div class="cell sec2__title iv" style="--d:0ms">
+          <h2>The work<br>answers.</h2>
+        </div>
+        <div class="cell sec-center iv" style="--d:120ms">
+          <p>I don&rsquo;t need the first version to prove me right. I need it to teach us something. Data tells us where to focus; experience and creativity decide what we do there.</p>
+          <p class="sec3__punch">The result becomes the next brief.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ══ FOOTER — forsidens siste modul, helt dekkende ══════ -->
+  <footer class="footer">
+    <i class="mline" aria-hidden="true"></i>
+    <div class="cols">
+      <div class="cell footer__colophon">
+        <div class="footer__name">Rune &Oslash;verland</div>
+        <div class="colo__mid">
+          <nav class="footer__nav" aria-label="Footer">
+            <a href="grid-video.html#approach">Approach</a>
+            <a href="grid-video.html#work">Work</a>
+            <a href="how-i-work.html">How I work</a>
+            <a href="grid-video.html#contact">Contact</a>
+          </nav>
+        </div>
+        <a class="footer__mail" href="mailto:mail2overland@gmail.com">mail2overland@gmail.com</a>
+      </div>
+
+      <div class="cell footer__ticker" aria-hidden="true">
+        <div class="ticker__track">
+          <span class="ticker__seq">Ads Video Design Code Agents&nbsp;</span>
+          <span class="ticker__seq">Ads Video Design Code Agents&nbsp;</span>
+        </div>
+      </div>
+
+      <div class="cell footer__c">&copy; 2026</div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── BOKSTAV-SPLITT — fra forsiden ───────────────────────── */
+  Array.prototype.forEach.call(document.querySelectorAll('.split'), function (el) {
+    var words = el.textContent.split(' ');
+    el.textContent = '';
+    var ci = 0;
+    words.forEach(function (word, wi) {
+      var w = document.createElement('span');
+      w.className = 'w';
+      for (var i = 0; i < word.length; i++) {
+        var c = document.createElement('span');
+        c.className = 'ch';
+        c.style.setProperty('--ci', ci++);
+        c.textContent = word.charAt(i);
+        w.appendChild(c);
+      }
+      el.appendChild(w);
+      if (wi < words.length - 1) { el.appendChild(document.createTextNode(' ')); }
+    });
+  });
+
+  /* ── IN VIEW — Contact/footer trigges av scroll ──────────── */
+  var targets = document.querySelectorAll('.iv, .split');
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -30% 0px', threshold: 0 });
+    Array.prototype.forEach.call(targets, function (el) {
+      if (el.closest('.stage')) { return; }
+      io.observe(el);
+    });
+  } else {
+    Array.prototype.forEach.call(targets, function (el) { el.classList.add('is-in'); });
+  }
+
+  /* ── GRUNNLINJE — fra forsiden ───────────────────────────── */
+  function seatBaselines() {
+    Array.prototype.forEach.call(document.querySelectorAll('.baseline'), function (el) {
+      el.style.setProperty('--nudge', '0px');
+      var probe = document.createElement('span');
+      probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+      el.appendChild(probe);
+      var gap = el.getBoundingClientRect().bottom - probe.getBoundingClientRect().top;
+      el.removeChild(probe);
+      el.style.setProperty('--nudge', (gap > 0.5 ? gap : 0).toFixed(2) + 'px');
+    });
+  }
+  seatBaselines();
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(seatBaselines); }
+  var rt; window.addEventListener('resize', function () {
+    clearTimeout(rt); rt = setTimeout(seatBaselines, 120);
+  });
+
+  /* ── SEC2-TITTEL — fit til rutekant (CEO 08-12) ──────────────
+     Størrelsen er ikke et fritt tall: den avledes av rutebredden
+     så lengste linje ligger HELT i kanten på rute 2–3. Måles med
+     prøvestørrelse 100px, skaleres til boksens clientWidth.
+     Mobil (CEO rev 2): fit AV — der taler typeskalaen i rem på
+     flytende rot, px-fit er desktop-gridens mekanikk.           */
+  var fitEls = Array.prototype.slice.call(document.querySelectorAll('.sec2__title h2'));
+  function fitTitle() {
+    fitEls.forEach(function (el) {
+      if (window.innerWidth < 1024) { el.style.fontSize = ''; return; }
+      el.style.fontSize = '100px';
+      var w = el.scrollWidth;
+      if (w > 0) { el.style.fontSize = (100 * el.parentElement.clientWidth / w) + 'px'; }
+    });
+  }
+  fitTitle();
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fitTitle); }
+  var ft; window.addEventListener('resize', function () {
+    clearTimeout(ft); ft = setTimeout(fitTitle, 120);
+  });
+
+  /* ── SEC3 — video-scrub (CEO 08-12) ──────────────────────────
+     Kontinuerlig progresjon over hele sec3-wrappens bane (inn
+     nedenfra → teppet dekker), rAF-lerp .12 mot mål, 1/30s-gate
+     på currentTime. Ikke på mobil / reduced-motion — der står
+     videoen på første frame.                                    */
+  var s3wrap = document.querySelector('.sec3-wrap');
+  var s3v = document.querySelector('.sec3__bg');
+  if (s3wrap && s3v && !reduce && window.innerWidth >= 1024) {
+    s3v.preload = 'auto'; s3v.load();
+    var s3target = 0, s3cur = 0, s3raf = null;
+    var s3tick = function () {
+      s3raf = null;
+      if (!s3v.duration) { return; }
+      s3cur += (s3target - s3cur) * 0.12;
+      if (Math.abs(s3target - s3cur) < 0.001) { s3cur = s3target; }
+      var t = s3cur * s3v.duration;
+      if (Math.abs(t - s3v.currentTime) > 1 / 30) { s3v.currentTime = t; }
+      if (s3cur !== s3target) { s3raf = requestAnimationFrame(s3tick); }
+    };
+    window.addEventListener('scroll', function () {
+      var r = s3wrap.getBoundingClientRect();
+      /* Banen starter når wrap-toppen når MIDTEN av skjermen
+         (CEO 08-12: «for tidlig» fra bunnkanten) og ender ved
+         stick-slutt (én modul = r.height/2).                  */
+      /* Startlinje 40 % fra toppen (CEO 08-12, tilbake fra 50).
+         Stick-slutt = 1 modul av wrappens 2,5 (= ×0.4).      */
+      var half = window.innerHeight * 0.40;
+      var p = (half - r.top) / (r.height * 0.4 + half);
+      s3target = Math.max(0, Math.min(1, p));
+      if (!s3raf) { s3raf = requestAnimationFrame(s3tick); }
+    }, { passive: true });
+  }
+
+  /* ── SCENEN — diskret stasjonsbytte drevet av snap ──────────
+     Stasjon = rundet scrollposisjon i hele moduler. Snap sørger
+     for at hvilepunktene alltid ER hele moduler; handleren her
+     bare speiler tilstanden inn i DOM: aktiv stasjon, bar-fyll
+     (st/5) og aktivt jump-tall. rAF-throttlet.                 */
+  var wrap = document.querySelector('.stage-wrap');
+  var stage = document.querySelector('.stage');
+  var stations = Array.prototype.slice.call(document.querySelectorAll('.st'));
+  var fill = document.querySelector('.stage__bar .fill');
+  var jumps = Array.prototype.slice.call(document.querySelectorAll('.nav__jumps button'));
+  var nav = document.querySelector('.nav');
+  var scrollHint = document.querySelector('.stage__scroll');
+  var mobile = window.matchMedia('(max-width: 1023px)');
+
+  var padPx = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pad')) || 10;
+  var current = 0;
+
+  function boxPx() { return stage.offsetHeight; }
+  function wrapTop() { return wrap.getBoundingClientRect().top + window.scrollY; }
+
+  function setStation(n) {
+    if (n === current) { return; }
+    current = n;
+    stations.forEach(function (st, i) {
+      st.classList.toggle('is-on', i === n);
+      st.setAttribute('aria-hidden', i === n ? 'false' : 'true');
+    });
+    fill.style.width = (n / 4 * 100) + '%';
+  }
+
+  var ticking = false;
+  var lastY = window.scrollY;
+  function onScroll() {
+    if (ticking) { return; }
+    ticking = true;
+    requestAnimationFrame(function () {
+      ticking = false;
+      var y = window.scrollY;
+
+      /* Mobil: scenen er i flyt — kun navens skjul-ved-scroll-
+         ned lever (hvit rygg ligger fast i CSS).               */
+      if (mobile.matches) {
+        nav.classList.toggle('is-hidden', y > lastY && y > 40);
+        lastY = y;
+        return;
+      }
+
+      var origin = wrapTop() - padPx;
+      var n = Math.round((y - origin) / boxPx());
+      n = Math.max(0, Math.min(4, n));
+      setStation(n);
+      scrollHint.classList.toggle('is-gone', n > 0);
+
+      var raw = Math.round((y - origin) / boxPx());
+
+      /* NAV: henger igjen gjennom hele hero-scenen (CEO 08-12
+         r3) — der er den selve avlesningen av jump-lista.
+         I det scenen slipper (siden begynner å gå oppover,
+         CEO r4) faller den bort med en gang på vei ned.        */
+      var released = y > origin + boxPx() * 4;
+      nav.classList.toggle('is-hidden', released && y > lastY && y > 40);
+      lastY = y;
+
+      /* Aktivt jump-tall: 1-4 = stasjonene, 5 = Section 2.     */
+      var a = Math.max(0, Math.min(5, raw));
+      jumps.forEach(function (b) {
+        b.classList.toggle('is-here', parseInt(b.dataset.jump, 10) === a);
+      });
+
+      /* Hvit rygg når vi har forlatt hero-scenen.              */
+      nav.classList.toggle('is-paper', released);
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* Jump-lenkene: 1–4 → stasjonene på scenen, 5 → Section 2. */
+  jumps.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var n = parseInt(b.dataset.jump, 10);
+      window.scrollTo({
+        top: (wrapTop() - padPx) + n * boxPx(),
+        behavior: reduce ? 'auto' : 'smooth'
+      });
+    });
+  });
+
+  /* Load: stasjon 0 står i markup med hero-forsinkelsene
+     (retimet etter flisene). Etter åpningen strammes delayene
+     så returen fra 01 → 0 svarer som de andre byttene.         */
+  stations.forEach(function (st, i) {
+    st.setAttribute('aria-hidden', i === 0 ? 'false' : 'true');
+  });
+  setTimeout(function () {
+    var d = ['0ms', '80ms'];
+    Array.prototype.forEach.call(document.querySelectorAll('#st-0 .cell'), function (el, i) {
+      el.style.setProperty('--d', d[i] || '160ms');
+    });
+  }, 2800);
+
+  /* ── CURSOR-DYBDE — finte 3 på scenefotoet ─────────────────── */
+  var media = document.querySelector('.stage__media');
+  var finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+  if (stage && media && finePointer && !reduce) {
+    var tx = 0, ty = 0, cx = 0, cy = 0, tiltRaf = null;
+    var step = function () {
+      cx += (tx - cx) * .06;
+      cy += (ty - cy) * .06;
+      media.style.setProperty('--mx', cx.toFixed(2) + 'px');
+      media.style.setProperty('--my', cy.toFixed(2) + 'px');
+      if (Math.abs(tx - cx) > .1 || Math.abs(ty - cy) > .1) {
+        tiltRaf = requestAnimationFrame(step);
+      } else { tiltRaf = null; }
+    };
+    stage.addEventListener('mousemove', function (e) {
+      var r = stage.getBoundingClientRect();
+      /* 1.02-scale gir ~±9px monn på 900px høyde — utslaget
+         holdes under det så fotokanten aldri blir synlig.      */
+      tx = ((e.clientX - r.left) / r.width - .5) * 16;
+      ty = ((e.clientY - r.top) / r.height - .5) * 16;
+      if (tiltRaf === null) { tiltRaf = requestAnimationFrame(step); }
+    });
+    stage.addEventListener('mouseleave', function () {
+      tx = 0; ty = 0;
+      if (tiltRaf === null) { tiltRaf = requestAnimationFrame(step); }
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
