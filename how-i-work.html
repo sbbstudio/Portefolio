@@ -28,6 +28,11 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
+/* CEO 08-13: subtil smooth scroll — ankerhopp glir; av ved
+   redusert bevegelse.                                          */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
 body { margin: 0; }
 
 /* CEO 08-12: ingen snap — fri scroll. Diskret-modellen bæres
@@ -221,6 +226,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .nav .nav__jumps button:hover { color: var(--accent); }
 .nav__cta { grid-column: 4 / 5; text-align: right; }
 .nav__cta .arrow { display: inline-block; }
+
 
 /* Blekk: ren sort #000, ingen hover-funksjon (CEO 08-12).
    NB: over den sorte footeren forsvinner naven — åpen CEO-dom. */
@@ -602,7 +608,8 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .footer__mail { text-transform: none; letter-spacing: 0; }
 
 /* TICKER — portert fra forsiden. Lineær tid: på en ticker er
-   farten konstant per definisjon.                              */
+   farten konstant per definisjon. CEO 08-13: CAPS + samme
+   mellomrom mellom alle ord (elementgap + padding-skjøt).      */
 .footer__ticker {
   grid-column: 1 / 3; grid-row: 2 / 3;
   align-self: stretch;
@@ -629,6 +636,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   font-weight: 500;
   color: var(--ink-2);
 }
+.ticker__seq i { font-style: normal; }
 @keyframes tick {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
@@ -776,6 +784,8 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   .footer__colophon .colo__mid,
   .footer__colophon .footer__mail { align-self: flex-start; }
   .footer__nav { flex-direction: column; gap: .65rem; }
+  .footer__ticker { align-self: stretch; overflow: hidden; }
+  .ticker__seq { font-size: var(--t-h1); }
   .footer__nav a {
     font-size: var(--t-h4); line-height: 1.3;
     letter-spacing: -.012em; font-weight: 500;
@@ -789,10 +799,8 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   }
   .footer__mail, .footer__c { text-align: left; }
   .footer__c { align-self: flex-start; }
-  .footer__ticker { align-self: stretch; overflow: hidden; }
   /* Tickerens desktop-størrelse er geometri (row/2 ≈ 200px) —
      på mobil finnes ikke modulen; ned på skalaen: 45.          */
-  .ticker__seq { font-size: var(--t-h1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -811,7 +819,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   <nav class="nav" aria-label="Main">
     <div class="cell nav__name"><a href="grid-video.html">Rune &Oslash;verland</a></div>
     <div class="cell nav__links">
-      <a href="grid-video.html">Home</a>
+      <a href="nyme.html">Nyme</a>
       <a href="how-i-work.html" aria-current="page">How I work</a>
     </div>
     <div class="cell nav__jumps" aria-label="Sections on this page">
@@ -821,7 +829,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
       <button type="button" data-jump="4"><span class="jno">04</span><span class="jt">Ownership</span></button>
       <button type="button" data-jump="5"><span class="jno">05</span><span class="jt">Learning loop</span></button>
     </div>
-    <div class="cell nav__cta"><a href="mailto:mail2overland@gmail.com">Start a conversation <span class="arrow">&rarr;</span></a></div>
+    <div class="cell nav__cta"><a href="mailto:rune@kaizenstudio.no">Start a conversation <span class="arrow">&rarr;</span></a></div>
   </nav>
 
   <!-- ══ SCENEN — sticky, 5 stasjoner ════════════════════════ -->
@@ -989,13 +997,13 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
             <a href="grid-video.html#contact">Contact</a>
           </nav>
         </div>
-        <a class="footer__mail" href="mailto:mail2overland@gmail.com">mail2overland@gmail.com</a>
+        <a class="footer__mail" href="mailto:rune@kaizenstudio.no">rune@kaizenstudio.no</a>
       </div>
 
       <div class="cell footer__ticker" aria-hidden="true">
         <div class="ticker__track">
-          <span class="ticker__seq">Ads Video Design Code Agents&nbsp;</span>
-          <span class="ticker__seq">Ads Video Design Code Agents&nbsp;</span>
+          <span class="ticker__seq"><i>ADS</i><i>VIDEO</i><i>DESIGN</i><i>CODE</i><i>AGENTS</i></span>
+          <span class="ticker__seq"><i>ADS</i><i>VIDEO</i><i>DESIGN</i><i>CODE</i><i>AGENTS</i></span>
         </div>
       </div>
 
@@ -1149,17 +1157,27 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 
   var ticking = false;
   var lastY = window.scrollY;
+  /* CEO 08-13: nav-en var for sensitiv — krev 120px akkumulert
+     opp-scroll for aa vise den igjen; ned-scroll nullstiller.  */
+  var navUpAcc = 0;
+  function navReveal(hideWanted, y, dy) {
+    if (!hideWanted || y <= 40) { nav.classList.remove('is-hidden'); return; }
+    if (dy > 0) { nav.classList.add('is-hidden'); }
+    else if (navUpAcc >= 120) { nav.classList.remove('is-hidden'); }
+  }
   function onScroll() {
     if (ticking) { return; }
     ticking = true;
     requestAnimationFrame(function () {
       ticking = false;
       var y = window.scrollY;
+      var dy = y - lastY;
+      navUpAcc = dy > 0 ? 0 : navUpAcc - dy;
 
       /* Mobil: scenen er i flyt — kun navens skjul-ved-scroll-
          ned lever (hvit rygg ligger fast i CSS).               */
       if (mobile.matches) {
-        nav.classList.toggle('is-hidden', y > lastY && y > 40);
+        navReveal(true, y, dy);
         lastY = y;
         return;
       }
@@ -1177,7 +1195,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
          I det scenen slipper (siden begynner å gå oppover,
          CEO r4) faller den bort med en gang på vei ned.        */
       var released = y > origin + boxPx() * 4;
-      nav.classList.toggle('is-hidden', released && y > lastY && y > 40);
+      navReveal(released, y, dy);
       lastY = y;
 
       /* Aktivt jump-tall: 1-4 = stasjonene, 5 = Section 2.     */

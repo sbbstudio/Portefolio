@@ -3,13 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script>
-try {
-  if (new URLSearchParams(window.location.search).get('type-test') === 'stacked') {
-    document.documentElement.dataset.typeTest = 'stacked';
-  }
-} catch (error) {}
-</script>
 <title>Rune Øverland — Creative Fullstack Engineer</title>
 <style>
 /* ============================================================
@@ -32,6 +25,11 @@ try {
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
+/* CEO 08-13: subtil smooth scroll — ankerhopp glir; av ved
+   redusert bevegelse.                                          */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
 body { margin: 0; }
 
 :root {
@@ -245,6 +243,7 @@ body {
   border-bottom: var(--hair) solid rgba(5, 5, 5, .14);
 }
 .nav .cell { font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; }
+
 .nav a { text-decoration: none; color: #FFFFFF; transition: color .3s var(--ez); }
 .nav.is-paper a { color: #000000; }
 .nav__name { grid-column: 1 / 2; }
@@ -387,7 +386,14 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   grid-column: 4 / 5; grid-row: 2 / 3;
   align-self: start; text-align: right;
 }
-.hero__cta a { text-decoration: none; }
+/* CEO 08-13: CTA-en tilbake i rute 8 — NYME-kortets mekanikk:
+   blokk mot høyre, cellas 20px er hele avstanden fra streken.  */
+.hero__cta a {
+  display: block; width: fit-content; margin-left: auto;
+  font-size: var(--t-meta);
+  color: var(--ink);
+  text-decoration: none;
+}
 .hero__cta .arrow { display: inline-block; letter-spacing: 0; transition: transform .35s var(--ez); }
 .hero__cta a:hover .arrow { transform: translateX(.5ch); }
 
@@ -580,20 +586,21 @@ body.ready .rl { opacity: 1; transform: none; }
   padding-right: 1ch;
 }
 
-/* TYPE TEST — ?type-test=stacked
-   Én samlet setningsblokk i to faktiske linjer. Originalens fire
-   grid-fragmenter skjules bare i testtilstanden.               */
+/* CEO 08-13: STABLET er standarden — V-formen (fire grid-
+   fragmenter + ticker) klippet «APPLICATION» og kolliderte.
+   Én samlet setningsblokk i to faktiske linjer: lead-en spenner
+   radbredden (THE mot venstre, APPLICATION, mot høyre),
+   STARTS WITH THE JOB. sentrert under. V-form-markupen står
+   igjen skjult om vi vil tilbake.                              */
+.card--nyme .nyme__line,
+.card--nyme .nyme__ticker {
+  display: none;
+}
 .card--nyme .nyme__statement {
-  display: none;
-}
-html[data-type-test="stacked"] .card--nyme .nyme__line,
-html[data-type-test="stacked"] .card--nyme .nyme__ticker {
-  display: none;
-}
-html[data-type-test="stacked"] .card--nyme .nyme__statement {
   grid-column: 1 / 5;
   grid-row: 1 / 2;
   align-self: stretch;
+  position: relative;   /* anker for APPLICATION,-plasseringen */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -602,7 +609,7 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement {
   pointer-events: none;
   z-index: 4;
 }
-html[data-type-test="stacked"] .card--nyme .nyme__statement p {
+.card--nyme .nyme__statement p {
   margin: 0;
   font-size: min(var(--t-display), 7.6vw);
   font-weight: 500;
@@ -610,36 +617,22 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement p {
   letter-spacing: -.03em;
   white-space: nowrap;
 }
-html[data-type-test="stacked"] .card--nyme .nyme__statement-lead {
+.card--nyme .nyme__statement-lead {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: baseline;
   width: 100%;
 }
-html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
-  text-align: center;
-}
-
-/* Gauntlet R1: mediet skal kaste lys på flaten rundt seg.
-   Samme kilde duplisert bak kolonnen, oppskalert, blurret —
-   kortets eget innhold blir kortets lyskilde.                 */
-.card__glow {
+/* CEO 08-13 r2: APPLICATION, til topp venstre i rute 3–4 —
+   venstrekanten PÅ kolonne-3-linja (50 % av kortet), toppcella
+   som THE. Egen vw-brems så ordet bor innenfor de to rutene.   */
+.card--nyme .nyme__statement-lead span:last-child {
   position: absolute;
-  top: -6%; height: 112%;
-  width: calc(var(--vs, 1) * 25% + 15%);
-  left: calc((var(--vc, 1) - 1) * 25% - 7.5%);
-  z-index: 0;
-  transform: scale(1.35);
-  filter: blur(80px) saturate(1.2);
-  opacity: .35;
-  pointer-events: none;
-  transition: opacity .8s var(--ez);
+  left: 50%; top: var(--cell);
+  font-size: min(9.375rem, 6.4vw);
 }
-.card:hover .card__glow { opacity: .5; }   /* lyset svarer på leseren */
-.card__glow video, .card__glow img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  display: block;
+.card--nyme .nyme__statement-rest {
+  text-align: center;
 }
 
 /* Bildeslot. Settes per kort med style="--media:url(...)".    */
@@ -754,8 +747,35 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
   background-color: rgba(0, 0, 0, calc(var(--terreng, 0) * .86));
 }
 
-/* KAIZEN Studio AI-org-kartets CSS fjernet med seksjonen
-   (CEO 08-13, «enn så lenge») — hent fra git ved gjeninnsetting. */
+/* CEO 08-13: full-bleed-modifikator — klippet dekker HELE
+   seksjonen, scrim-gradient (som card__media) så teksten leser
+   mot flaten. Brukes av KAIZEN- (Morfar, påstander i rute 5–6,
+   kort i rute 7, rute 8 tom) og SBB-seksjonen (Video Seksjon 2). */
+.card--bleed .card__col { grid-column: 1 / -1; grid-row: 1 / 3; }
+.card--kzai .kz__claim {
+  grid-column: 1 / 3; grid-row: 2 / 3;   /* CEO r2: XXL trenger to ruter */
+  position: relative; z-index: 1;
+  align-self: start;   /* henger 20px under midtstreken — husregelen */
+}
+.card--kzai .kz__claim p {
+  margin: 0;
+  font-size: var(--t-xxl);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+/* Oppfølgeren under tidsgevinsten — samme stemme, dempet blekk,
+   tett på linja over.                                          */
+.card--kzai .card__say--follow { margin-top: 4px; color: var(--ink-2); }
+/* Scrimmen tilbake på begge (CEO 08-13 r2: SBB som før,
+   med vignett).                                                */
+.card--bleed .card__col::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to bottom,
+    rgba(0,0,0,.72) 0%, rgba(0,0,0,.55) 45%, rgba(0,0,0,.30) 100%);
+}
 
 /* Noten bor på svart side i rute 4-kolonnen.                   */
 .card__note {
@@ -787,11 +807,6 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
   transition: border-color .3s var(--ez);
 }
 .card__note a:hover, .nyme__cta a:hover, .card__link:hover { border-bottom-color: var(--ink); }
-
-/* CEO 08-11 r6: siste kortmodul sto med tom bunnrad rett over
-   Contact — kortet krympes til ÉN rad, så Contact-tekstraden
-   rykker opp i den posisjonen.                                 */
-.card--single { height: var(--row); grid-template-rows: 1fr; }
 
 /* HELE kortet i ÉN grid rute. Glass på hele stacken:
    panelkanten faller på gridlinjene, de 20px innenfor er samme
@@ -923,7 +938,10 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
    ticker er farten konstant per definisjon; easing her ville
    vært en kurve på en rulletrapp.                              */
 /* CEO 08-11 r4: ticker i rute 5–6 (bunnraden, kol 1–2), kant
-   til kant i sitt felt — ingen side-fade; glyfene klippes rått. */
+   til kant i sitt felt — ingen side-fade; glyfene klippes rått.
+   CEO 08-13: CAPS, og SAMME mellomrom mellom alle ord — hvert
+   ord er eget element (1.5ch gap), skjøten er 1.5ch padding,
+   ingen nbsp-søm.                                              */
 .contact__ticker {
   grid-column: 1 / 3; grid-row: 4 / 5;
   align-self: stretch;
@@ -950,6 +968,7 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
   font-weight: 500;
   color: var(--ink-2);
 }
+.ticker__seq i { font-style: normal; }
 @keyframes tick {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
@@ -985,6 +1004,18 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
 /* CEO 08-11 r8: kortet fyller ruta — navnet til topps, lenke-
    blokken hviler på rutas egen midtlinje ovenfra («litt over
    midten»), © alene mot bunnen.                                */
+/* CEO 08-13: rune-flyr-klippet fyller rute 1–2 i kolofonraden;
+   videokantene ER gridlinjene (kortvideoregelen).              */
+.contact__reel {
+  grid-column: 1 / 3; grid-row: 3 / 4;
+  position: relative; overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .55);
+}
+.contact__reel video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
 .contact__colophon {
   grid-column: 4 / 5; grid-row: 3 / 4; align-self: stretch;
   display: grid; grid-template-rows: repeat(2, 1fr);
@@ -995,16 +1026,30 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
   grid-area: 1 / 1; align-self: end;
   display: flex; flex-direction: column; gap: 10px;
 }
-/* CEO 08-11 r9: mail skjøvet ned til bunnen av kortet; © 2026
-   flyttet én rute ned (rute under, i tickerraden).             */
-.contact__colophon .footer__mail { grid-area: 2 / 1; align-self: end; }
+/* CEO 08-13: én handling med tyngde — START A CONVERSATION →
+   bærer kortets baselinje i blekk; mailen ligger dempet 10px
+   over, løftet fra kanten i stedet for å se avkuttet ut.       */
+.colo__bottom {
+  grid-area: 2 / 1; align-self: end;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.footer__cta {
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: .14em; text-transform: uppercase;
+  font-weight: 500;
+}
+.footer__cta .arrow { display: inline-block; transition: transform .35s var(--ez); }
+.footer__cta:hover .arrow { transform: translateX(.5ch); }
 .contact__c {
   grid-column: 4 / 5; grid-row: 4 / 5; align-self: end;
   font-size: var(--t-fine); line-height: 1.4;
   color: var(--ink-3); letter-spacing: .14em;
 }
 .footer__name { letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
-.footer__nav { display: flex; flex-wrap: wrap; gap: 6px 2.5ch; }
+/* CEO 08-13: bevisst 2 × 2-grid — Approach/Work øverst,
+   How I work/Contact under; ingen tilfeldig knekk.             */
+.footer__nav { display: grid; grid-template-columns: repeat(2, max-content); gap: 6px 2.5ch; }
 .footer__nav a, .footer__mail {
   color: var(--ink-2);
   text-decoration: none;
@@ -1097,8 +1142,8 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
   .contact__colophon { display: flex; flex-direction: column; gap: 1.5rem; }
   .contact__colophon .footer__name,
   .contact__colophon .colo__mid,
-  .contact__colophon .footer__mail { align-self: flex-start; }
-  .footer__nav { flex-direction: column; gap: .65rem; }
+  .contact__colophon .colo__bottom { align-self: flex-start; }
+  .footer__nav { grid-template-columns: 1fr; gap: .65rem; }
   .footer__nav a {
     font-size: var(--t-h4); line-height: 1.3;
     letter-spacing: -.012em; font-weight: 500;
@@ -1134,7 +1179,16 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
   .card__note { padding: var(--cell) 0 0; }
   .card--nyme .nyme__cta { text-align: left; }
   .card--nyme .nyme__cta a { margin-left: 0; }
+  .hero__cta { text-align: left; }
+  .hero__cta a { margin-left: 0; }
   .card--nyme .nyme__ph img { position: static; height: auto; }
+  /* Stablet statement på mobil: APPLICATION, i flyt rett etter
+     THE (ikke absolutt mot 50 %-linja som på desktop), og hele
+     setningen på 6.4vw så nowrap-linjene bor i flaten.        */
+  .card--nyme .nyme__statement p { font-size: 6.4vw; }
+  .card--nyme .nyme__statement-lead { gap: .5ch; }
+  .card--nyme .nyme__statement-lead span:last-child { position: static; font-size: inherit; }
+
   /* Jelsa-veggen: hover finnes ikke på mobil — sidene VISES,
      to og to.                                                  */
   .card--jelsa { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--cell); }
@@ -1143,7 +1197,11 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
   .jelsa-cell img { opacity: 1; }
   .card__say, .card__facts { text-align: left; }
   .card__col { position: relative; aspect-ratio: 9 / 16; max-height: 70vh; overflow: hidden; }
-  .card__glow { display: none; }
+  /* Bleed-klippene (Morfar, Video Seksjon 2) er landskap —
+     16:9-flate i stedet for portrettbeskjæring.               */
+  .card--bleed .card__col { aspect-ratio: 16 / 9; max-height: none; }
+  /* Kolofon-reelen i flyt: klippets eget format styrer høyden. */
+  .contact__reel { aspect-ratio: 1660 / 1244; }
   .contact__ticker { min-height: 72px; }
   /* Tickerens desktop-størrelse er geometri (row/2 ≈ 200px) —
      på mobil finnes ikke modulen; ned på skalaen: 45.          */
@@ -1174,7 +1232,7 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
   <nav class="nav" aria-label="Main">
     <div class="cell nav__name"><a href="grid-video.html">Rune &Oslash;verland</a></div>
     <div class="cell nav__links">
-      <a href="grid-video.html" aria-current="page">Home</a>
+      <a href="nyme.html">Nyme</a>
       <a href="how-i-work.html">How I work</a>
     </div>
     <div class="cell nav__jumps" aria-label="Sections on this page">
@@ -1182,7 +1240,7 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
       <button type="button" data-jump="2"><span class="jno">02</span><span class="jt">Work</span></button>
       <button type="button" data-jump="3"><span class="jno">03</span><span class="jt">Contact</span></button>
     </div>
-    <div class="cell nav__cta"><a href="mailto:mail2overland@gmail.com">Start a conversation <span class="arrow">&rarr;</span></a></div>
+    <div class="cell nav__cta"><a href="mailto:rune@kaizenstudio.no">Start a conversation <span class="arrow">&rarr;</span></a></div>
   </nav>
 
   <section class="hero" id="hero">
@@ -1206,9 +1264,12 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
         </dl>
       </div>
 
-      <!-- Eyebrow + CTA UT (CEO 08-12, nav-porten): navnet,
-           How i work-lenka og kontakt-CTA-en bor i naven nå —
-           samme grep som på how-i-work.                       -->
+      <!-- Eyebrow UT (CEO 08-12, nav-porten). CTA tilbake ved
+           CEO-ordre 08-13: How I work i rute 8 topp/høyre —
+           NYME-kortets rute-8-mekanikk (ren 20px fra streken). -->
+      <div class="cell hero__cta rl" style="--i:8">
+        <a href="how-i-work.html">How I work&nbsp;<span class="arrow">&rarr;</span></a>
+      </div>
     </div>
   </section>
 
@@ -1281,17 +1342,13 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
 
     <!-- SBB: videoen ER caset — Tiktok-annonsen som kjøpte
          publikummet. Én rute bred, to rows høy, kant på linje. -->
-    <article class="card" style="--vc:1;--bc:3;--br:2">
+    <!-- CEO 08-13: Video Seksjon 2 som BG på hele seksjonen —
+         samme full-bleed-mekanikk som KAIZEN-modulen. Reel-
+         kolonnen og glowen ut; kortet står igjen i rute 7.     -->
+    <article class="card card--bleed" style="--bc:3;--br:2">
       <i class="mline" aria-hidden="true"></i>
-      <!-- Glow-kilden er en frame fra samme reel (12s), ikke et
-           andre videoelement: ved blur 70px er forskjellen på
-           statisk og levende glow marginal, og kortet slipper
-           dobbel videodekoding.                                -->
-      <div class="card__glow" aria-hidden="true">
-        <img src="assets/reel-glow.jpg" alt="">
-      </div>
       <div class="card__col">
-        <video src="assets/reel-musikkfest.mp4" autoplay muted loop playsinline></video>
+        <video src="assets/sbb-seksjon.mp4" autoplay muted loop playsinline></video>
       </div>
       <div class="card__box">
 
@@ -1308,7 +1365,7 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
 
         <div class="card__facts"><ul>
           <li>Musikkfest 2025</li>
-          <li>1.500+ attendees</li>
+          <li>1,500+ attendees</li>
           <li>TikTok Ads, 6.55× ROAS</li>
         </ul></div>
 
@@ -1319,7 +1376,7 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
          Media = SJU ruter, sju ekte undersider i sporrekkefølge
          (card__box i rute 4). Veggen står dempet; hover løfter
          ruta til 100 % opacity.                                -->
-    <article class="card card--jelsa" id="work-jelsa" style="--bc:4;--br:1;--terreng:.45">
+    <article class="card card--jelsa" id="work-jelsa" style="--bc:4;--br:2;--terreng:.45">
       <i class="mline" aria-hidden="true"></i>
       <div class="card__media" aria-hidden="true"></div>
       <i class="jelsa-terreng" aria-hidden="true"></i>
@@ -1329,7 +1386,9 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
       <div class="jelsa-cell" style="--sc:1;--sr:2" aria-hidden="true"><img src="assets/jelsa/still-parallellsporet.jpg" alt=""></div>
       <div class="jelsa-cell" style="--sc:2;--sr:2" aria-hidden="true"><img src="assets/jelsa/still-91-ar.jpg" alt=""></div>
       <div class="jelsa-cell" style="--sc:3;--sr:2" aria-hidden="true"><img src="assets/jelsa/still-klageloopen.jpg" alt=""></div>
-      <div class="jelsa-cell" style="--sc:4;--sr:2" aria-hidden="true"><img src="assets/jelsa/still-lovbruddsregisteret.jpg" alt=""></div>
+      <!-- CEO 08-13: kortet bor nå i rute 8 — artikkelen som lå
+           der er flyttet opp i toppradens ledige fjerdeplass.  -->
+      <div class="jelsa-cell" style="--sc:4;--sr:1" aria-hidden="true"><img src="assets/jelsa/still-lovbruddsregisteret.jpg" alt=""></div>
       <div class="card__box">
 
         <div class="card__lead">
@@ -1337,23 +1396,50 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
             <span class="card__no">03</span>
             <div class="card__id">
               <h3>Jelsadokumentene</h3>
-              <p>Investigative site<span class="sep">·</span>Since 2026</p>
+              <p>Source-controlled legal case system<span class="sep">·</span>Since 2026</p>
             </div>
           </div>
-          <p class="card__say">Every claim traced back to its source.</p>
+          <p class="card__say">From decisive evidence<br>to defensible action.</p>
         </div>
 
         <div class="card__facts"><ul>
-          <li>10 investigative tracks</li>
-          <li>Document register + evidence vault</li>
-          <li>Claims labeled: documented / assessment</li>
+          <li>Investigation &rarr; evidence &rarr; legal reasoning</li>
+          <li>Adversarial review &rarr; strategy &rarr; delivery</li>
         </ul></div>
 
       </div>
     </article>
 
-    <!-- KAIZEN Studio AI-seksjonen (04, org-kartet) tatt ut
-         enn så lenge (CEO 08-13) — ligger i git-historikken. -->
+    <article class="card card--bleed card--kzai" style="--bc:3;--br:2">
+      <i class="mline" aria-hidden="true"></i>
+      <div class="card__col">
+        <video src="assets/morfar.mp4" autoplay muted loop playsinline></video>
+      </div>
+      <!-- CEO 08-13 r2: hovedpåstanden i XXL over rute 5–6,
+           tidsgevinsten flyttet inn i kortet, rute 8 tom —
+           filmen får puste. -->
+      <div class="cell kz__claim"><p>The work<br>gets done.</p></div>
+      <div class="card__box">
+
+        <div class="card__lead">
+          <div class="card__top">
+            <span class="card__no">04</span>
+            <div class="card__id">
+              <h3>KAIZEN Studio AI</h3>
+              <p>Applied AI<span class="sep">·</span>custom systems</p>
+            </div>
+          </div>
+          <p class="card__say">You get your time back.</p>
+          <p class="card__say card__say--follow">The work decides what gets built.</p>
+        </div>
+
+        <div class="card__facts"><ul>
+          <li>New systems or existing tools</li>
+          <li>Routine handled &middot; exceptions stay human</li>
+        </ul></div>
+
+      </div>
+    </article>
 
   </section>
 
@@ -1363,8 +1449,8 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
     <div class="cols">
       <div class="cell contact__ticker" aria-hidden="true">
         <div class="ticker__track">
-          <span class="ticker__seq">Ads Video Design Code Agents&nbsp;</span>
-          <span class="ticker__seq">Ads Video Design Code Agents&nbsp;</span>
+          <span class="ticker__seq"><i>ADS</i><i>VIDEO</i><i>DESIGN</i><i>CODE</i><i>AGENTS</i></span>
+          <span class="ticker__seq"><i>ADS</i><i>VIDEO</i><i>DESIGN</i><i>CODE</i><i>AGENTS</i></span>
         </div>
       </div>
 
@@ -1378,8 +1464,13 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
         <p class="iv" style="--d:240ms">Now I’m ready to bring that way of working to the right company and see how far we can take it together.</p>
       </div>
 
-      <div class="cell contact__cta"><a href="mailto:mail2overland@gmail.com">Start a conversation <span class="arrow">→</span></a></div>
+      <div class="cell contact__cta"><a href="mailto:rune@kaizenstudio.no">Start a conversation <span class="arrow">→</span></a></div>
 
+      <!-- CEO 08-13: rune-flyr M1 i rute 1–2 av kolofonraden —
+           kantene på gridlinjene, samme regel som kortvideoene. -->
+      <div class="contact__reel" aria-hidden="true">
+        <video src="assets/rune-flyr-m1.mp4" muted loop playsinline preload="metadata"></video>
+      </div>
       <div class="cell contact__colophon">
         <div class="footer__name">Rune Øverland</div>
         <div class="colo__mid">
@@ -1390,7 +1481,11 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
             <a href="#contact">Contact</a>
           </nav>
         </div>
-        <a class="footer__mail" href="mailto:mail2overland@gmail.com">mail2overland@gmail.com</a>
+        <div class="colo__bottom">
+          <a class="footer__mail" href="tel:+4741167940">0047 411 67 940</a>
+          <a class="footer__mail" href="mailto:rune@kaizenstudio.no">rune@kaizenstudio.no</a>
+          <a class="footer__cta" href="mailto:rune@kaizenstudio.no">Start a conversation <span class="arrow">&rarr;</span></a>
+        </div>
       </div>
 
       <div class="cell contact__c">© 2026</div>
@@ -1507,21 +1602,46 @@ html[data-type-test="stacked"] .card--nyme .nyme__statement-rest {
      hero-en; etter hero → hvit rygg + retningsstyrt hide.
      Aktivt jump-tall = siste seksjon hvis topp har passert 45 %
      av skjermen. Klikk scroller til seksjonstopp på 10px-linja. */
+  /* ── KOLOFON-REELEN — fyrer først når 50 % står på skjermen
+     (CEO 08-13); pauser når den forlater 50 %-terskelen.       */
+  var reelVid = document.querySelector('.contact__reel video');
+  if (reelVid) {
+    if ('IntersectionObserver' in window) {
+      var reelIo = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.play().catch(function () {}); }
+          else { e.target.pause(); }
+        });
+      }, { threshold: .5 });
+      reelIo.observe(reelVid);
+    } else {
+      reelVid.play().catch(function () {});
+    }
+  }
+
   var nav = document.querySelector('.nav');
   var heroEl = document.querySelector('.hero');
   var navJumps = Array.prototype.slice.call(document.querySelectorAll('.nav__jumps button'));
   var navTargets = ['approach', 'work', 'contact'].map(function (id) { return document.getElementById(id); });
   var navPad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pad')) || 10;
   if (nav && heroEl) {
-    var navLastY = window.scrollY, navTick = false;
+    /* CEO 08-13: nav-en var for sensitiv — ethvert 1px-tikk
+       oppover hentet den frem. Nå må man TJENE den tilbake:
+       120px akkumulert opp-scroll før den viser seg, og
+       tellingen nullstilles straks retningen snur nedover.     */
+    var navLastY = window.scrollY, navTick = false, navUpAcc = 0;
     var onNavScroll = function () {
       if (navTick) { return; }
       navTick = true;
       requestAnimationFrame(function () {
         navTick = false;
         var y = window.scrollY;
+        var dy = y - navLastY;
+        navUpAcc = dy > 0 ? 0 : navUpAcc - dy;
         var released = heroEl.getBoundingClientRect().bottom <= navPad + 2;
-        nav.classList.toggle('is-hidden', released && y > navLastY && y > 40);
+        if (!released || y <= 40) { nav.classList.remove('is-hidden'); }
+        else if (dy > 0) { nav.classList.add('is-hidden'); }
+        else if (navUpAcc >= 120) { nav.classList.remove('is-hidden'); }
         nav.classList.toggle('is-paper', released);
         navLastY = y;
         var active = 0;
