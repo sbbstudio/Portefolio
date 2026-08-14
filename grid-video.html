@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rune Øverland — Creative Fullstack Engineer</title>
+<!-- LCP: hero-bakgrunnen er CSS-bg og kan ikke få loading-attributt —
+     preload med høy prioritet er hero-lasten. ALDRI lazy (perf-task). -->
+<link rel="preload" as="image" href="assets/opt/hero-placeholder.webp" type="image/webp" fetchpriority="high">
 <style>
 /* ============================================================
    LAB — frittstående. Ingen imports, ingen deps, ingen build.
@@ -309,7 +312,12 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
      til viewporten — bildet står bom stille mens siden scroller
      over det. Ikke parallax (der flytter bildet seg i annen fart). */
   background-color: var(--ground);
-  background-image: url("assets/hero-placeholder.jpg");
+  /* Optimalisert hero (perf-task): webp via image-set, jpg-fallback.
+     Samme motiv, samme geometri — byttet er visuelt usynlig.         */
+  background-image: url("assets/opt/hero-placeholder.jpg");
+  background-image: image-set(
+    url("assets/opt/hero-placeholder.webp") type("image/webp"),
+    url("assets/opt/hero-placeholder.jpg") type("image/jpeg"));
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1280,7 +1288,7 @@ body.ready .rl { opacity: 1; transform: none; }
       <div class="cell appr__top iv" style="--d:0ms">
         <div class="appr__media">
           <p class="card__say appr__cap">Copenhagen</p>
-          <div class="appr__frame"><img src="assets/appr-rute7.jpg" alt="København — Marmorkirken fra Amalienborg"></div>
+          <div class="appr__frame"><img src="assets/opt/appr-rute7.webp" alt="København — Marmorkirken fra Amalienborg" loading="lazy" decoding="async" width="540" height="720"></div>
         </div>
         <h2>The system comes with me.</h2>
         <p>I don’t start from zero. Every project leaves behind a better way to work&nbsp;— clearer decisions, reusable components and stronger checks. The next one starts from there.</p>
@@ -1333,7 +1341,7 @@ body.ready .rl { opacity: 1; transform: none; }
         <a class="card__link" href="https://nymestudio.no" target="_blank" rel="noopener">nymestudio.no&nbsp;&rarr;</a>
       </div>
       <div class="nyme__ph iv" style="--d:180ms">
-        <img src="assets/nyme/placeholder-success.jpg" alt="Placeholder: handshake over a laptop" />
+        <img src="assets/opt/nyme/placeholder-success.webp" alt="Placeholder: handshake over a laptop" loading="lazy" decoding="async" width="680" height="1020" />
       </div>
       <div class="cell nyme__cta iv" style="--d:240ms">
         <a href="nyme.html">How NYME works&nbsp;&rarr;</a>
@@ -1348,7 +1356,7 @@ body.ready .rl { opacity: 1; transform: none; }
     <article class="card card--bleed" style="--bc:3;--br:2">
       <i class="mline" aria-hidden="true"></i>
       <div class="card__col">
-        <video src="assets/sbb-seksjon.mp4" autoplay muted loop playsinline></video>
+        <video src="assets/opt/sbb-seksjon.mp4" poster="assets/opt/sbb-seksjon-poster.jpg" muted loop playsinline preload="none"></video>
       </div>
       <div class="card__box">
 
@@ -1380,15 +1388,15 @@ body.ready .rl { opacity: 1; transform: none; }
       <i class="mline" aria-hidden="true"></i>
       <div class="card__media" aria-hidden="true"></div>
       <i class="jelsa-terreng" aria-hidden="true"></i>
-      <div class="jelsa-cell" style="--sc:1;--sr:1" aria-hidden="true"><img src="assets/jelsa/still-windworks.jpg" alt=""></div>
-      <div class="jelsa-cell" style="--sc:2;--sr:1" aria-hidden="true"><img src="assets/jelsa/still-wales.jpg" alt=""></div>
-      <div class="jelsa-cell" style="--sc:3;--sr:1" aria-hidden="true"><img src="assets/jelsa/still-manualen.jpg" alt=""></div>
-      <div class="jelsa-cell" style="--sc:1;--sr:2" aria-hidden="true"><img src="assets/jelsa/still-parallellsporet.jpg" alt=""></div>
-      <div class="jelsa-cell" style="--sc:2;--sr:2" aria-hidden="true"><img src="assets/jelsa/still-91-ar.jpg" alt=""></div>
-      <div class="jelsa-cell" style="--sc:3;--sr:2" aria-hidden="true"><img src="assets/jelsa/still-klageloopen.jpg" alt=""></div>
+      <div class="jelsa-cell" style="--sc:1;--sr:1" aria-hidden="true"><img src="assets/opt/jelsa/still-windworks.webp" alt="" loading="lazy" decoding="async" width="680" height="884"></div>
+      <div class="jelsa-cell" style="--sc:2;--sr:1" aria-hidden="true"><img src="assets/opt/jelsa/still-wales.webp" alt="" loading="lazy" decoding="async" width="680" height="884"></div>
+      <div class="jelsa-cell" style="--sc:3;--sr:1" aria-hidden="true"><img src="assets/opt/jelsa/still-manualen.webp" alt="" loading="lazy" decoding="async" width="680" height="884"></div>
+      <div class="jelsa-cell" style="--sc:1;--sr:2" aria-hidden="true"><img src="assets/opt/jelsa/still-parallellsporet.webp" alt="" loading="lazy" decoding="async" width="680" height="884"></div>
+      <div class="jelsa-cell" style="--sc:2;--sr:2" aria-hidden="true"><img src="assets/opt/jelsa/still-91-ar.webp" alt="" loading="lazy" decoding="async" width="680" height="884"></div>
+      <div class="jelsa-cell" style="--sc:3;--sr:2" aria-hidden="true"><img src="assets/opt/jelsa/still-klageloopen.webp" alt="" loading="lazy" decoding="async" width="680" height="884"></div>
       <!-- CEO 08-13: kortet bor nå i rute 8 — artikkelen som lå
            der er flyttet opp i toppradens ledige fjerdeplass.  -->
-      <div class="jelsa-cell" style="--sc:4;--sr:1" aria-hidden="true"><img src="assets/jelsa/still-lovbruddsregisteret.jpg" alt=""></div>
+      <div class="jelsa-cell" style="--sc:4;--sr:1" aria-hidden="true"><img src="assets/opt/jelsa/still-lovbruddsregisteret.webp" alt="" loading="lazy" decoding="async" width="680" height="884"></div>
       <div class="card__box">
 
         <div class="card__lead">
@@ -1413,7 +1421,7 @@ body.ready .rl { opacity: 1; transform: none; }
     <article class="card card--bleed card--kzai" style="--bc:3;--br:2">
       <i class="mline" aria-hidden="true"></i>
       <div class="card__col">
-        <video src="assets/morfar.mp4" autoplay muted loop playsinline></video>
+        <video src="assets/opt/morfar.mp4" poster="assets/opt/morfar-poster.jpg" muted loop playsinline preload="none"></video>
       </div>
       <!-- CEO 08-13 r2: hovedpåstanden i XXL over rute 5–6,
            tidsgevinsten flyttet inn i kortet, rute 8 tom —
@@ -1469,7 +1477,7 @@ body.ready .rl { opacity: 1; transform: none; }
       <!-- CEO 08-13: rune-flyr M1 i rute 1–2 av kolofonraden —
            kantene på gridlinjene, samme regel som kortvideoene. -->
       <div class="contact__reel" aria-hidden="true">
-        <video src="assets/rune-flyr-m1.mp4" muted loop playsinline preload="metadata"></video>
+        <video src="assets/opt/rune-flyr-m1.mp4" poster="assets/opt/rune-flyr-m1-poster.jpg" muted loop playsinline preload="none"></video>
       </div>
       <div class="cell contact__colophon">
         <div class="footer__name">Rune Øverland</div>
@@ -1602,22 +1610,28 @@ body.ready .rl { opacity: 1; transform: none; }
      hero-en; etter hero → hvit rygg + retningsstyrt hide.
      Aktivt jump-tall = siste seksjon hvis topp har passert 45 %
      av skjermen. Klikk scroller til seksjonstopp på 10px-linja. */
-  /* ── KOLOFON-REELEN — fyrer først når 50 % står på skjermen
-     (CEO 08-13); pauser når den forlater 50 %-terskelen.       */
-  var reelVid = document.querySelector('.contact__reel video');
-  if (reelVid) {
+  /* ── VIDEOENE — lazy: preload="none" + poster i markup; spiller
+     først når de faktisk står i viewporten (perf-task). Kolofon-
+     reelen beholder CEO-terskelen 50 % (08-13); kortvideoene
+     (sbb/morfar, tidligere autoplay) fyrer ved 25 % og pauser
+     utenfor — visuelt identisk med autoplay, uten å laste ~4 MB
+     ved sidelast.                                              */
+  function lazyPlay(els, threshold) {
+    if (!els.length) { return; }
     if ('IntersectionObserver' in window) {
-      var reelIo = new IntersectionObserver(function (entries) {
+      var vio = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
           if (e.isIntersecting) { e.target.play().catch(function () {}); }
           else { e.target.pause(); }
         });
-      }, { threshold: .5 });
-      reelIo.observe(reelVid);
+      }, { threshold: threshold });
+      els.forEach(function (v) { vio.observe(v); });
     } else {
-      reelVid.play().catch(function () {});
+      els.forEach(function (v) { v.play().catch(function () {}); });
     }
   }
+  lazyPlay(Array.prototype.slice.call(document.querySelectorAll('.card__col video')), .25);
+  lazyPlay(Array.prototype.slice.call(document.querySelectorAll('.contact__reel video')), .5);
 
   var nav = document.querySelector('.nav');
   var heroEl = document.querySelector('.hero');
