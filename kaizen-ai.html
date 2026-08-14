@@ -90,6 +90,9 @@ body {
 .grid {
   position: absolute;
   inset: 0;
+  /* CEO 08-14: nettet er AV i heroen — starter først etter første
+     modul. --box = 2×--row, så radrytmen holder fasen videre ned. */
+  top: var(--box);
   z-index: 40;
   pointer-events: none;
 }
@@ -322,7 +325,19 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   background: var(--ground);
   overflow: hidden;
 }
-.hero .cols { position: absolute; inset: 0; grid-template-rows: repeat(2, minmax(0, 1fr)); }
+/* CEO-test 08-14: rad 1 = 1fr, rad 2 = 2fr — tekstene henger fra
+   1/3-linja, XXL-en får dobbel rad. Nettet er av i heroen; linja
+   teksten henger fra tegnes selv (.hero__rule på 1/3).         */
+.hero .cols { position: absolute; inset: 0; grid-template-rows: minmax(0, 1fr) minmax(0, 2fr); }
+/* Streken teksten henger fra — 20px over teksttoppen (samme
+   rolle som AVTALEN-streken), kant til kant.                   */
+.hero__rule {
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(var(--box) / 3);
+  /* CEO 08-14: svakere — nettets valør, ikke AVTALEN-strekens. */
+  border-top: var(--hair) solid var(--line);
+}
 
 .hero__mark { grid-column: 1 / 2; grid-row: 1 / 2; align-self: start; color: var(--ink); }
 .hero__nav  { grid-column: 3 / 5; grid-row: 1 / 2; align-self: start; text-align: right; }
@@ -347,27 +362,30 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   text-transform: uppercase;
 }
 .xxl__l1 { display: flex; justify-content: space-between; }
-.xxl__l2 { display: flex; justify-content: center; }
+/* SKALERER sentreres i GAPET mellom ARBEID og SOM (CEO 08-14) —
+   midtpunktet måles av seatXxl(), ikke flatens midte.          */
+.xxl__l2 { display: flex; justify-content: flex-start; }
 
 .hero__open { grid-column: 1 / 2; grid-row: 2 / 3; align-self: start; }
-.hero__open p { margin: 0; font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; color: var(--ink); text-box: trim-both cap alphabetic; }
+/* CEO 08-14: «Frigjør mer kapasitet.» er heroens ANDRE hierarki —
+   trinnet under XXL-en, over Body 2. H3-registeret, fullt blekk. */
+.hero__open p { margin: 0; font-size: var(--t-h3); line-height: 1.15; letter-spacing: -.025em; font-weight: 500; color: var(--ink); text-box: trim-both cap alphabetic; }
+/* CEO 08-14: hele brødet samlet i RUTE 3, større register —
+   avsnittene stables med 20px-gap, toppen henger fra streken.  */
 .hero__aside {
-  grid-column: 2 / 4; grid-row: 2 / 3;
+  grid-column: 3 / 4; grid-row: 2 / 3;
   align-self: start;
 }
-/* De to avsnittene i hver sin rute (kol 2 og 3) — gapet er
-   20px ut + 20px inn over nettlinja, så spaltene bor i griden
-   og ingen tekst rekker ned i XXL-en.                          */
 .hero__aside .body {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 calc(var(--cell) * 2);
+  gap: var(--cell);
 }
-.hero__aside .body p { margin: 0; font-size: var(--t-meta); line-height: 1.5; color: var(--ink-2); max-width: 34ch; }
-/* Gauntlet R2 (A): siste tekstlinje deler baseline med
-   «Frigjør mer kapasitet.» — begge trimmes til alphabetic.     */
-.hero__aside .body p:last-child { text-box: trim-both cap alphabetic; }
+.hero__aside .body p { margin: 0; font-size: var(--t-body); line-height: 1.45; color: var(--ink-2); text-box: trim-both cap alphabetic; }
 .hero__aside .body .hold { color: var(--ink); }
+
+/* CEO 08-14: CTA i rute 4, top right — henger fra samme strek. */
+.hero__cta { grid-column: 4 / 5; grid-row: 2 / 3; align-self: start; text-align: right; }
+.hero__cta a { text-decoration: none; display: inline-block; text-box: trim-both cap alphabetic; }
 
 .rl {
   --d: calc(var(--i) * 90ms + 240ms);
@@ -436,8 +454,8 @@ body.ready .rl { opacity: 1; transform: none; }
   border-top: var(--hair) solid var(--ink-3);
 }
 .avt__cta a { text-decoration: none; }
-.avt__cta .arrow, .met__cta .arrow { display: inline-block; transition: transform .35s var(--ez); }
-.avt__cta a:hover .arrow, .met__cta a:hover .arrow { transform: translateX(.5ch); }
+.avt__cta .arrow, .met__cta .arrow, .hero__cta .arrow { display: inline-block; transition: transform .35s var(--ez); }
+.avt__cta a:hover .arrow, .met__cta a:hover .arrow, .hero__cta a:hover .arrow { transform: translateX(.5ch); }
 
 /* ══ 03 · TRE STEDER Å BEGYNNE — BENTO (CEO 08-11) ═══════════
    Mosaikk over hele modulen: 01 Tilbud som stor 2×2-flis i
@@ -522,7 +540,9 @@ body.ready .rl { opacity: 1; transform: none; }
 }
 .card__body {
   margin: 0;
-  font-size: var(--t-meta); line-height: 1.5;
+  /* CEO 08-14: Body 2 på alle prosjektene — samme register som
+     hero-brødet, ikke eget meta-trinn.                          */
+  font-size: var(--t-body); line-height: 1.45;
   color: var(--ink-2);
 }
 .card__tag {
@@ -721,6 +741,8 @@ body.ready .rl { opacity: 1; transform: none; }
   .hgrid { display: none !important; }
   .avt__rule { display: none; }  /* baseline-streken hører desktop-målet til */
   .hero__nav { text-align: left; }
+  .hero__cta { text-align: left; }
+  .hero__rule { display: none; }  /* strek-hengingen hører desktop-målet til */
   .card__say, .card__id { text-align: left; }
   .contact__cta { text-align: left; }
   .contact__cta .cta-stack { align-items: flex-start; }
@@ -755,6 +777,7 @@ body.ready .rl { opacity: 1; transform: none; }
   <!-- ══ 01 · HERO ══════════════════════════════════════════ -->
   <section class="hero" id="topp">
     <div class="mesh" aria-hidden="true"><i class="m1"></i><i class="m2"></i><i class="m3"></i><i class="m4"></i></div>
+    <i class="hero__rule" aria-hidden="true"></i>
     <div class="cols">
       <div class="cell hero__mark label">KAIZEN</div>
       <nav class="cell hero__nav label" aria-label="Hoved">
@@ -781,6 +804,10 @@ body.ready .rl { opacity: 1; transform: none; }
           <p class="rl" style="--i:1">KAIZEN bygger AI-agenter som tar ansvar for konkrete arbeidsflyter i systemene dere bruker. De lærer av hvordan dere arbeider, og utvikles videre i takt med virksomheten.</p>
           <p class="rl hold" style="--i:2">Agentene holder flyten i gang, mens dere beholder kontrollen.</p>
         </div>
+      </div>
+
+      <div class="cell hero__cta label rl" style="--i:3">
+        <a href="#avtalen">Se avtalen <span class="arrow">→</span></a>
       </div>
     </div>
   </section>
@@ -1172,7 +1199,7 @@ body.ready .rl { opacity: 1; transform: none; }
      text-box ikke støttes måles fontens luft over versaltoppen
      og under grunnlinjen og trekkes fra marginene — 20px-enheten
      betyr det samme i alle nettlesere. */
-  var TRIMMED = '.hero__open p, .hero__aside .body p:last-child, ' +
+  var TRIMMED = '.hero__open p, .hero__aside .body p, .hero__cta a, ' +
     '.avt__claim h2, .avt__body p, .avt__price p, .avt__cta a, ' +
     '.met__intro p, .met__cta a, .card__id h3, .sted__ask h3, .met__step h3, .contact__h h2';
   function seatCapTrims() {
@@ -1197,10 +1224,42 @@ body.ready .rl { opacity: 1; transform: none; }
       el.style.marginBottom = (parseFloat(cs.marginBottom) - botRom).toFixed(2) + 'px';
     });
   }
-  seatCapTrims();
-  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(seatCapTrims); }
+  /* ── SKALERER I GAPET ──────────────────────────────────────
+     Linje 2 sentreres på midtpunktet mellom ARBEID-slutt og
+     SOM-start, målt på flaten. Kjøres med samme kadens som
+     captrim (init, fonts, resize).                             */
+  function seatXxl() {
+    var h1 = document.querySelector('.hero__xxl');
+    if (!h1) { return; }
+    var l1w = h1.querySelectorAll('.xxl__l1 > .split');
+    var l2 = h1.querySelector('.xxl__l2');
+    if (l1w.length < 2 || !l2) { return; }
+    var a = l1w[0].getBoundingClientRect();
+    var s = l1w[1].getBoundingClientRect();
+    var H = h1.getBoundingClientRect();
+    var w2 = l2.querySelector('.split').getBoundingClientRect().width;
+    var m = (a.right + s.left) / 2 - H.left;
+    l2.style.paddingLeft = Math.max(0, m - w2 / 2).toFixed(1) + 'px';
+    /* CEO 08-14: SKALERER 20px ned til bunnlinja. Cellens
+       padding ER 20px — luften under grunnlinjen (versaler har
+       ingen underlengder) måles med baseline-probe og trekkes
+       av. text-box biter ikke på h1-en (flex-barn), så dette
+       kjøres i alle nettlesere.                                */
+    h1.style.marginBottom = '';
+    var probe = document.createElement('span');
+    probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+    var sk = l2.querySelector('.split');
+    sk.appendChild(probe);
+    var lastBase = probe.getBoundingClientRect().top;
+    sk.removeChild(probe);
+    var botRom = h1.getBoundingClientRect().bottom - lastBase;
+    h1.style.marginBottom = (-botRom).toFixed(2) + 'px';
+  }
+  function seatAll() { seatCapTrims(); seatXxl(); }
+  seatAll();
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(seatAll); }
   var rt; window.addEventListener('resize', function () {
-    clearTimeout(rt); rt = setTimeout(seatCapTrims, 120);
+    clearTimeout(rt); rt = setTimeout(seatAll, 120);
   });
 })();
 </script>
