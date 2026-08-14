@@ -12,8 +12,8 @@
    GJENBRUK (CEO 08-11, «40 % av Porschen»): systemet fra
    porteføljens grid-video.html — hvit ramme, sorte moduler,
    JMB-låsene, glasskortet, lyskilde+grain, ticker, split-reveal.
-   Per riffet notert i kilden: HER MED NETTET SKJULT — geometrien
-   styrer fortsatt alt, men linjene tegnes ikke.
+   CEO 08-14: nettet TEGNES nå også her (opphever 08-11-riffet
+   «nettet skjult») — samme synlige 4×2 som porteføljen.
 
    COPY: Lesekopi v0.3 (godkjent 2026-08-11) ordrett. Fire
    kontakt-CTA-er (RING OSS / SEND EN E-POST) står i HOLD til
@@ -42,6 +42,7 @@ body { margin: 0; }
   --pad:  10px;
   --cell: 20px;
   --hair: 1px;
+  --node: 6px;    /* firkanten i hvert kryss (porteføljens nett) */
   --stack: 0px;
   /* CEO 08-11: marg på hver side — 4 × --cell (regel 5: alt er
      multipler av den ene spacing-verdien).                     */
@@ -62,8 +63,8 @@ body { margin: 0; }
   --t-body:    1.125rem;
   --t-base:    1rem;
 
-  /* NETTET: 8 felt per 100vh — 2 rader × 4 kolonner. Skjult her,
-     men all plassering refererer fortsatt til --row.            */
+  /* NETTET: 8 felt per 100vh — 2 rader × 4 kolonner. CEO 08-14:
+     SYNLIG, som på porteføljen — samme flate-DNA på begge sider. */
   --box:  calc(100vh - (var(--pad) * 2));
   --row:  calc(var(--box) / 2);
 
@@ -80,6 +81,43 @@ body {
 }
 
 .page { position: relative; margin: var(--pad); background: var(--ground); }
+
+/* ─── NETTET SYNLIG (CEO 08-14) ──────────────────────────────
+   Porteføljens design-nett, portert ordrett fra grid-video.html:
+   3 vertikaler på 25/50/75 %, radlinje hver --row, 6×6-noder i
+   kryssene. Absolutt, ikke fixed — ruller med innholdet.
+   Hvite linjer forsvinner av seg selv på AVTALENs hvite flate.  */
+.grid {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+.grid .v {
+  position: absolute; top: 0; bottom: 0;
+  width: var(--hair); background: var(--line);
+}
+.grid .v1 { left: 25%; }  .grid .v2 { left: 50%; }  .grid .v3 { left: 75%; }
+.grid .rows {
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--line) 0, var(--line) var(--hair),
+    transparent var(--hair), transparent var(--row)
+  );
+}
+.grid .nodes {
+  position: absolute; top: 0; bottom: 0;
+  width: var(--node);
+  margin-left: calc(var(--node) / -2);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--paper) 0, var(--paper) var(--node),
+    transparent var(--node), transparent var(--row)
+  );
+  background-position: 0 calc(var(--node) / -2);
+}
+.grid .n1 { left: 25%; }  .grid .n2 { left: 50%; }  .grid .n3 { left: 75%; }
 
 /* ─── HJELPEGRID (CEO 08-11) ─────────────────────────────────
    Ikke design — arbeidslys. Margstrekene + de fire kolonnene
@@ -172,9 +210,9 @@ body.gridon .hgrid { display: block; }
 .cols {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  /* CEO 08-11: felles marg — kolonnene lever MELLOM margene,
-     samme felt som hjelpegridden tegner.                       */
-  padding-inline: var(--marg);
+  /* CEO 08-14: margen UT (opphever 08-11-margen) — med nettet
+     synlig gjelder porteføljens regel: innholdskolonnene ER
+     nettets ruter; 20px fra linje til tekst via .cell.         */
 }
 .cell { min-width: 0; padding: var(--cell); }
 
@@ -200,6 +238,80 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 }
 .iv.is-in { opacity: 1; transform: none; }
 
+/* ── NATT-VARIANTEN (CEO-test 08-14) ─────────────────────────
+   KAIZEN-palettens blå akse som ÉN hel lysflate — testes på
+   hero (?natt=hero) eller avslutningen (?natt=slutt). Finten er
+   en interaktiv MESH-GRADIENT: fire myke radiale fargefelt som
+   driver etter pekeren (lerpet, samme mekanikk som hero-lyset).
+   Korallen er varmepunktet; resten holder den blå aksen.       */
+:root {
+  --kaizen-night-deep: #0A0F57;
+  --kaizen-night:      #18349B;
+  --kaizen-coral:      #EA765B;
+  --kaizen-sky:        #9CB3E4;
+}
+.mesh {
+  position: absolute; inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  display: none;
+  background: var(--kaizen-night-deep);
+}
+.natt-hero .hero .mesh,
+.natt-slutt .contact .mesh { display: block; }
+/* Flaten ER lyset — den håndlagde lyskilden viker for meshen. */
+.natt-hero .hero::before,
+.natt-slutt .contact::before { content: none; }
+.mesh i {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  will-change: transform;
+  transform: translate(calc(var(--mx, 0) * var(--fx, 0px)), calc(var(--my, 0) * var(--fy, 0px)));
+}
+/* Fire felt: natt bærer flaten, sky løfter den, korallen er ett
+   varmt punkt, dypet holder hjørnet nede. Ulike --fx/--fy gir
+   parallakse — feltene glir fra hverandre, ikke i flokk.       */
+.mesh .m1 { left: -15%; top: -25%; width: 75vw; height: 75vw;
+  background: radial-gradient(circle, var(--kaizen-night) 0%, transparent 65%);
+  --fx: 46px; --fy: 34px; }
+.mesh .m2 { right: -20%; top: -15%; width: 65vw; height: 65vw;
+  background: radial-gradient(circle, var(--kaizen-sky) 0%, transparent 62%);
+  opacity: .8; --fx: -60px; --fy: 42px; }
+.mesh .m3 { left: 8%; bottom: -35%; width: 60vw; height: 60vw;
+  background: radial-gradient(circle, var(--kaizen-coral) 0%, transparent 60%);
+  opacity: .75; --fx: 34px; --fy: -52px; }
+.mesh .m4 { right: 2%; bottom: -30%; width: 55vw; height: 55vw;
+  background: radial-gradient(circle, var(--kaizen-night-deep) 12%, transparent 66%);
+  --fx: -28px; --fy: -30px; }
+
+/* LYS-varianten (CEO 08-14, SPHERE-referansen): samme mesh og
+   samme pekerdrift, lysere register — blå i øvre venstre, stor
+   kjølig glød i senter, oransje bærer høyre halvdel.
+   ?natt=lys (hero) | ?natt=lys-slutt (avslutningen).           */
+.natt-lys .mesh { background: #E9EEF6; }
+.natt-lys .mesh .m1 { left: -18%; top: -30%; width: 80vw; height: 80vw;
+  background: radial-gradient(circle, #3D6FC4 0%, transparent 65%); }
+.natt-lys .mesh .m2 { left: 4%; top: -8%; right: auto; width: 62vw; height: 62vw;
+  background: radial-gradient(circle, #ECF2FB 8%, transparent 62%); opacity: 1; }
+.natt-lys .mesh .m3 { left: auto; right: -22%; top: -10%; bottom: auto; width: 85vw; height: 85vw;
+  background: radial-gradient(circle, #F0925A 0%, transparent 63%); opacity: .95; }
+.natt-lys .mesh .m4 { right: -8%; bottom: -35%; width: 65vw; height: 65vw;
+  background: radial-gradient(circle, #E87F3F 15%, transparent 66%); opacity: .8; }
+/* Lys flate = møblementet snus til night-deep-blekk; de to
+   stemmene (display + støttelinje) beholder hvitt som i
+   SPHERE-referansen.                                           */
+.natt-lys.natt-hero .hero,
+.natt-lys.natt-slutt .contact {
+  --ink-2: rgba(10, 15, 87, .60);
+  --ink-3: rgba(10, 15, 87, .38);
+  --line:  rgba(10, 15, 87, .14);
+}
+/* Shader-trinnet: WebGL-lerretet erstatter CSS-feltene når det
+   får init — CSS-meshen står igjen som fallback.               */
+.mesh canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.mesh.gl i { display: none; }
+
 /* ══ 01 · HERO ═══════════════════════════════════════════════
    Ren type på sort — ingen foto-avhengighet. Rad 1: KAIZEN-
    merket venstre, nav høyre. Under streken: displayet ARBEID SOM
@@ -217,34 +329,40 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .hero__nav a { text-decoration: none; margin-left: 2.5ch; transition: color .3s var(--ez); }
 .hero__nav a:hover { color: var(--ink); }
 
+/* CEO 08-14 (layout-runde): XXL i BUNN over hele bredden —
+   linje 1: ARBEID mot venstre linje, SOM mot høyre; linje 2:
+   SKALERER sentrert mot bunnkanten. Tekstene henger topp-
+   venstre fra midtstreken (20px-regelen).                      */
 .hero__display {
-  grid-column: 1 / 4;
+  grid-column: 1 / 5;
   grid-row: 2 / 3;
-  align-self: start;
+  align-self: end;
 }
 .hero__display h1 {
   margin: 0;
   font-size: var(--t-display);
-  line-height: 1.0;
+  line-height: 1.04;
   letter-spacing: -.032em;
   font-weight: 500;
   text-transform: uppercase;
-  /* Gauntlet R1 (A): versalhøyden skal dele optisk topplinje med
-     støttelinjen i rute 8 — samme henge-avstand fra streken.    */
-  text-box: trim-both cap alphabetic;
 }
+.xxl__l1 { display: flex; justify-content: space-between; }
+.xxl__l2 { display: flex; justify-content: center; }
 
-/* Gauntlet R1 (A): støttelinjen flyttet til bunnlinjen i venstre
-   felt — displayet spenner nå mellom strek og kant. Aside = kun
-   brødstacken, ankret mot bunn.                                */
-.hero__open { grid-column: 1 / 3; grid-row: 2 / 3; align-self: end; }
+.hero__open { grid-column: 1 / 2; grid-row: 2 / 3; align-self: start; }
 .hero__open p { margin: 0; font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; color: var(--ink); text-box: trim-both cap alphabetic; }
 .hero__aside {
-  grid-column: 4 / 5; grid-row: 2 / 3;
-  align-self: stretch;
-  display: flex; flex-direction: column; justify-content: flex-end;
+  grid-column: 2 / 4; grid-row: 2 / 3;
+  align-self: start;
 }
-.hero__aside .body { display: flex; flex-direction: column; gap: 14px; }
+/* De to avsnittene i hver sin rute (kol 2 og 3) — gapet er
+   20px ut + 20px inn over nettlinja, så spaltene bor i griden
+   og ingen tekst rekker ned i XXL-en.                          */
+.hero__aside .body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 calc(var(--cell) * 2);
+}
 .hero__aside .body p { margin: 0; font-size: var(--t-meta); line-height: 1.5; color: var(--ink-2); max-width: 34ch; }
 /* Gauntlet R2 (A): siste tekstlinje deler baseline med
    «Frigjør mer kapasitet.» — begge trimmes til alphabetic.     */
@@ -267,6 +385,10 @@ body.ready .rl { opacity: 1; transform: none; }
    snus lokalt. Påstanden som H1-stemme øverst, brødet i rute 7,
    «Se eksempler» som exit nederst til høyre.                   */
 .avtalen {
+  /* Over nettet (40), som porteføljens hvite flate: hvite
+     hairlines/noder på hvitt = nettet «forsvinner» av seg selv,
+     og bruddet blir materielt.                                 */
+  z-index: 41;
   background: var(--paper);
   --ink: #050505;
   --ink-2: rgba(5, 5, 5, .55);
@@ -304,10 +426,12 @@ body.ready .rl { opacity: 1; transform: none; }
 .avt__body p, .avt__price p, .avt__cta a { text-box: trim-both cap alphabetic; }  /* cap-toppen måler 20px fra streken */
 .avt__cta { grid-column: 4 / 5; grid-row: 2 / 3; align-self: start; text-align: right; }
 .avt__cta a { display: block; }
-/* Streken — på radlinja (50vh fra modultopp), marg til marg. */
+/* Streken — på radlinja (50vh fra modultopp), kant til kant:
+   den ER nettets radlinje, tegnet i blekk siden flaten dekker
+   nettet (CEO 08-14, porteføljeregelen).                       */
 .avt__rule {
   position: absolute;
-  left: var(--marg); right: var(--marg);
+  left: 0; right: 0;
   top: var(--row);
   border-top: var(--hair) solid var(--ink-3);
 }
@@ -328,7 +452,6 @@ body.ready .rl { opacity: 1; transform: none; }
 .steder .cols {
   height: var(--box);
   grid-template-rows: repeat(2, minmax(0, 1fr));
-  padding-inline: var(--marg);
 }
 /* Gauntlet R2 (B): venstrekolonnen er ÉN komposisjon over begge
    rader — label topp, spørsmålet mot midtstreken, knappene mot
@@ -341,7 +464,9 @@ body.ready .rl { opacity: 1; transform: none; }
 /* Den åpne spørsmålskolonnen henger 20px under modultoppen og
    slipper 20px før bunnen — samme takt som kortenes innmat.    */
 .steder .sted__label { padding: 0; }
-.steder .sted__ask { padding: var(--cell) var(--cell) var(--cell) 0; }
+/* CEO 08-14: 20px også mot venstre linje — null-paddingen hørte
+   den gamle margen til.                                        */
+.steder .sted__ask { padding: var(--cell); }
 
 /* Den store flisen: navnet på h2-trinnet, påstanden på h3 —
    samme stige, to trinn opp. Brødet får lesebredde.            */
@@ -369,27 +494,26 @@ body.ready .rl { opacity: 1; transform: none; }
   -webkit-backdrop-filter: blur(5px);
 }
 
-.card__top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
+/* CEO 08-14: top left — porteføljens kort-grammatikk. Nummer
+   øverst, tittel under, alt venstre; høyrestillingen fra
+   08-11-bentoen er ute.                                        */
+.card__top { display: block; }
 .card__no {
   display: block;
   font-size: var(--t-fine); line-height: 1.2;
   letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3);
+  margin-bottom: var(--cell);
 }
-.card__id { text-align: right; }
 .card__id h3 {
   margin: 0;
   font-size: var(--t-h3);
   line-height: 1.1;
   letter-spacing: -.025em;
   font-weight: 500;
+  text-box: trim-both cap alphabetic;
 }
 .card__say {
   margin: var(--cell) 0 0;
-  text-align: right;
   font-size: var(--t-h4);
   line-height: 1.3;
   letter-spacing: -.012em;
@@ -412,7 +536,7 @@ body.ready .rl { opacity: 1; transform: none; }
    knappene rendres uten adresse (peker til kontaktseksjonen).  */
 .sted__ask { grid-column: 4 / 5; grid-row: 2 / 3; align-self: stretch;
   display: flex; flex-direction: column; justify-content: space-between; }
-.sted__ask h3 { margin: 0; font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; }
+.sted__ask h3 { margin: 0; font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; text-box: trim-both cap alphabetic; }
 .sted__ask p { margin: 14px 0 0; font-size: var(--t-meta); line-height: 1.5; color: var(--ink-2); max-width: 30ch; }
 .cta-stack { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
 .cta-stack a {
@@ -434,12 +558,13 @@ body.ready .rl { opacity: 1; transform: none; }
 .metode .cols {
   height: var(--box);
   grid-template-rows: repeat(2, minmax(0, 1fr));
-  padding-inline: var(--marg);
 }
 .met__label { grid-column: 1 / 2; grid-row: 1 / 2; align-self: start; }
-.met__intro { grid-column: 2 / 4; grid-row: 1 / 2; align-self: end; }
+/* CEO 08-14: topphengt — teksten henger fra modultoppens linje
+   (20px-regelen), ikke mot streken under.                      */
+.met__intro { grid-column: 2 / 4; grid-row: 1 / 2; align-self: start; }
 .met__intro p { margin: 0; font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; color: var(--ink); max-width: 44ch; }
-.met__cta { grid-column: 4 / 5; grid-row: 1 / 2; align-self: end; text-align: right; }
+.met__cta { grid-column: 4 / 5; grid-row: 1 / 2; align-self: start; text-align: right; }
 .met__cta a { text-decoration: none; font-size: var(--t-meta); line-height: 1.3; color: var(--ink-2); transition: color .3s var(--ez); display: inline-block; text-box: trim-both cap alphabetic; }
 /* Gauntlet R1 (B): intro og lenke deler bunnlinje — trim begge. */
 .met__intro p { text-box: trim-both cap alphabetic; }
@@ -461,7 +586,7 @@ body.ready .rl { opacity: 1; transform: none; }
 .met__step.s3 { grid-column: 3 / 4; }
 .met__step.s4 { grid-column: 4 / 5; }
 .met__step .card__no { margin-bottom: var(--cell); }
-.met__step h3 { margin: 0; font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; }
+.met__step h3 { margin: 0; font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; text-box: trim-both cap alphabetic; }
 .met__step p { margin: 10px 0 0; font-size: var(--t-meta); line-height: 1.5; color: var(--ink-2); max-width: 30ch; }
 /* Gauntlet R2 (B): taggen følger brødet — innholdsmassen samles
    i topp, voidet blir ETT felles bånd over alle fire.          */
@@ -520,7 +645,6 @@ body.ready .rl { opacity: 1; transform: none; }
 .contact__ticker {
   grid-column: 1 / 5; grid-row: 4 / 5;
   align-self: stretch;
-  margin-inline: calc(var(--marg) * -1);
   padding: 0;
   overflow: hidden;
   display: flex;
@@ -577,6 +701,9 @@ body.ready .rl { opacity: 1; transform: none; }
 
 /* ─── MOBIL — mekanikken kobles ut ─────────────────────────── */
 @media (max-width: 1023px) {
+  /* Nettet er desktop-instrumentet — mobil ruller fritt uten
+     linjer, samme dom som porteføljen.                         */
+  .grid { display: none; }
   :root {
     --pad: 8px; --cell: 16px; --marg: 16px;
     --t-display: 13vw;
@@ -612,6 +739,13 @@ body.ready .rl { opacity: 1; transform: none; }
 
 <div class="page">
 
+  <!-- Design-nettet — porteføljens 4×2, synlig (CEO 08-14). -->
+  <div class="grid" aria-hidden="true">
+    <div class="rows"></div>
+    <i class="v v1"></i><i class="v v2"></i><i class="v v3"></i>
+    <i class="nodes n1"></i><i class="nodes n2"></i><i class="nodes n3"></i>
+  </div>
+
   <!-- Hjelpegrid — arbeidslys, ikke design. Tast G slår av/på. -->
   <div class="hgrid" aria-hidden="true">
     <div class="rows"></div>
@@ -620,6 +754,7 @@ body.ready .rl { opacity: 1; transform: none; }
 
   <!-- ══ 01 · HERO ══════════════════════════════════════════ -->
   <section class="hero" id="topp">
+    <div class="mesh" aria-hidden="true"><i class="m1"></i><i class="m2"></i><i class="m3"></i><i class="m4"></i></div>
     <div class="cols">
       <div class="cell hero__mark label">KAIZEN</div>
       <nav class="cell hero__nav label" aria-label="Hoved">
@@ -631,7 +766,10 @@ body.ready .rl { opacity: 1; transform: none; }
       </nav>
 
       <div class="cell hero__display">
-        <h1 class="split">Arbeid som skalerer</h1>
+        <h1 class="hero__xxl" aria-label="Arbeid som skalerer">
+          <span class="xxl__l1"><span class="split">Arbeid</span><span class="split">som</span></span>
+          <span class="xxl__l2"><span class="split">skalerer</span></span>
+        </h1>
       </div>
 
       <div class="cell hero__open">
@@ -769,6 +907,7 @@ body.ready .rl { opacity: 1; transform: none; }
 
   <!-- ══ 05 · BARE SPØR + KOLOFON ═══════════════════════════ -->
   <section class="contact" id="kontakt">
+    <div class="mesh" aria-hidden="true"><i class="m1"></i><i class="m2"></i><i class="m3"></i><i class="m4"></i></div>
     <div class="cols">
       <div class="cell contact__h">
         <h2 class="split">Bare spør.</h2>
@@ -815,8 +954,8 @@ body.ready .rl { opacity: 1; transform: none; }
 (function () {
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* Hjelpegrid — på som standard i lab; G toggler. */
-  document.body.classList.add('gridon');
+  /* Hjelpegrid — AV som standard nå som design-nettet tegnes
+     (CEO 08-14); G toggler arbeidslyset ved behov. */
   document.addEventListener('keydown', function (e) {
     if (e.key === 'g' || e.key === 'G') { document.body.classList.toggle('gridon'); }
   });
@@ -883,6 +1022,186 @@ body.ready .rl { opacity: 1; transform: none; }
       if (!raf) { step(); }
     });
   }
+
+  /* ── NATT-VARIANTEN — ?natt=hero | ?natt=slutt (CEO-test) ──
+     Mesh-gradienten driver etter pekeren; -1..1 normalisert,
+     lerpet som hero-lyset. Reduced motion = statisk flate.     */
+  var natt = new URLSearchParams(location.search).get('natt');
+  /* CEO 08-14: SPHERE-shaderen i hero er DEFAULT — bg-en er tatt
+     med. ?natt=sort gir den rene sorte flaten; øvrige varianter
+     som før.                                                   */
+  if (natt === null) { natt = 'lys'; }
+  if (natt === 'sort') { natt = ''; }
+  if (natt && natt.indexOf('lys') === 0) { document.body.classList.add('natt-lys'); }
+  if (natt === 'hero'  || natt === 'lys')       { document.body.classList.add('natt-hero'); }
+  if (natt === 'slutt' || natt === 'lys-slutt') { document.body.classList.add('natt-slutt'); }
+  if (natt && !reduce && window.matchMedia('(pointer: fine)').matches) {
+    var meshHost = document.querySelector(document.body.classList.contains('natt-hero') ? '.hero' : '.contact');
+    var mesh = meshHost && meshHost.querySelector('.mesh');
+    if (mesh) {
+      var mtx = 0, mty = 0, mcx = 0, mcy = 0, mraf = null;
+      var mstep = function () {
+        mraf = requestAnimationFrame(function () {
+          mcx += (mtx - mcx) * .05;
+          mcy += (mty - mcy) * .05;
+          mesh.style.setProperty('--mx', mcx.toFixed(3));
+          mesh.style.setProperty('--my', mcy.toFixed(3));
+          if (Math.abs(mtx - mcx) + Math.abs(mty - mcy) > .002) { mstep(); } else { mraf = null; }
+        });
+      };
+      meshHost.addEventListener('pointermove', function (e) {
+        var r = meshHost.getBoundingClientRect();
+        mtx = (e.clientX - r.left) / r.width * 2 - 1;
+        mty = (e.clientY - r.top) / r.height * 2 - 1;
+        if (!mraf) { mstep(); }
+      });
+    }
+  }
+
+  /* ── SHADER-MESH — trinn 2 av finten (CEO 08-14) ───────────
+     Fragment-shader regner flaten per piksel: SPHERE-paletten
+     med selvgående drift (fbm-støy) og pekeren som drar i
+     fargen. Kun ?natt=lys på hero; faller stille tilbake til
+     CSS-meshen uten WebGL. Reduced motion = ett stille bilde.  */
+  if (document.body.classList.contains('natt-lys') && document.body.classList.contains('natt-hero')) {
+    (function () {
+      var meshEl = document.querySelector('.hero .mesh');
+      if (!meshEl) { return; }
+      var cv = document.createElement('canvas');
+      var gl = cv.getContext('webgl', { antialias: false, alpha: false });
+      if (!gl) { return; }
+      var FRAG =
+        'precision highp float;' +
+        'uniform vec2 u_r; uniform float u_t; uniform vec2 u_m;' +
+        'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}' +
+        'float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);' +
+        ' return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}' +
+        'float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*n(p);p*=2.03;a*=.5;}return v;}' +
+        'void main(){' +
+        ' vec2 uv=gl_FragCoord.xy/u_r; uv.y=1.-uv.y;' +
+        ' vec2 asp=vec2(u_r.x/u_r.y,1.);' +
+        ' vec2 p=uv*asp;' +
+        ' vec2 md=(uv-u_m)*asp;' +
+        ' vec2 drag=md*exp(-dot(md,md)*6.0)*.5;' +
+        ' vec2 q=p+.42*vec2(fbm(p*1.3+vec2(u_t*.030,0.)),fbm(p*1.3+vec2(3.1,-u_t*.024)))-drag;' +
+        ' float wo=smoothstep(.72,1.6,q.x+(q.y-.5)*.45);' +
+        ' float wb=1.-smoothstep(.05,1.3,q.x*.8+q.y*.5);' +
+        ' vec2 g=(uv-vec2(.40,.32))*asp+ (q-p)*.6;' +
+        ' float wg=exp(-dot(g,g)*2.4);' +
+        ' vec3 col=vec3(.913,.933,.965);' +
+        ' col=mix(col,vec3(.239,.435,.769),wb);' +
+        ' col=mix(col,vec3(.941,.573,.353),wo);' +
+        ' col=mix(col,vec3(.910,.498,.247),wo*smoothstep(.55,1.,uv.y)*.7);' +
+        ' col=mix(col,vec3(.925,.949,.984),wg);' +
+        ' col+= (h(gl_FragCoord.xy+fract(u_t))*2.-1.)*.016;' +
+        ' gl_FragColor=vec4(col,1.);}';
+      var VERT = 'attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+      function sh(type, src) {
+        var s = gl.createShader(type);
+        gl.shaderSource(s, src); gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { return null; }
+        return s;
+      }
+      var vs = sh(gl.VERTEX_SHADER, VERT), fs = sh(gl.FRAGMENT_SHADER, FRAG);
+      if (!vs || !fs) { return; }
+      var pr = gl.createProgram();
+      gl.attachShader(pr, vs); gl.attachShader(pr, fs); gl.linkProgram(pr);
+      if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) { return; }
+      gl.useProgram(pr);
+      var buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      var loc = gl.getAttribLocation(pr, 'a');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      var uR = gl.getUniformLocation(pr, 'u_r'),
+          uT = gl.getUniformLocation(pr, 'u_t'),
+          uM = gl.getUniformLocation(pr, 'u_m');
+      meshEl.appendChild(cv);
+      meshEl.classList.add('gl');
+      /* CEO 08-14 (revidert samme kveld): flaten GÅR AV SEG SELV
+         — «i ro»-versjonen prøvd og forkastet. Langsom fbm-drift
+         bærer flaten; pekerdraget ligger oppå som respons.
+         Pauser utenfor viewport/skjult fane; reduce = stillbilde. */
+      var SEED = 6.2;
+      var smx = .5, smy = .4, stx = .5, sty = .4;
+      function draw(t) {
+        gl.uniform2f(uR, cv.width, cv.height);
+        gl.uniform1f(uT, t);
+        gl.uniform2f(uM, smx, smy);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      }
+      function sizeGL() {
+        var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        cv.width = Math.round(meshEl.clientWidth * dpr);
+        cv.height = Math.round(meshEl.clientHeight * dpr);
+        gl.viewport(0, 0, cv.width, cv.height);
+        draw(SEED);
+      }
+      sizeGL();
+      window.addEventListener('resize', sizeGL);
+      var heroEl = document.querySelector('.hero');
+      if (!reduce) {
+        if (window.matchMedia('(pointer: fine)').matches) {
+          heroEl.addEventListener('pointermove', function (e) {
+            var r = heroEl.getBoundingClientRect();
+            stx = (e.clientX - r.left) / r.width;
+            sty = (e.clientY - r.top) / r.height;
+          });
+        }
+        var visible = true;
+        if ('IntersectionObserver' in window) {
+          new IntersectionObserver(function (en) { visible = en[0].isIntersecting; }).observe(heroEl);
+        }
+        var t0 = null;
+        var frame = function (ts) {
+          if (t0 === null) { t0 = ts; }
+          if (visible && !document.hidden) {
+            smx += (stx - smx) * .06; smy += (sty - smy) * .06;
+            draw(SEED + (ts - t0) / 1000);
+          }
+          requestAnimationFrame(frame);
+        };
+        requestAnimationFrame(frame);
+      }
+    })();
+  }
+
+  /* ── CAPTRIM-REGELEN (porteføljens, CEO 08-14) ─────────────
+     Samme liste som stilarkets text-box-deklarasjoner. Der
+     text-box ikke støttes måles fontens luft over versaltoppen
+     og under grunnlinjen og trekkes fra marginene — 20px-enheten
+     betyr det samme i alle nettlesere. */
+  var TRIMMED = '.hero__open p, .hero__aside .body p:last-child, ' +
+    '.avt__claim h2, .avt__body p, .avt__price p, .avt__cta a, ' +
+    '.met__intro p, .met__cta a, .card__id h3, .sted__ask h3, .met__step h3, .contact__h h2';
+  function seatCapTrims() {
+    if (CSS.supports && CSS.supports('text-box', 'trim-both cap alphabetic')) { return; }
+    var ctx2d = document.createElement('canvas').getContext('2d');
+    Array.prototype.forEach.call(document.querySelectorAll(TRIMMED), function (el) {
+      el.style.marginTop = ''; el.style.marginBottom = '';
+      var cs = getComputedStyle(el);
+      ctx2d.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+      var cap = ctx2d.measureText('H').actualBoundingBoxAscent;
+      var probe = document.createElement('span');
+      probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+      el.insertBefore(probe, el.firstChild);
+      var firstBase = probe.getBoundingClientRect().top;
+      el.appendChild(probe);
+      var lastBase = probe.getBoundingClientRect().top;
+      el.removeChild(probe);
+      var r2 = el.getBoundingClientRect();
+      var topRom = (firstBase - cap) - r2.top;
+      var botRom = r2.bottom - lastBase;
+      el.style.marginTop = (parseFloat(cs.marginTop) - topRom).toFixed(2) + 'px';
+      el.style.marginBottom = (parseFloat(cs.marginBottom) - botRom).toFixed(2) + 'px';
+    });
+  }
+  seatCapTrims();
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(seatCapTrims); }
+  var rt; window.addEventListener('resize', function () {
+    clearTimeout(rt); rt = setTimeout(seatCapTrims, 120);
+  });
 })();
 </script>
 
