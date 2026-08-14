@@ -570,24 +570,94 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   font-weight: 500;
   max-width: 16ch;
 }
-.close__colophon {
-  grid-column: 3 / 4; grid-row: 2 / 3; align-self: stretch;
-  display: flex; flex-direction: column; justify-content: space-between;
+/* ── FOOTER — forsidens fulle kolofonmodul (CEO 08-14: samme
+   footer på alle sider, inkludert reel-klippet i rute 1–2). ── */
+.footer { position: relative; z-index: 1; overflow: hidden; }
+.footer .cols {
+  height: var(--box);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+.footer__reel {
+  grid-column: 1 / 3; grid-row: 1 / 2;
+  position: relative; overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .55);
+}
+.footer__reel video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.footer__colophon {
+  grid-column: 4 / 5; grid-row: 1 / 2; align-self: stretch;
+  display: grid; grid-template-rows: repeat(2, 1fr);
   font-size: var(--t-fine); line-height: 1.4;
 }
-.close__colophon .footer__name { letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
-.footer__nav { display: flex; flex-direction: column; gap: 10px; }
-.footer__nav a {
+.footer__colophon .footer__name { grid-area: 1 / 1; align-self: start; }
+.colo__mid {
+  grid-area: 1 / 1; align-self: end;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.colo__bottom {
+  grid-area: 2 / 1; align-self: end;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.footer__name { letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+/* Bevisst 2 × 2-grid — forsidens kanon; ingen tilfeldig knekk. */
+.footer__nav { display: grid; grid-template-columns: repeat(2, max-content); gap: 6px 2.5ch; }
+.footer__nav a, .footer__mail {
   color: var(--ink-2);
   text-decoration: none;
   letter-spacing: .14em; text-transform: uppercase;
   transition: color .3s var(--ez);
 }
-.footer__nav a:hover { color: var(--ink); }
-.close__legal { display: flex; gap: 3ch; align-items: baseline; }
-.close__legal .footer__c { color: var(--ink-3); letter-spacing: .14em; }
-.close__legal a { color: var(--ink-2); text-decoration: none; transition: color .3s var(--ez); }
-.close__legal a:hover { color: var(--ink); }
+.footer__nav a:hover, .footer__mail:hover { color: var(--ink); }
+.footer__mail { text-transform: none; letter-spacing: 0; }
+.footer__cta {
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: .14em; text-transform: uppercase;
+  font-weight: 500;
+}
+.footer__cta .arrow { display: inline-block; transition: transform .35s var(--ez); }
+.footer__cta:hover .arrow { transform: translateX(.5ch); }
+.footer__c {
+  grid-column: 4 / 5; grid-row: 2 / 3; align-self: end;
+  font-size: var(--t-fine); line-height: 1.4;
+  color: var(--ink-3); letter-spacing: .14em;
+}
+/* TICKER — portert fra forsiden. Lineær tid: på en ticker er
+   farten konstant per definisjon.                              */
+.footer__ticker {
+  grid-column: 1 / 3; grid-row: 2 / 3;
+  align-self: stretch;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+.ticker__track {
+  display: flex;
+  flex: none;
+  animation: tick 40s linear infinite;
+}
+.ticker__seq {
+  display: flex; flex: none;
+  white-space: nowrap;
+  gap: 1.5ch;
+  padding-right: 1.5ch;
+  /* Ordene uten bindestrek, store nok til å dekke halve ruta —
+     størrelsen er geometri (row/2), ikke et skalatrinn.        */
+  font-size: calc(var(--row) / 2);
+  line-height: 1;
+  letter-spacing: -.02em;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.ticker__seq i { font-style: normal; }
+@keyframes tick {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
 .close__cta { grid-column: 4 / 5; grid-row: 2 / 3; align-self: start; text-align: right; }
 .close__cta a {
   text-decoration: none;
@@ -851,25 +921,47 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
       <div class="cell close__h iv" style="--d:0ms">
         <h2>I built NYME to move early without cutting corners.</h2>
       </div>
-      <div class="cell close__colophon">
-        <div class="footer__name">Rune &Oslash;verland</div>
-        <nav class="footer__nav" aria-label="Footer">
-          <a href="grid-video.html#approach">Approach</a>
-          <a href="grid-video.html#work">Work</a>
-          <a href="how-i-work.html">How I work</a>
-          <a href="grid-video.html#contact">Contact</a>
-        </nav>
-        <div class="close__legal">
-          <span class="footer__c">&copy; 2026</span>
-          <a href="tel:+4741167940">0047 411 67 940</a>
-          <a href="mailto:rune@kaizenstudio.no">rune@kaizenstudio.no</a>
-        </div>
-      </div>
       <div class="cell close__cta iv" style="--d:120ms">
         <a href="mailto:rune@kaizenstudio.no">Start a conversation <span class="arrow">&rarr;</span></a>
       </div>
     </div>
   </section>
+
+  <!-- ══ 06 · FOOTER — forsidens fulle kolofonmodul (CEO 08-14:
+       samme footer på alle sider, inkludert reel-klippet) ═════ -->
+  <footer class="footer">
+    <i class="mline" aria-hidden="true"></i>
+    <div class="cols">
+      <div class="footer__reel" aria-hidden="true">
+        <video src="assets/opt/rune-flyr-m1.mp4" poster="assets/opt/rune-flyr-m1-poster.jpg" muted loop playsinline preload="none"></video>
+      </div>
+      <div class="cell footer__colophon">
+        <div class="footer__name">Rune &Oslash;verland</div>
+        <div class="colo__mid">
+          <nav class="footer__nav" aria-label="Footer">
+            <a href="grid-video.html#approach">Approach</a>
+            <a href="grid-video.html#work">Work</a>
+            <a href="how-i-work.html">How I work</a>
+            <a href="grid-video.html#contact">Contact</a>
+          </nav>
+        </div>
+        <div class="colo__bottom">
+          <a class="footer__mail" href="tel:+4741167940">0047 411 67 940</a>
+          <a class="footer__mail" href="mailto:rune@kaizenstudio.no">rune@kaizenstudio.no</a>
+          <a class="footer__cta" href="mailto:rune@kaizenstudio.no">Start a conversation <span class="arrow">&rarr;</span></a>
+        </div>
+      </div>
+
+      <div class="cell footer__ticker" aria-hidden="true">
+        <div class="ticker__track">
+          <span class="ticker__seq"><i>ADS</i><i>VIDEO</i><i>DESIGN</i><i>CODE</i><i>AGENTS</i></span>
+          <span class="ticker__seq"><i>ADS</i><i>VIDEO</i><i>DESIGN</i><i>CODE</i><i>AGENTS</i></span>
+        </div>
+      </div>
+
+      <div class="cell footer__c">&copy; 2026</div>
+    </div>
+  </footer>
 
 </div>
 
@@ -944,7 +1036,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   }
 
   /* ── APP-KLIPPENE — spiller kun i syne ────────────────────── */
-  var vids = Array.prototype.slice.call(document.querySelectorAll('.app video'));
+  var vids = Array.prototype.slice.call(document.querySelectorAll('.app video, .footer__reel video'));
   if (vids.length && !reduce) {
     if ('IntersectionObserver' in window) {
       var vio = new IntersectionObserver(function (entries) {

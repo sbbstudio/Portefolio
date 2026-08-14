@@ -588,6 +588,18 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   height: var(--box);
   grid-template-rows: repeat(2, minmax(0, 1fr));
 }
+/* CEO 08-14: samme footer på alle sider — reel-klippet i rute
+   1–2 av kolofonraden, kantene på gridlinjene (forsidens regel). */
+.footer__reel {
+  grid-column: 1 / 3; grid-row: 1 / 2;
+  position: relative; overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .55);
+}
+.footer__reel video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
 .footer__colophon {
   grid-column: 4 / 5; grid-row: 1 / 2; align-self: stretch;
   display: grid; grid-template-rows: repeat(2, 1fr);
@@ -598,14 +610,26 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   grid-area: 1 / 1; align-self: end;
   display: flex; flex-direction: column; gap: 10px;
 }
-.footer__colophon .footer__mail { grid-area: 2 / 1; align-self: end; }
+.colo__bottom {
+  grid-area: 2 / 1; align-self: end;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.footer__cta {
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: .14em; text-transform: uppercase;
+  font-weight: 500;
+}
+.footer__cta .arrow { display: inline-block; transition: transform .35s var(--ez); }
+.footer__cta:hover .arrow { transform: translateX(.5ch); }
 .footer__c {
   grid-column: 4 / 5; grid-row: 2 / 3; align-self: end;
   font-size: var(--t-fine); line-height: 1.4;
   color: var(--ink-3); letter-spacing: .14em;
 }
 .footer__name { letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
-.footer__nav { display: flex; flex-wrap: wrap; gap: 6px 2.5ch; }
+/* Bevisst 2 × 2-grid — forsidens kanon; ingen tilfeldig knekk. */
+.footer__nav { display: grid; grid-template-columns: repeat(2, max-content); gap: 6px 2.5ch; }
 .footer__nav a, .footer__mail {
   color: var(--ink-2);
   text-decoration: none;
@@ -995,6 +1019,9 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   <footer class="footer">
     <i class="mline" aria-hidden="true"></i>
     <div class="cols">
+      <div class="footer__reel" aria-hidden="true">
+        <video src="assets/opt/rune-flyr-m1.mp4" poster="assets/opt/rune-flyr-m1-poster.jpg" muted loop playsinline preload="none"></video>
+      </div>
       <div class="cell footer__colophon">
         <div class="footer__name">Rune &Oslash;verland</div>
         <div class="colo__mid">
@@ -1005,7 +1032,11 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
             <a href="grid-video.html#contact">Contact</a>
           </nav>
         </div>
-        <a class="footer__mail" href="mailto:rune@kaizenstudio.no">rune@kaizenstudio.no</a>
+        <div class="colo__bottom">
+          <a class="footer__mail" href="tel:+4741167940">0047 411 67 940</a>
+          <a class="footer__mail" href="mailto:rune@kaizenstudio.no">rune@kaizenstudio.no</a>
+          <a class="footer__cta" href="mailto:rune@kaizenstudio.no">Start a conversation <span class="arrow">&rarr;</span></a>
+        </div>
       </div>
 
       <div class="cell footer__ticker" aria-hidden="true">
@@ -1268,6 +1299,22 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
       tx = 0; ty = 0;
       if (tiltRaf === null) { tiltRaf = requestAnimationFrame(step); }
     });
+  }
+
+  /* ── FOOTER-REEL — spiller kun i syne (forsidens lazyPlay) ── */
+  var reelVids = Array.prototype.slice.call(document.querySelectorAll('.footer__reel video'));
+  if (reelVids.length && !reduce) {
+    if ('IntersectionObserver' in window) {
+      var rio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.play().catch(function () {}); }
+          else { e.target.pause(); }
+        });
+      }, { threshold: .25 });
+      reelVids.forEach(function (v) { rio.observe(v); });
+    } else {
+      reelVids.forEach(function (v) { v.play().catch(function () {}); });
+    }
   }
 })();
 </script>

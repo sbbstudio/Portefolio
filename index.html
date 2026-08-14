@@ -355,6 +355,12 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   text-box: trim-both cap alphabetic;
   transform: translateY(var(--nudge, 0px));
 }
+/* ─── CAPTRIM — REGELEN OM LIK AVSTAND ───────────────────────
+   Tekst som skal holde eksakt avstand får .captrim: boksen
+   trimmes til versaltopp og grunnlinje, så et gap på 20px ER
+   20px — uavhengig av fontstørrelse. Der text-box ikke støttes
+   emulerer seatCapTrims() trimmen med målte negative marginer. */
+.captrim { text-box: trim-both cap alphabetic; }
 
 /* CEO 08-11 hierarki, justert: 1 = samlet avsnitt (30/500),
    2 = «Fullstack engineer.» (21/500), 3 = Ads-lista (15/400),
@@ -767,7 +773,9 @@ body.ready .rl { opacity: 1; transform: none; }
 }
 .card--kzai .kz__claim p {
   margin: 0;
-  font-size: var(--t-xxl);
+  /* XXL med egen vw-brems: «YOU GET YOUR» holder én linje i
+     to-ruters-cellen — tolinjeren er CEO-valgt (08-14). */
+  font-size: min(var(--t-xxl), 5.8vw);
   line-height: 1.1;
   letter-spacing: -.025em;
   font-weight: 500;
@@ -776,7 +784,14 @@ body.ready .rl { opacity: 1; transform: none; }
 }
 /* Oppfølgeren under tidsgevinsten — samme stemme, dempet blekk,
    tett på linja over.                                          */
-.card--kzai .card__say--follow { margin-top: 4px; color: var(--ink-2); }
+.card--kzai .kz__claim .kz__sub {
+  margin-top: 20px;
+  font-size: var(--t-h3);
+  line-height: 1.2;
+  letter-spacing: -.012em;
+  text-transform: none;
+  color: var(--ink);   /* avgjørende linje — fullt blekk, ikke dempet */
+}
 /* Scrimmen tilbake på begge (CEO 08-13 r2: SBB som før,
    med vignett).                                                */
 .card--bleed .card__col::after {
@@ -1365,16 +1380,16 @@ body.ready .rl { opacity: 1; transform: none; }
             <span class="card__no">02</span>
             <div class="card__id">
               <h3>SBB Studio</h3>
-              <p>Since 2020<span class="sep">·</span>6–8 projects a year</p>
+              <p>6–8 projects a year<span class="sep">·</span>Since 2020</p>
             </div>
           </div>
-          <p class="card__say">Made the video, ran the ads, filled the room.</p>
+          <p class="card__say">Made the video. Ran the ads. Filled the room.</p>
         </div>
 
         <div class="card__facts"><ul>
           <li>Musikkfest 2025</li>
           <li>1,500+ attendees</li>
-          <li>TikTok Ads, 6.55× ROAS</li>
+          <li>6.55&times; ROAS<span class="sep">·</span>TikTok Ads</li>
         </ul></div>
 
       </div>
@@ -1404,46 +1419,50 @@ body.ready .rl { opacity: 1; transform: none; }
             <span class="card__no">03</span>
             <div class="card__id">
               <h3>Jelsadokumentene</h3>
-              <p>Source-controlled legal case system<span class="sep">·</span>Since 2026</p>
+              <p>Source-controlled legal case system<span class="sep">·</span>2025–2026</p>
             </div>
           </div>
-          <p class="card__say">From decisive evidence<br>to defensible action.</p>
+          <p class="card__say">From decisive public records to traceable evidence, legal strategy and defensible action.</p>
         </div>
 
         <div class="card__facts"><ul>
-          <li>Investigation &rarr; evidence &rarr; legal reasoning</li>
-          <li>Adversarial review &rarr; strategy &rarr; delivery</li>
+          <li>Source selection &rarr; claim-level evidence &rarr; legal analysis</li>
+          <li>QA + adversarial stress-test &rarr; strategy &rarr; delivery</li>
         </ul></div>
 
       </div>
     </article>
 
-    <article class="card card--bleed card--kzai" style="--bc:3;--br:2">
+    <article class="card card--bleed card--kzai" id="work-kzai" style="--bc:3;--br:2">
       <i class="mline" aria-hidden="true"></i>
       <div class="card__col">
         <video src="assets/opt/morfar.mp4" poster="assets/opt/morfar-poster.jpg" muted loop playsinline preload="none"></video>
       </div>
-      <!-- CEO 08-13 r2: hovedpåstanden i XXL over rute 5–6,
-           tidsgevinsten flyttet inn i kortet, rute 8 tom —
-           filmen får puste. -->
-      <div class="cell kz__claim"><p>The work<br>gets done.</p></div>
+      <!-- Testvariant 08-14: hierarkiet snudd — gevinsten i XXL,
+           arbeidet som støttelinje under; KAIZEN Studio er avsender
+           (AI kun i metalinjen). Årsakskjede: bygger det arbeidet
+           krever → arbeidet blir gjort → tiden tilbake. -->
+      <div class="cell kz__claim">
+        <p class="captrim">You get your<br>time back.</p>
+        <p class="kz__sub captrim">The work still gets done.</p>
+      </div>
       <div class="card__box">
 
         <div class="card__lead">
           <div class="card__top">
             <span class="card__no">04</span>
             <div class="card__id">
-              <h3>KAIZEN Studio AI</h3>
-              <p>Applied AI<span class="sep">·</span>custom systems</p>
+              <h3>KAIZEN</h3>
+              <p>Custom systems<span class="sep">·</span>applied AI</p>
             </div>
           </div>
-          <p class="card__say">You get your time back.</p>
-          <p class="card__say card__say--follow">The work decides what gets built.</p>
+          <p class="card__say">We build systems that do the routine work for you.</p>
         </div>
 
         <div class="card__facts"><ul>
           <li>New systems or existing tools</li>
-          <li>Routine handled &middot; exceptions stay human</li>
+          <li>Routine work runs automatically</li>
+          <li>You make the decisions that matter</li>
         </ul></div>
 
       </div>
@@ -1594,10 +1613,37 @@ body.ready .rl { opacity: 1; transform: none; }
       el.style.setProperty('--nudge', (gap > 0.5 ? gap : 0).toFixed(2) + 'px');
     });
   }
-  seatBaselines();
-  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(seatBaselines); }
+  /* ── CAPTRIM-REGELEN ───────────────────────────────────────
+     Der text-box ikke støttes emuleres trimmen: fontens luft
+     over versaltoppen og under grunnlinjen måles og trekkes fra
+     elementets marginer. Autorerte marginer (20px-enheten)
+     betyr da det samme i alle nettlesere. */
+  function seatCapTrims() {
+    if (CSS.supports && CSS.supports('text-box', 'trim-both cap alphabetic')) { return; }
+    var ctx2d = document.createElement('canvas').getContext('2d');
+    Array.prototype.forEach.call(document.querySelectorAll('.captrim'), function (el) {
+      el.style.marginTop = ''; el.style.marginBottom = '';
+      var cs = getComputedStyle(el);
+      ctx2d.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+      var cap = ctx2d.measureText('H').actualBoundingBoxAscent;
+      var probe = document.createElement('span');
+      probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+      el.insertBefore(probe, el.firstChild);
+      var firstBase = probe.getBoundingClientRect().top;
+      el.appendChild(probe);
+      var lastBase = probe.getBoundingClientRect().top;
+      el.removeChild(probe);
+      var r = el.getBoundingClientRect();
+      var topRom = (firstBase - cap) - r.top;
+      var botRom = r.bottom - lastBase;
+      el.style.marginTop = (parseFloat(cs.marginTop) - topRom).toFixed(2) + 'px';
+      el.style.marginBottom = (parseFloat(cs.marginBottom) - botRom).toFixed(2) + 'px';
+    });
+  }
+  seatBaselines(); seatCapTrims();
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(function () { seatBaselines(); seatCapTrims(); }); }
   var rt; window.addEventListener('resize', function () {
-    clearTimeout(rt); rt = setTimeout(seatBaselines, 120);
+    clearTimeout(rt); rt = setTimeout(function () { seatBaselines(); seatCapTrims(); }, 120);
   });
 
   /* Pipeline-state-maskinen er flyttet til nyme.html (CEO 08-11). */
