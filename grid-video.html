@@ -42,7 +42,7 @@ body { margin: 0; }
   --ink-2:  rgba(255, 255, 255, .52);
   --ink-3:  rgba(255, 255, 255, .30);
   --line:   rgba(255, 255, 255, .16);
-  --accent: #FF4A00;   /* TEST (CEO 08-12, fra how-i-work): aktiv/hover i jump-lista */
+  --accent: #3D6FC4;   /* TEST (CEO 08-12, fra how-i-work): aktiv/hover i jump-lista */
 
   --pad:  10px;   /* BG-div padding — avstand til skjermkanten */
   --cell: 20px;   /* padding inne i grid-div — linje til tekst   */
@@ -245,13 +245,13 @@ body {
   padding-bottom: var(--cell);
   border-bottom: var(--hair) solid rgba(5, 5, 5, .14);
 }
-.nav .cell { font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; }
+.nav .cell { font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 400; } /* CEO 08-16: 500 for tykk */
 
 .nav a { text-decoration: none; color: #FFFFFF; transition: color .3s var(--ez); }
 .nav.is-paper a { color: #000000; }
 .nav__name { grid-column: 1 / 2; }
 .nav__links { grid-column: 2 / 3; display: flex; flex-wrap: wrap; gap: 6px 1.25ch; }
-.nav__links a[aria-current="page"] { opacity: .45; }
+.nav__links a[aria-current="page"] { color: var(--accent); }
 .nav .nav__jumps {
   grid-column: 3 / 4;
   display: flex; flex-direction: column;
@@ -274,9 +274,7 @@ body {
 .nav__jumps .jno { padding-right: .75ch; font-variant-numeric: tabular-nums; }
 .nav__jumps button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 .nav .nav__jumps button.is-here,
-.nav .nav__jumps button:hover,
-.nav.is-paper .nav__jumps button.is-here,
-.nav.is-paper .nav__jumps button:hover { color: var(--accent); }
+.nav.is-paper .nav__jumps button.is-here { color: var(--accent); }
 .nav__cta { grid-column: 4 / 5; text-align: right; }
 .nav__cta .arrow { display: inline-block; }
 
@@ -362,10 +360,9 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
    emulerer seatCapTrims() trimmen med målte negative marginer. */
 .captrim { text-box: trim-both cap alphabetic; }
 
-/* CEO 08-11 hierarki, justert: 1 = samlet avsnitt (30/500),
-   2 = «Fullstack engineer.» (21/500), 3 = Ads-lista (15/400),
-   4 = CTA (15 meta). Tre størrelser — CEO-dom over regel 3:
-   trappen trengte et synlig trinn 2.                           */
+/* CEO 08-16: «Fullstack engineer.» og CTA-en på SAMME trinn —
+   t-h4 (21). Hierarki: 1 = samlet avsnitt (30/500), 2 =
+   Fullstack/CTA (21/500), 3 = Ads-lista (15/400).              */
 .hero__display h1 {
   margin: 0;
   font-size: var(--t-h4);
@@ -404,7 +401,12 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
    blokk mot høyre, cellas 20px er hele avstanden fra streken.  */
 .hero__cta a {
   display: block; width: fit-content; margin-left: auto;
-  font-size: var(--t-meta);
+  /* CEO 08-16: CTA på samme trinn som «Fullstack engineer.»
+     — t-h4 (21); sto på t-meta 15.                             */
+  font-size: var(--t-h4);
+  line-height: 1.2;
+  letter-spacing: -.012em;
+  font-weight: 500;
   color: var(--ink);
   text-decoration: none;
 }
@@ -625,7 +627,9 @@ body.ready .rl { opacity: 1; transform: none; }
 }
 .card--nyme .nyme__statement p {
   margin: 0;
-  font-size: min(var(--t-display), 7.6vw);
+  /* CEO 08-15: hele statementet på ETT trinn.
+     CEO 08-16: løftet fra 6.4vw-bremsen til --t-xxl-trinnet.  */
+  font-size: var(--t-xxl);
   font-weight: 500;
   line-height: .94;
   letter-spacing: -.03em;
@@ -1237,6 +1241,82 @@ body.ready .rl { opacity: 1; transform: none; }
   .split .ch { opacity: 1; transform: none; transition: none; }
   .ticker__track { animation: none; }
 }
+
+/* ── CEO 08-15: footer/nav-detaljer ──────────────────────────
+   1) Back to top i kolofonen — CTA-stemmen, pil opp på hover.
+   2) Hover-prikk foran nav-jump-titlene (Dado-referansen).
+   3) Jump-titlene på nav-cellens trinn — bare Rune Øverland-
+      merket står igjen på sitt.
+   4) Click to copy-tooltip på adressene (kun hover-flater).   */
+.footer__top {
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: .14em; text-transform: uppercase;
+  font-weight: 500;
+}
+.footer__top .arrow { display: inline-block; transition: transform .35s var(--ez); }
+.footer__top:hover .arrow { transform: translateY(-.35ch); }
+
+.nav .nav__jumps { font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 400; }
+.nav__jumps button { position: relative; }
+.nav__jumps button::before {
+  content: ""; position: absolute;
+  left: -.8em; top: 50%;
+  width: .34em; height: .34em; border-radius: 50%;
+  background: currentColor;
+  transform: translateY(-50%) scale(0);
+  transition: transform .3s var(--ez);
+}
+.nav__jumps button:hover::before,
+.nav__jumps button.is-here::before { transform: translateY(-50%) scale(1); }
+
+.copytip {
+  position: fixed; left: 0; top: 0; z-index: 200;
+  pointer-events: none;
+  background: #111111; color: #FFFFFF;
+  border: var(--hair) solid rgba(255, 255, 255, .18);
+  font-size: var(--t-fine); line-height: 1;
+  letter-spacing: .02em;
+  padding: 9px 12px; border-radius: 2px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .2s var(--ez);
+}
+.copytip.is-on { opacity: 1; }
+.contact__c { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+
+/* CEO 08-15 (2): sidelenkene (Nyme / How I work) vertikalt som
+   jump-lista, med samme hover-prikk; prikken står fast på
+   aktiv side (aria-current).                                  */
+.nav__links { flex-direction: column; gap: 0; align-items: flex-start; }
+.nav__links a { position: relative; }
+.nav__links a::before {
+  content: ""; position: absolute;
+  left: -.8em; top: 50%;
+  width: .34em; height: .34em; border-radius: 50%;
+  background: currentColor;
+  transform: translateY(-50%) scale(0);
+  transition: transform .3s var(--ez);
+}
+.nav__links a:hover::before,
+.nav__links a[aria-current="page"]::before { transform: translateY(-50%) scale(1); }
+
+/* CEO 08-15 (3): Contact-CTA paa samme prikk-grammatikk som resten
+   av naven -- pilen ut. Fargepar: hover = noeytral prikk (teksten
+   staar), valgt state = accent paa baade prikk og tekst.          */
+.nav__cta a { position: relative; }
+.nav__cta a::before {
+  content: ""; position: absolute;
+  left: -.8em; top: 50%;
+  width: .34em; height: .34em; border-radius: 50%;
+  background: currentColor;
+  transform: translateY(-50%) scale(0);
+  transition: transform .3s var(--ez);
+}
+.nav__cta a:hover::before { transform: translateY(-50%) scale(1); }
+.nav__cta a[aria-current="page"] { color: var(--accent); }
+.nav__cta a[aria-current="page"]::before { transform: translateY(-50%) scale(1); }
+
 </style>
 </head>
 <body>
@@ -1263,7 +1343,7 @@ body.ready .rl { opacity: 1; transform: none; }
       <button type="button" data-jump="2"><span class="jno">02</span><span class="jt">Work</span></button>
       <button type="button" data-jump="3"><span class="jno">03</span><span class="jt">Contact</span></button>
     </div>
-    <div class="cell nav__cta"><a href="mailto:rune@kaizenstudio.no">Start a conversation <span class="arrow">&rarr;</span></a></div>
+    <div class="cell nav__cta"><a href="contact.html">Contact</a></div>
   </nav>
 
   <section class="hero" id="hero">
@@ -1491,7 +1571,7 @@ body.ready .rl { opacity: 1; transform: none; }
         <p class="iv" style="--d:240ms">Now I’m ready to bring that way of working to the right company and see how far we can take it together.</p>
       </div>
 
-      <div class="cell contact__cta"><a href="mailto:rune@kaizenstudio.no">Start a conversation <span class="arrow">→</span></a></div>
+      <div class="cell contact__cta"><a href="contact.html">Start a conversation <span class="arrow">→</span></a></div>
 
       <!-- CEO 08-13: rune-flyr M1 i rute 1–2 av kolofonraden —
            kantene på gridlinjene, samme regel som kortvideoene. -->
@@ -1511,11 +1591,13 @@ body.ready .rl { opacity: 1; transform: none; }
         <div class="colo__bottom">
           <a class="footer__mail" href="tel:+4741167940">0047 411 67 940</a>
           <a class="footer__mail" href="mailto:rune@kaizenstudio.no">rune@kaizenstudio.no</a>
-          <a class="footer__cta" href="mailto:rune@kaizenstudio.no">Start a conversation <span class="arrow">&rarr;</span></a>
         </div>
       </div>
 
-      <div class="cell contact__c">© 2026</div>
+      <div class="cell contact__c">
+        <a class="footer__top" href="#top">Back to top <span class="arrow">&uarr;</span></a>
+        <span>&copy; 2026</span>
+      </div>
     </div>
   </section>
 
@@ -1815,6 +1897,77 @@ body.ready .rl { opacity: 1; transform: none; }
     tegn();
   }
 
+})();
+</script>
+
+<script>
+/* Kopier-CTA (CEO 08-15): mailto skal aldri rive besøkeren ut i
+   en mail-app — klikk legger adressen på utklippstavlen. På
+   hover-flater bærer «Click to copy»-tooltipen (Dado-ref.) både
+   affordance og kvittering; på touch svarer lenka selv
+   (adresse + ✓). mailto-href beholdes kun som fallback.        */
+(function () {
+  var tip = null;
+  if (window.matchMedia('(hover: hover)').matches) {
+    tip = document.createElement('div');
+    tip.className = 'copytip';
+    tip.textContent = 'Copy email \u2192';
+    document.body.appendChild(tip);
+    document.addEventListener('mousemove', function (e) {
+      tip.style.transform = 'translate(' + (e.clientX + 14) + 'px, ' + (e.clientY + 18) + 'px)';
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('a[href^="mailto:"]'), function (a) {
+    var addr = a.getAttribute('href').replace(/^mailto:/, '').split('?')[0];
+    a.setAttribute('aria-live', 'polite');
+    if (tip) {
+      a.addEventListener('mouseenter', function () { tip.textContent = 'Copy email \u2192'; tip.classList.add('is-on'); });
+      a.addEventListener('mouseleave', function () { tip.classList.remove('is-on'); });
+    }
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      function kvitter() {
+        if (tip && tip.classList.contains('is-on')) {
+          tip.textContent = 'Copied \u2713';
+          return;
+        }
+        if (a.dataset.orig) return;
+        a.dataset.orig = a.innerHTML;
+        a.innerHTML = addr + ' <span class="arrow">\u2713</span>';
+        setTimeout(function () {
+          a.innerHTML = a.dataset.orig;
+          delete a.dataset.orig;
+        }, 1800);
+      }
+      function fallback() {
+        var t = document.createElement('textarea');
+        t.value = addr;
+        t.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(t);
+        t.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (err) {}
+        document.body.removeChild(t);
+        if (ok) kvitter(); else location.href = 'mailto:' + addr;
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(addr).then(kvitter, fallback);
+      } else {
+        fallback();
+      }
+    });
+  });
+})();
+
+/* Back to top — footerens vei hjem (CEO 08-15). */
+(function () {
+  Array.prototype.forEach.call(document.querySelectorAll('.footer__top'), function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    });
+  });
 })();
 </script>
 

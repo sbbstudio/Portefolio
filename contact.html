@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NYME — how it works</title>
+<title>Rune Øverland — Contact</title>
 <style>
 /* ═══ CASE-UNDERSIDE — delt mal, NYME er første instans ═══════
    (CEO 08-13: «case underside på alt — ikke for bespoke for
@@ -237,6 +237,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .nav__name { grid-column: 1 / 2; }
 .nav__links { grid-column: 2 / 3; display: flex; flex-wrap: wrap; gap: 6px 1.25ch; }
 .nav__links a[aria-current="page"] { color: var(--accent); }
+.nav__cta a[aria-current="page"] { pointer-events: none; }
 .nav .nav__jumps {
   grid-column: 3 / 4;
   display: flex; flex-direction: column;
@@ -832,6 +833,86 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .nav__cta a[aria-current="page"] { color: var(--accent); }
 .nav__cta a[aria-current="page"]::before { transform: translateY(-50%) scale(1); }
 
+
+/* ══ CONTACT-SIDEN (CEO 08-15) ═══════════════════════════════
+   Modul 1: Contact me. mot bunnlinja. Modul 2: forsidens
+   godkjente linje + E/T-rader venstre, skjemaet i rute 3–4.   */
+.chero { position: relative; }
+.chero .cols { min-height: var(--box); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+/* CEO 08-15 r2: Let’s talk. center-center i modulen; E/T-radene
+   nederst til venstre (cellens 20px).                          */
+.chero__display { grid-column: 1 / 5; grid-row: 1 / 3; place-self: center; }
+.chero__display h1 {
+  margin: 0;
+  font-size: min(9.375rem, 9.9vw);
+  font-weight: 500;
+  line-height: .94;
+  letter-spacing: -.03em;
+  color: var(--ink);
+  text-box: trim-both cap alphabetic;
+}
+.cform { position: relative; }
+.cform .cols { min-height: var(--box); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+.cform__h { grid-column: 1 / 3; grid-row: 1 / 2; align-self: start; }
+.cform__h h2 {
+  margin: 0;
+  font-size: var(--t-h1);
+  line-height: 1.1;
+  letter-spacing: -.032em;
+  font-weight: 500;
+  max-width: 20ch;
+  text-box: trim-both cap alphabetic;
+}
+.cf__row { margin: 0; font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 500; text-box: trim-both cap alphabetic; }
+.cf__k { display: inline-block; width: 2.6ch; color: var(--ink-2); }
+.cf__row a { color: var(--ink); text-decoration: none; }
+/* CEO 08-15 r2: skjemaet bor i ÉN gridrute (rute 4);
+   E/T-radene i ruta til venstre (rute 3).            */
+.cform__meta { grid-column: 4 / 5; grid-row: 1 / 2; align-self: start; display: grid; gap: 14px; }
+.cform__form { grid-column: 3 / 4; grid-row: 1 / 2; align-self: start; }
+.contact__form { display: grid; gap: 18px; }
+.cf__field { display: grid; gap: 6px; }
+.cf__lab { font-size: var(--t-fine); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.contact__form input,
+.contact__form textarea {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: var(--hair) solid var(--line);
+  border-radius: 0;
+  font: inherit;
+  font-size: var(--t-base);
+  color: var(--ink);
+  padding: 0 0 8px;
+  outline: none;
+  resize: none;
+}
+.contact__form input:focus,
+.contact__form textarea:focus { border-bottom-color: var(--ink); }
+.cf__hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.contact__form button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  justify-self: start;
+  font: inherit;
+  /* CEO 08-16: ett trinn ned fra t-h4 — knappen på feltenes
+     størrelse, vekten skiller den.                             */
+  font-size: var(--t-base);
+  line-height: 1.3;
+  letter-spacing: -.012em;
+  font-weight: 500;
+  color: var(--ink);
+}
+.contact__form button .arrow { display: inline-block; transition: transform .35s var(--ez); }
+.contact__form button:hover .arrow { transform: translateX(.5ch); }
+/* CEO 08-16: knappen kvitterer selv i tre akter — Send → /
+   Sending… (dempet, låst) / Message sent ✓ — samme figur som
+   Copy email → / Copied ✓.                                     */
+.contact__form button:disabled { color: var(--ink-2); cursor: default; }
+.cf__msg { margin: 0; font-size: var(--t-fine); color: var(--ink-2); }
 </style>
 </head>
 <body>
@@ -840,15 +921,10 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 <nav class="nav" aria-label="Main">
   <div class="cell nav__name"><a href="grid-video.html">Rune &Oslash;verland</a></div>
   <div class="cell nav__links">
-    <a href="nyme.html" aria-current="page">Nyme</a>
+    <a href="nyme.html">Nyme</a>
     <a href="how-i-work.html">How I work</a>
   </div>
-  <div class="cell nav__jumps" aria-label="Sections on this page">
-    <button type="button" data-jump="1"><span class="jno">01</span><span class="jt">The app</span></button>
-    <button type="button" data-jump="2"><span class="jno">02</span><span class="jt">Pipeline</span></button>
-    <button type="button" data-jump="3"><span class="jno">03</span><span class="jt">Contact</span></button>
-  </div>
-  <div class="cell nav__cta"><a href="contact.html">Contact</a></div>
+  <div class="cell nav__cta"><a href="contact.html" aria-current="page">Contact</a></div>
 </nav>
 
 <div class="page">
@@ -860,143 +936,37 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
     <span class="nodes n1"></span><span class="nodes n2"></span><span class="nodes n3"></span>
   </div>
 
-  <!-- ══ 01 · INTRO — én modul ══════════════════════════════ -->
-  <section class="intro" id="intro">
+  <!-- ══ 01 · HERO — Contact me. ═══════════════════════════ -->
+  <section class="chero" id="intro">
     <div class="cols">
-      <!-- XXL-wordmark UT (CEO 08-13) — toppraden puster som
-           forsidens hero; naven bærer NYME-navnet nå.          -->
-      <!-- Copywriter 08-13: H1 ordrett beholdt, tre BEVISSTE
-           linjer — «site.» skal aldri stå alene.               -->
-      <div class="cell intro__h iv" style="--d:80ms">
-        <h1>It finds the job,<br>writes the application,<br>builds the site.</h1>
-      </div>
-      <div class="cell intro__body iv" style="--d:160ms">
-        <p>NYME finds promising roles early and starts working while the opportunity is still fresh. One thorough application, not fifty generic ones a week later.</p>
-        <p>Each run starts with the company: what it ships, what the role may need and where the candidate may genuinely fit. Those conclusions remain hypotheses, not facts. Nine stages build a tailored CV, cover letter and dedicated website. Nothing mass-sent. Nothing invented. The final decision stays with the candidate.</p>
-      </div>
-      <div class="cell intro__cta iv" style="--d:240ms">
-        <a href="https://nymestudio.no" target="_blank" rel="noopener">nymestudio.no&nbsp;<span class="arrow">&rarr;</span></a>
+      <div class="cell chero__display">
+        <h1 class="chero__h1">Let’s talk.</h1>
       </div>
     </div>
   </section>
 
-  <!-- ══ 02 · APP — én modul, tre ekte skjermopptak ═════════ -->
-  <section class="app" id="app" aria-label="The NYME app">
+  <!-- ══ 02 · FORM — forsidens godkjente linje + E/T-rader
+       venstre, skjemaet i rute 3–4. Skjema → Notion-innboks
+       via portefolio-contact-endepunktet. ═══════════════════ -->
+  <section class="cform" id="contact">
     <i class="mline" aria-hidden="true"></i>
     <div class="cols">
-      <div class="cell app__cap"><p class="label">The app &mdash; live recordings</p></div>
-      <div class="app__row" style="display: contents;">
-        <figure class="cell app__item iv" style="--d:0ms">
-          <div class="app__frame">
-            <span class="node" aria-hidden="true"></span>
-            <video src="assets/opt/nyme/01-feed.mp4" poster="assets/opt/nyme/01-feed-poster.jpg" muted loop playsinline preload="none"></video>
-          </div>
-          <figcaption><b>Feed</b><span>Every match scored against your profile.</span></figcaption>
-        </figure>
-        <figure class="cell app__item iv" style="--d:120ms">
-          <div class="app__frame">
-            <span class="node" aria-hidden="true"></span>
-            <video src="assets/opt/nyme/04-annonsen.mp4" poster="assets/opt/nyme/04-annonsen-poster.jpg" muted loop playsinline preload="none"></video>
-          </div>
-          <figcaption><b>Inside a role</b><span>Gaps named, skills matched &mdash; you confirm or reject.</span></figcaption>
-        </figure>
-        <figure class="cell app__item iv" style="--d:240ms">
-          <div class="app__frame">
-            <span class="node" aria-hidden="true"></span>
-            <video src="assets/opt/nyme/07-ops.mp4" poster="assets/opt/nyme/07-ops-poster.jpg" muted loop playsinline preload="none"></video>
-          </div>
-          <figcaption><b>Ops</b><span>What&rsquo;s scraped, queued and rejected &mdash; per source.</span></figcaption>
-        </figure>
+      <div class="cell cform__h iv" style="--d:0ms">
+        <h2>Tell me what you need. I’ll tell you where I can help.</h2>
       </div>
-    </div>
-  </section>
-
-  <!-- ══ 03 · PIPELINE — tre rader, sporet på v2 ════════════ -->
-  <section class="pipe" id="pipeline">
-    <i class="mline" aria-hidden="true"></i>
-    <div class="pipe__stage">
-      <p class="pipe__cap"><span>One orchestrator</span><span>Nine stages</span><span>Three deliverables</span></p>
-      <ol class="pipe__list" id="pipe">
-        <li class="pipe__step"><b>Liz</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>screens the role</span></li>
-        <li class="pipe__step"><b>Lina</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>frames what the role may need</span></li>
-        <li class="pipe__step"><b>Sophie</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>researches the company</span></li>
-        <li class="pipe__step"><b>Eva</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>keeps your facts straight</span></li>
-        <li class="pipe__step"><b>Sentinel</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>verifies every claim</span></li>
-        <li class="pipe__step"><b>Petra</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>finds your angle</span></li>
-        <li class="pipe__step"><b>Nora</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>writes the application</span></li>
-        <li class="pipe__step"><b>Astrid</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>stress-tests the draft</span></li>
-        <li class="pipe__step"><b>Reviewer</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>checks the full package</span></li>
-      </ol>
-      <div class="pipe__fork" aria-hidden="true">
-        <span class="fork__stem"></span>
-        <span class="fork__bus"></span>
-        <span class="fork__d1"></span>
-        <span class="fork__d2"></span>
-        <span class="fork__d3"></span>
+      <div class="cell cform__meta iv" style="--d:120ms">
+        <p class="cf__row"><span class="cf__k">E:</span><a href="mailto:rune@kaizenstudio.no">rune@kaizenstudio.no</a></p>
+        <p class="cf__row"><span class="cf__k">T:</span><a href="tel:+4741167940">+47 411 67 940</a></p>
       </div>
-      <div class="pipe__out">
-        <span class="itm"><svg width="72" height="92" viewBox="0 0 56 72" aria-hidden="true">
-          <rect class="sheet" x=".5" y=".5" width="55" height="71"/>
-          <line x1="8" y1="7.5" x2="18" y2="7.5"/>
-          <line x1=".5" y1="13.5" x2="55.5" y2="13.5"/>
-          <rect x="8.5" y="21.5" width="39" height="15"/>
-          <line x1="8" y1="46.5" x2="26" y2="46.5"/><line x1="30" y1="46.5" x2="48" y2="46.5"/>
-          <line x1="8" y1="52.5" x2="26" y2="52.5"/><line x1="30" y1="52.5" x2="48" y2="52.5"/>
-          <line x1="8" y1="58.5" x2="26" y2="58.5"/><line x1="30" y1="58.5" x2="48" y2="58.5"/>
-        </svg><b>Website</b></span>
-        <span class="itm"><svg width="72" height="92" viewBox="0 0 56 72" aria-hidden="true">
-          <rect class="sheet" x=".5" y=".5" width="55" height="71"/>
-          <line class="hvy" x1="8" y1="10" x2="30" y2="10"/>
-          <line x1="8" y1="16.5" x2="22" y2="16.5"/>
-          <line x1="8" y1="28.5" x2="48" y2="28.5"/>
-          <line x1="8" y1="33.5" x2="48" y2="33.5"/>
-          <line x1="8" y1="38.5" x2="48" y2="38.5"/>
-          <line x1="8" y1="50.5" x2="48" y2="50.5"/>
-          <line x1="8" y1="55.5" x2="48" y2="55.5"/>
-          <line x1="8" y1="60.5" x2="32" y2="60.5"/>
-        </svg><b>CV</b></span>
-        <span class="itm"><svg width="72" height="92" viewBox="0 0 56 72" aria-hidden="true">
-          <rect class="sheet" x=".5" y=".5" width="55" height="71"/>
-          <line x1="8" y1="8.5" x2="24" y2="8.5"/>
-          <line x1="38" y1="8.5" x2="48" y2="8.5"/>
-          <line x1="8" y1="13.5" x2="20" y2="13.5"/>
-          <line x1="8" y1="25.5" x2="48" y2="25.5"/>
-          <line x1="8" y1="30.5" x2="48" y2="30.5"/>
-          <line x1="8" y1="35.5" x2="48" y2="35.5"/>
-          <line x1="8" y1="40.5" x2="48" y2="40.5"/>
-          <line x1="8" y1="45.5" x2="48" y2="45.5"/>
-          <line x1="8" y1="50.5" x2="36" y2="50.5"/>
-          <line class="hvy" x1="8" y1="62" x2="22" y2="62"/>
-        </svg><b>Cover letter</b></span>
-      </div>
-      <p class="pipe__new">A new package for every role</p>
-    </div>
-  </section>
-
-  <!-- ══ 04 · HOOK — leveransene tolket (Copywriter 08-13) ══ -->
-  <section class="hook" id="hook">
-    <i class="mline" aria-hidden="true"></i>
-    <div class="cols">
-      <div class="cell hook__title iv" style="--d:0ms">
-        <h2>One argument.<br>Built three ways.</h2>
-      </div>
-      <div class="cell hook__body iv" style="--d:120ms">
-        <p>The CV establishes the fit.</p>
-        <p>The cover letter makes the case.</p>
-        <p>The website carries the proof.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ 05 · CLOSE — én modul, kolofonen i nettet ══════════ -->
-  <section class="close" id="contact">
-    <i class="mline" aria-hidden="true"></i>
-    <div class="cols">
-      <div class="cell close__h iv" style="--d:0ms">
-        <h2>I built NYME to move early without cutting corners.</h2>
-      </div>
-      <div class="cell close__cta iv" style="--d:120ms">
-        <a href="mailto:rune@kaizenstudio.no">Start a conversation <span class="arrow">&rarr;</span></a>
+      <div class="cell cform__form iv" style="--d:240ms">
+        <form class="contact__form" novalidate>
+          <label class="cf__field"><span class="cf__lab">Name</span><input name="name" type="text" autocomplete="name" required></label>
+          <label class="cf__field"><span class="cf__lab">Email</span><input name="email" type="email" autocomplete="email" required></label>
+          <label class="cf__field"><span class="cf__lab">Message</span><textarea name="message" rows="4" required></textarea></label>
+          <input class="cf__hp" name="company" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <button type="submit">Send <span class="arrow">&rarr;</span></button>
+          <p class="cf__msg" role="status" hidden></p>
+        </form>
       </div>
     </div>
   </section>
@@ -1130,7 +1100,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   /* ── NAV — ingen hero her: hvit rygg straks scrollet ──────── */
   var nav = document.querySelector('.nav');
   var navJumps = Array.prototype.slice.call(document.querySelectorAll('.nav__jumps button'));
-  var navTargets = ['app', 'pipeline', 'contact'].map(function (id) { return document.getElementById(id); });
+  var navTargets = ['contact'].map(function (id) { return document.getElementById(id); });
   var navPad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pad')) || 10;
   if (nav) {
     /* CEO 08-13: terskel mot for sensitiv nav — 120px akkumulert
@@ -1147,7 +1117,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
         if (y <= 40) { nav.classList.remove('is-hidden'); }
         else if (dy > 0) { nav.classList.add('is-hidden'); }
         else if (navUpAcc >= 120) { nav.classList.remove('is-hidden'); }
-        nav.classList.toggle('is-paper', y > 40);
+        /* contact: nav forblir mørk — is-paper-flippen leste som bug her */
         navLastY = y;
         var active = 0;
         navTargets.forEach(function (el, i) {
@@ -1240,6 +1210,52 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
       e.preventDefault();
       var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    });
+  });
+})();
+</script>
+
+<script>
+/* Skjema → Notion via portefolio-contact-endepunktet (CEO 08-15). */
+(function () {
+  var CF_ENDPOINT = 'https://portefolio-contact.vercel.app/api/contact';
+  var form = document.querySelector('.contact__form');
+  if (!form) return;
+  var btn = form.querySelector('button');
+  var msg = form.querySelector('.cf__msg');
+  function si(t) { msg.textContent = t; msg.hidden = !t; }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (form.company.value) return; /* honningkrukke */
+    var data = {
+      name: form.name.value.trim(),
+      email: form.email.value.trim(),
+      message: form.message.value.trim(),
+      source: location.pathname
+    };
+    if (!data.name || !data.email || !data.message || data.email.indexOf('@') < 1) {
+      si('Please complete all three fields.');
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    si('');
+    fetch(CF_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      form.reset();
+      btn.innerHTML = 'Message sent <span class="arrow">\u2713</span>';
+      setTimeout(function () {
+        btn.innerHTML = 'Send <span class="arrow">\u2192</span>';
+        btn.disabled = false;
+      }, 4000);
+    }).catch(function () {
+      btn.disabled = false;
+      btn.innerHTML = 'Send <span class="arrow">\u2192</span>';
+      si('Couldn\u2019t send. Email me directly at rune@kaizenstudio.no.');
     });
   });
 })();
