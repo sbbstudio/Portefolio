@@ -832,6 +832,17 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .nav__cta a[aria-current="page"] { color: var(--accent); }
 .nav__cta a[aria-current="page"]::before { transform: translateY(-50%) scale(1); }
 
+/* CEO 08-16: hover paa EN nav-lenke graaner resten -- den du
+   peker paa staar i fullt blekk, alt annet faller til .45.     */
+.nav__name, .nav__links a, .nav__jumps button, .nav__cta a {
+  transition: opacity .3s var(--ez), color .3s var(--ez);
+}
+.nav:has(.nav__links a:hover, .nav__jumps button:hover, .nav__cta a:hover)
+  :is(.nav__name, .nav__links a, .nav__jumps button, .nav__cta a) { opacity: .45; }
+.nav:has(.nav__links a:hover, .nav__jumps button:hover, .nav__cta a:hover)
+  :is(.nav__links a, .nav__jumps button, .nav__cta a):hover { opacity: 1; }
+
+
 </style>
 </head>
 <body>
@@ -996,7 +1007,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
         <h2>I built NYME to move early without cutting corners.</h2>
       </div>
       <div class="cell close__cta iv" style="--d:120ms">
-        <a href="mailto:rune@kaizenstudio.no">Start a conversation <span class="arrow">&rarr;</span></a>
+        <a href="contact.html">Contact <span class="arrow">&rarr;</span></a>
       </div>
     </div>
   </section>

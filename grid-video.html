@@ -1317,6 +1317,17 @@ body.ready .rl { opacity: 1; transform: none; }
 .nav__cta a[aria-current="page"] { color: var(--accent); }
 .nav__cta a[aria-current="page"]::before { transform: translateY(-50%) scale(1); }
 
+/* CEO 08-16: hover paa EN nav-lenke graaner resten -- den du
+   peker paa staar i fullt blekk, alt annet faller til .45.     */
+.nav__name, .nav__links a, .nav__jumps button, .nav__cta a {
+  transition: opacity .3s var(--ez), color .3s var(--ez);
+}
+.nav:has(.nav__links a:hover, .nav__jumps button:hover, .nav__cta a:hover)
+  :is(.nav__name, .nav__links a, .nav__jumps button, .nav__cta a) { opacity: .45; }
+.nav:has(.nav__links a:hover, .nav__jumps button:hover, .nav__cta a:hover)
+  :is(.nav__links a, .nav__jumps button, .nav__cta a):hover { opacity: 1; }
+
+
 </style>
 </head>
 <body>
@@ -1571,7 +1582,7 @@ body.ready .rl { opacity: 1; transform: none; }
         <p class="iv" style="--d:240ms">Now I’m ready to bring that way of working to the right company and see how far we can take it together.</p>
       </div>
 
-      <div class="cell contact__cta"><a href="contact.html">Start a conversation <span class="arrow">→</span></a></div>
+      <div class="cell contact__cta"><a href="contact.html">Contact <span class="arrow">→</span></a></div>
 
       <!-- CEO 08-13: rune-flyr M1 i rute 1–2 av kolofonraden —
            kantene på gridlinjene, samme regel som kortvideoene. -->
