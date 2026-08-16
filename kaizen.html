@@ -1,818 +1,1395 @@
 <!doctype html>
-<html lang="nb">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>KAIZEN — Arbeid som skalerer</title>
-<meta name="description" content="KAIZEN bygger AI-agenter som tar ansvar for konkrete arbeidsflyter i systemene dere bruker." />
-<script>document.documentElement.className += " js";</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KAIZEN — custom systems</title>
 <style>
-/* ============================================================
-   KAIZEN — one-shot landingsside
-   Frittstående. Ingen arv fra catalog/ eller packages/design-system/.
-   Copy: ORDRETT fra COPY — KAIZEN root v0.2 (CTO+CCO-gated 2026-07-30).
-   Konverteringsstruktur: garanti + pris + CTA over folden (fikser funn F1).
-   ============================================================ */
+/* ═══ CASE-UNDERSIDE — delt mal, KAIZEN er andre instans ══════
+   Malen er nyme.html, portert ordrett (CEO 08-16: «helt lik
+   NYME siden»). Alt av system — nett, lys, nav, footer, mobil —
+   er identisk; bare de fem innholds-slottene er byttet.
+   Media-modulen bærer ÉN liggende film i rute 1–3 der NYME har
+   tre stående app-opptak; det er samme modul, annet materiale.
+   Dybde-slottet er KAIZENs fireleddede metode i stedet for
+   NYMEs ni-trinns kjede — viften/leveransene ut, kjeden står.
 
-:root {
-  --ink:        #000000;
-  --ink-2:      #1A1F24;
-  --ink-soft:   #9CA3AF;
-  --paper:      #FFFFFF;
-  --paper-2:    #FFFFFF;
-  --line:       #E5E5E5;
-  --line-dark:  #2A2A2A;
-  /* Monokromt med vilje. Ingen aksentfarge er låst i kanon
-     («Hvordan skal det se ut?» = MANGLER i Docs Map, DADO reversert
-     2026-08-04). Strukturen bærer flaten til DIRECTION v1.0 finnes. */
-  --accent:     #000000;
+   ─── ORIGINAL PORTERT MALKOMMENTAR ───────────────────────────
+   (CEO 08-13: «case underside på alt — ikke for bespoke for
+   NYME».) Fire moduler, tre av dem er malen:
 
-  /* Websafe og metrisk forutsigbar på Mac, Windows og Android.
-     system-ui er bevisst UTE — den gjør uttrykket avhengig av leserens maskin.
-     Erstattes av @font-face når DIRECTION — KAIZEN root v1.0 finnes. */
-  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+     01 INTRO  (delt, --box)   wordmark rute 1 · claim rute 5–6
+                               · note rute 7 · lenke rute 8
+     02 MEDIA  (delt, --box)   casens materiale i kolonnene —
+                               her tre app-opptak; kan være
+                               foto, video, dokument
+     03 DEPTH  (bespoke slot)  casens egen mekanikk — her NYME-
+                               kjeden; Jelsa/Sitter setter sitt
+                               eget inn. Hele rader, alltid.
+     04 HOOK   (delt, --box)   tolkningen av leveransene —
+                               statement rute 5–6 + linjer rute 7
+     05 CLOSE  (delt, --box)   claim rute 5–6 · kolofon rute 7
+                               · CTA rute 8 — siden slutter i
+                               nettet, ikke i løs footer
 
-  --shell: 1360px;
-  --pad: clamp(20px, 4vw, 64px);
-
-  --t-display: clamp(2.75rem, 5.3vw, 5.75rem);
-  --t-h2:      clamp(2rem, 3.6vw, 3.5rem);
-  --t-h3:      clamp(1.25rem, 1.7vw, 1.6rem);
-  --t-lead:    clamp(1.125rem, 1.45vw, 1.4rem);
-  --t-body:    1.0625rem;
-  --t-label:   0.6875rem;
-
-  --sec:  clamp(88px, 11vw, 168px);
-}
+   Grunnlaget er forsidens system, portert ordrett:
+     · BG-div hvit #FFF, padding 10 — rammen alt ligger i
+     · Rullende nett: 2 rader × 4 kolonner per 100vh, 6px noder
+     · Innhold henger UNDER strekene (20px-husregelen)
+     · Seksjoner = hele moduler (JMB-lås 2) — nettet driver aldri
+     · Typeskala-tokens — ingen font-size skrives fritt
+   Innholdet (copy, app-triptyk, ni-trinns-kjeden) er uendret;
+   pipeline-motoren og Gauntlet-polishen intakt. Kjedens spor
+   ligger PÅ nettets v2 (50 %) — viftens bus spenner v1→v3.     */
 
 *, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+/* CEO 08-13: subtil smooth scroll — ankerhopp glir; av ved
+   redusert bevegelse.                                          */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+body { margin: 0; }
 
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+:root {
+  --paper:  #FFFFFF;
+  --ground: #000000;
+  --ink:    #FFFFFF;
+  --ink-2:  rgba(255, 255, 255, .52);
+  --ink-3:  rgba(255, 255, 255, .30);
+  --line:   rgba(255, 255, 255, .16);
+  --accent: #3D6FC4;
+
+  --pad:  10px;
+  --cell: 20px;
+  --hair: 1px;
+  --node: 6px;
+  --stack: 0px;
+
+  --ez: cubic-bezier(.22, .61, .36, 1);
+
+  /* Typeskala — forsidens tokens, 1rem = 16px. */
+  --t-display: min(9.375rem, 9.9vw);
+  --t-xxl:     min(6.875rem, 7.3vw);
+  --t-xl:      5rem;
+  --t-h1:      3.75rem;
+  --t-h2:      2.8125rem;
+  --t-h3:      1.875rem;
+  --t-h4:      1.31rem;
+  --t-caption: .9375rem;
+  --t-meta:    .9375rem;
+  --t-fine:    .75rem;
+  --t-body:    1.125rem;
+  --t-base:    1rem;
+
+  --box:  calc(100vh - (var(--pad) * 2));
+  --row:  calc(var(--box) / 2);
+}
 
 body {
-  margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--font-sans);
-  font-size: var(--t-body);
-  line-height: 1.5;
+  font-family: ui-sans-serif, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--t-base);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
-img, video { max-width: 100%; display: block; }
+/* ─── BG-DIV + RULLENDE NETT — forsidens system ordrett ────── */
+.page { position: relative; margin: var(--pad); background: var(--ground); }
 
-a { color: inherit; }
-
-.shell {
-  width: 100%;
-  max-width: var(--shell);
-  margin-inline: auto;
-  padding-inline: var(--pad);
+.grid {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
 }
+.grid .v {
+  position: absolute; top: 0; bottom: 0;
+  width: var(--hair); background: var(--line);
+}
+.grid .v1 { left: 25%; }  .grid .v2 { left: 50%; }  .grid .v3 { left: 75%; }
+.grid .rows {
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--line) 0, var(--line) var(--hair),
+    transparent var(--hair), transparent var(--row)
+  );
+}
+.grid .nodes {
+  position: absolute; top: 0; bottom: 0;
+  width: var(--node);
+  margin-left: calc(var(--node) / -2);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--paper) 0, var(--paper) var(--node),
+    transparent var(--node), transparent var(--row)
+  );
+  background-position: 0 calc(var(--node) / -2);
+}
+.grid .n1 { left: 25%; }  .grid .n2 { left: 50%; }  .grid .n3 { left: 75%; }
+
+/* ─── LYS I SVARTET — forsidens lysmodell per seksjon ────────
+   Én kilde per seksjon med ekte falloff; grain maskert av samme
+   geometri. Seksjonene er egne stacking contexts (z:1), kilden
+   ligger under innholdet.                                      */
+.intro::before, .app::before, .pipe::before, .hook::before, .close::before {
+  content: "";
+  position: absolute; inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.intro::before {
+  background: radial-gradient(1400px 900px at 62% 38%,
+    #1a1a1a 0%, #0d0d0d 40%, #050505 72%, #000 100%);
+}
+.app::before {
+  background: radial-gradient(1300px 850px at 30% 45%,
+    #181818 0%, #0c0c0c 40%, #050505 72%, #000 100%);
+}
+.pipe::before {
+  background: radial-gradient(1300px 850px at 50% 28%,
+    #181818 0%, #0c0c0c 40%, #050505 72%, #000 100%);
+}
+.hook::before {
+  background: radial-gradient(1300px 850px at 30% 62%,
+    #181818 0%, #0c0c0c 40%, #050505 72%, #000 100%);
+}
+.close::before {
+  background: radial-gradient(1300px 850px at 78% 22%,
+    #1a1a1a 0%, #0c0c0c 40%, #050505 72%, #000 100%);
+}
+.intro::after, .app::after, .pipe::after, .hook::after, .close::after {
+  content: "";
+  position: absolute; inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: .06;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='160'%20height='160'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.intro::after {
+  -webkit-mask-image: radial-gradient(1400px 900px at 62% 38%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+  mask-image: radial-gradient(1400px 900px at 62% 38%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+}
+.app::after {
+  -webkit-mask-image: radial-gradient(1300px 850px at 30% 45%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+  mask-image: radial-gradient(1300px 850px at 30% 45%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+}
+.pipe::after {
+  -webkit-mask-image: radial-gradient(1300px 850px at 50% 28%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+  mask-image: radial-gradient(1300px 850px at 50% 28%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+}
+.hook::after {
+  -webkit-mask-image: radial-gradient(1300px 850px at 30% 62%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+  mask-image: radial-gradient(1300px 850px at 30% 62%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+}
+.close::after {
+  -webkit-mask-image: radial-gradient(1300px 850px at 78% 22%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+  mask-image: radial-gradient(1300px 850px at 78% 22%, #000 0%, rgba(0,0,0,.5) 45%, transparent 80%);
+}
+
+/* ─── FELLES ───────────────────────────────────────────────── */
+.cols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+.cell { min-width: 0; padding: var(--cell); }
+
+.mline { display: none; }
+
+.intro, .app, .pipe, .hook, .close { position: relative; z-index: 1; overflow: hidden; }
 
 .label {
-  font-family: var(--font-mono);
-  font-size: var(--t-label);
-  letter-spacing: 0.14em;
+  font-size: var(--t-meta);
+  line-height: 1.4;
+  letter-spacing: .14em;
   text-transform: uppercase;
-  color: var(--ink-soft);
-  margin: 0;
+  color: var(--ink-2);
 }
+a { color: inherit; }
+a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 
-.rule { height: 1px; background: var(--line); border: 0; margin: 0; }
-
-/* ---------------- reveal ---------------- */
-.js .rv { opacity: 0; transform: translateY(18px); }
-.rv { transition: opacity .7s cubic-bezier(.19,1,.22,1), transform .7s cubic-bezier(.19,1,.22,1); }
-.rv.in { opacity: 1; transform: none; }
-.rv[data-d="1"] { transition-delay: .07s; }
-.rv[data-d="2"] { transition-delay: .14s; }
-.rv[data-d="3"] { transition-delay: .21s; }
-
-/* ============================ NAV ============================ */
-.nav {
-  position: sticky; top: 0; z-index: 50;
-  background: var(--ink);
-  color: var(--paper);
-  border-bottom: 1px solid var(--line-dark);
-}
-.nav__in {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 24px; height: 64px;
-}
-.nav__brand {
-  font-size: 1.0625rem; font-weight: 500; letter-spacing: 0.14em;
-  text-transform: uppercase; text-decoration: none;
-}
-.nav__links { display: flex; gap: clamp(16px, 2.4vw, 34px); align-items: center; }
-.nav__links a {
-  font-size: 0.875rem; text-decoration: none; color: rgba(255,255,255,.72);
-  transition: color .2s;
-}
-.nav__links a:hover { color: var(--paper); }
-.nav__cta {
-  font-family: var(--font-mono); font-size: var(--t-label);
-  letter-spacing: 0.12em; text-transform: uppercase;
-  text-decoration: none; color: var(--paper);
-  border: 1px solid rgba(255,255,255,.28);
-  padding: 9px 15px; transition: background .2s, border-color .2s;
-}
-.nav__cta:hover { background: var(--paper); border-color: var(--paper); color: var(--ink); }
-@media (max-width: 720px) { .nav__links a:not(.nav__cta) { display: none; } }
-
-/* ============================ HERO — scroll-drevet ============================
-   Heroen er sidens demonstrasjon, ikke sidens slagord.
-   Én sammenhengende scroll bærer fire tilstander:
-     01  uken slik den er        — alt står på Manuelt
-     02  vi finner hva som veier — en hårstrek leser seg nedover listen
-     03  vi begynner med én ting — de fem andre trekker seg tilbake
-     04  den gjør jobben nå      — den ene raden flipper til Agent
-   Ingen bevegelse her er dekor. Hver tilstand sier noe copyen ellers
-   måtte brukt et avsnitt på å forklare. Seksjonen under skyver heroen
-   ut — sceneovergangen er sticky-en, ikke en effekt lagt oppå.
-   ============================================================ */
-.stage { position: relative; }
-.js .stage { height: 300vh; }
-
-.hero {
-  background: var(--ink);
-  color: var(--paper);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding-block: clamp(40px, 5vw, 76px);
-  overflow: clip;
-}
-.js .hero { position: sticky; top: 0; }
-
-@media (max-width: 940px) {
-  .js .stage { height: auto; }
-  .js .hero { position: static; min-height: 0; }
-}
-
-.hero__grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
-  gap: clamp(32px, 5vw, 88px);
-  align-items: start;
-}
-@media (max-width: 940px) { .hero__grid { grid-template-columns: 1fr; } }
-
-.hero__eyebrow { color: rgba(255,255,255,.55); margin-bottom: clamp(20px, 3vw, 36px); }
-
-.hero__display {
-  font-size: var(--t-display);
-  line-height: .9;
-  letter-spacing: -0.02em;
-  font-weight: 500;
-  margin: 0;
-  text-transform: uppercase;
-}
-.hero__display span { display: block; }
-.hero__display em {
-  font-style: normal;
-  display: inline-block;
-  position: relative;
-}
-.hero__display em::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: .07em;
-  height: .045em; background: var(--paper);
-  transform: scaleX(0); transform-origin: left;
-  transition: transform .9s cubic-bezier(.19,1,.22,1) .5s;
-}
-.hero.in .hero__display em::after { transform: scaleX(1); }
-
-.hero__support {
-  font-size: var(--t-lead);
-  line-height: 1.32;
-  margin: clamp(22px, 3vw, 36px) 0 0;
-  max-width: 22ch;
-  color: var(--paper);
-}
-.hero__body {
-  font-size: var(--t-body);
-  line-height: 1.6;
-  color: rgba(255,255,255,.68);
-  max-width: 46ch;
-  margin: 20px 0 0;
-}
-.hero__signoff {
-  font-size: var(--t-body);
-  margin: 18px 0 0;
-  max-width: 46ch;
-  color: var(--paper);
-}
-
-/* --- garanti + CTA over folden (funn F1) --- */
-.hero__act {
-  margin-top: clamp(32px, 4vw, 52px);
-  display: flex; flex-wrap: wrap; align-items: center; gap: 18px 24px;
-}
-.btn {
-  display: inline-flex; align-items: center; gap: 12px;
-  background: var(--paper); color: var(--ink); text-decoration: none;
-  font-family: var(--font-mono); font-size: 0.8125rem;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  padding: 17px 26px;
-  transition: transform .2s cubic-bezier(.19,1,.22,1), background .2s;
-}
-.btn:hover { background: var(--ink-soft); }
-.btn__arrow { transition: transform .25s cubic-bezier(.19,1,.22,1); }
-.btn:hover .btn__arrow { transform: translateX(4px); }
-
-.guarantee {
-  font-family: var(--font-mono); font-size: var(--t-label);
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: rgba(255,255,255,.62);
-  display: flex; align-items: center; gap: 10px;
-}
-.guarantee::before {
-  content: ""; width: 18px; height: 1px; background: rgba(255,255,255,.62);
-  flex: none;
-}
-
-/* --- høyre panel: arbeidet som tas over --- */
-/* Ingen kort. Ingen ramme, ingen bakgrunn, ingen radius.
-   Listen bæres av hårstreker alene — som i kilden. */
-.takeover { padding: 0; }
-.takeover__head {
-  display: flex; justify-content: space-between; align-items: baseline;
-  gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--line-dark);
-}
-.takeover__head .label { color: rgba(255,255,255,.5); }
-.takeover__list { list-style: none; margin: 0; padding: 0; }
-
-.takeover__row {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center; gap: 16px;
-  padding: 15px 0;
-  border-bottom: 1px solid var(--line-dark);
+/* ─── IN VIEW — forsidens demping ──────────────────────────── */
+.iv {
+  opacity: 0;
+  transform: translateY(18px);
   transition:
-    opacity .55s cubic-bezier(.19,1,.22,1),
-    transform .55s cubic-bezier(.19,1,.22,1),
-    padding .55s cubic-bezier(.19,1,.22,1);
+    opacity   .8s var(--ez) var(--d, 0ms),
+    transform .8s var(--ez) var(--d, 0ms);
+  will-change: opacity, transform;
 }
-.takeover__row:last-child { border-bottom: 0; }
+.iv.is-in { opacity: 1; transform: none; }
 
-/* Lesestreken. Fylles fra venstre når raden er gjennomgått —
-   det er «vi går gjennom en vanlig arbeidsuke med dere», ikke en glow. */
-.takeover__row::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
-  height: 1px; background: var(--paper);
-  transform: scaleX(0); transform-origin: left;
-  transition: transform .5s cubic-bezier(.19,1,.22,1);
-}
-.takeover__row.is-seen::after { transform: scaleX(1); }
-
-.takeover__task {
-  display: flex; align-items: baseline; gap: 12px; min-width: 0;
-}
-.takeover__kind {
-  font-family: var(--font-mono); font-size: 0.625rem;
-  letter-spacing: 0.12em; color: rgba(255,255,255,.4);
-  flex: none; width: 2.5em;
-  font-variant-numeric: tabular-nums;
-  transition: color .5s cubic-bezier(.19,1,.22,1);
-}
-.takeover__name {
-  font-size: clamp(1rem, 1.15vw, 1.1875rem);
-  letter-spacing: -0.015em;
-  color: rgba(255,255,255,.34);
-  transition: color .5s cubic-bezier(.19,1,.22,1);
-}
-
-/* Høyre kolonne er kontrollkolonnen — hvem som bestemmer på hvert trinn.
-   Den er halve grunnen til at panelet finnes, og skal derfor være lesbar
-   tekst, ikke en statuslapp. */
-.takeover__state {
-  font-family: var(--font-mono); font-size: 0.6875rem;
-  letter-spacing: 0.06em;
-  padding: 0; flex: none; text-align: right;
-  color: rgba(255,255,255,.28);
-  transition: color .5s cubic-bezier(.19,1,.22,1);
-}
-
-/* Trinnet leseren står i */
-.takeover__row.is-seen .takeover__name  { color: rgba(255,255,255,.5); }
-.takeover__row.is-seen .takeover__kind  { color: rgba(255,255,255,.55); }
-.takeover__row.is-seen .takeover__state { color: rgba(255,255,255,.4); }
-
-.takeover__row.is-agent .takeover__name  { color: var(--paper); }
-.takeover__row.is-agent .takeover__kind  { color: var(--paper); }
-.takeover__row.is-agent .takeover__state { color: var(--paper); }
-
-@media (max-width: 560px) {
-  .takeover__row { grid-template-columns: 1fr; gap: 6px; }
-  .takeover__state { text-align: left; }
-}
-
-/* ============================ AVTALEN ============================ */
-.deal { padding-block: var(--sec); background: var(--paper); }
-.deal__grid {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: clamp(32px, 5vw, 80px); align-items: start;
-}
-@media (max-width: 940px) { .deal__grid { grid-template-columns: 1fr; } }
-
-.deal__statement {
-  font-size: clamp(1.625rem, 2.5vw, 2.5rem);
-  line-height: 1.08; letter-spacing: -0.032em;
-  font-weight: 500; margin: 18px 0 0; max-width: 19ch;
-}
-/* Garantien er sidens tyngste innvendingsfjerner. Den får stå alene
-   med en 2px-strek over — ikke understreket, som leser som lenke. */
-.deal__guarantee {
-  font-size: clamp(1.125rem, 1.5vw, 1.5rem);
-  line-height: 1.2; letter-spacing: -0.02em; font-weight: 500;
-  margin: clamp(28px, 3.2vw, 40px) 0 0;
-  padding-top: 18px; border-top: 2px solid var(--ink);
-  max-width: 19ch;
-}
-.deal__body p { font-size: var(--t-body); line-height: 1.62; max-width: 48ch; margin: 0 0 20px; }
-.deal__body p:last-of-type { margin-bottom: 0; }
-
-.price {
-  margin-top: clamp(28px, 3.5vw, 44px);
-  border-top: 2px solid var(--ink);
-  padding-top: 20px;
-  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 20px;
-}
-.price__num {
-  font-size: clamp(2.75rem, 5.4vw, 4.5rem); line-height: .9;
-  letter-spacing: -0.04em; font-weight: 500;
-  font-variant-numeric: tabular-nums;
-}
-.price__meta { font-family: var(--font-mono); font-size: var(--t-label);
-  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); padding-bottom: 6px; }
-
-.link-arrow {
-  display: inline-flex; align-items: center; gap: 9px;
-  font-family: var(--font-mono); font-size: var(--t-label);
-  letter-spacing: 0.12em; text-transform: uppercase;
-  text-decoration: none; color: var(--ink);
-  border-bottom: 1px solid var(--ink); padding-bottom: 4px;
-  margin-top: 26px;
-}
-.link-arrow span { transition: transform .25s cubic-bezier(.19,1,.22,1); }
-.link-arrow:hover span { transform: translateX(4px); }
-
-/* ============================ EKSEMPLER ============================
-   Én linje, ikke seks bokser. Bredden er et fotnotebevis her, ikke en meny. */
-.ex { background: var(--paper); padding-bottom: clamp(56px, 7vw, 96px); }
-.ex__list {
-  list-style: none; margin: 14px 0 0; padding: 0;
-  display: flex; flex-wrap: wrap;
-  column-gap: clamp(20px, 2.6vw, 40px); row-gap: 10px;
-  font-size: 1.0625rem; color: var(--ink);
-}
-.ex__list li { display: flex; align-items: baseline; gap: clamp(20px, 2.6vw, 40px); }
-.ex__list li:not(:last-child)::after {
-  content: ""; width: 1px; height: 0.85em; background: var(--line); display: block;
-}
-
-/* ============================ METODE — sticky ============================
-   Venstre kolonne står. Høyre kolonne beveger seg gjennom den.
-   Indeksen til venstre er ikke dekor: den er leserens posisjon i en
-   fireleddet forpliktelse, og hvem som bestemmer på hvert trinn. */
-.method { background: var(--paper); border-top: 1px solid var(--ink); }
-.method__grid {
+/* ═══ NAV — forsidens nav ordrett (CEO 08-12: samme nav på
+   alle sidene). Ingen hero her: hvit rygg straks man har
+   scrollet, retningsstyrt hide.                                */
+.nav {
+  position: fixed;
+  top: var(--pad); left: var(--pad); right: var(--pad);
+  z-index: 50;
   display: grid;
-  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-  gap: 0 clamp(32px, 5vw, 96px);
-  align-items: start;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  transition: transform .45s var(--ez), background-color .3s var(--ez);
 }
-@media (max-width: 940px) { .method__grid { grid-template-columns: 1fr; } }
+.nav.is-hidden { transform: translateY(calc(-100% - var(--pad) - 2px)); }
+.nav.is-paper {
+  background: var(--paper);
+  box-shadow: 0 calc(var(--pad) * -1) 0 0 var(--paper);
+  padding-top: calc(var(--cell) - var(--pad));
+  padding-bottom: var(--cell);
+  border-bottom: var(--hair) solid rgba(5, 5, 5, .14);
+}
+.nav .cell { font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 400; } /* CEO 08-16: 500 for tykk */
+.nav a { text-decoration: none; color: #FFFFFF; transition: color .3s var(--ez); }
+.nav.is-paper a { color: #000000; }
+.nav__name { grid-column: 1 / 2; }
+.nav__links { grid-column: 2 / 3; display: flex; flex-wrap: wrap; gap: 6px 1.25ch; }
+.nav__links a[aria-current="page"] { color: var(--accent); }
+.nav .nav__jumps {
+  grid-column: 3 / 4;
+  display: flex; flex-direction: column;
+  align-items: flex-start; gap: 0;
+  font-size: var(--t-meta);
+  line-height: 1.5;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.nav__jumps button {
+  margin: 0; padding: 0;
+  background: none; border: 0; cursor: pointer;
+  font: inherit;
+  text-align: left;
+  color: #FFFFFF;
+  white-space: nowrap;
+  transition: color .3s var(--ez);
+}
+.nav.is-paper .nav__jumps button { color: #000000; }
+.nav__jumps .jno { padding-right: .75ch; font-variant-numeric: tabular-nums; }
+.nav__jumps button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.nav .nav__jumps button.is-here,
+.nav.is-paper .nav__jumps button.is-here { color: var(--accent); }
+.nav__cta { grid-column: 4 / 5; text-align: right; }
+.nav__cta .arrow { display: inline-block; }
 
-.method__aside {
-  position: sticky; top: 64px;
-  padding-block: clamp(56px, 7vw, 104px);
-  align-self: start;
-}
-@media (max-width: 940px) {
-  .method__aside { position: static; padding-block: clamp(40px, 6vw, 64px) 0; }
-}
 
-.method__title {
-  font-size: clamp(1.75rem, 2.6vw, 2.75rem);
-  line-height: 1.02; letter-spacing: -0.035em;
-  font-weight: 500; margin: 18px 0 clamp(28px, 3.4vw, 44px);
-  text-transform: uppercase;
+/* ══ 01 · INTRO — én modul (2 rader) ═════════════════════════
+   Forsidens grammatikk: toppraden bærer identiteten (wordmark
+   rute 1, hengende fra topplinja); påstand og note henger RETT
+   UNDER midtstreken. Rute 5–6: claim · rute 7: note · rute 8:
+   nymestudio-lenka topp/høyre (rute-8-CTA-mekanikken).         */
+.intro .cols {
+  height: var(--box);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
 }
+.intro__h { grid-column: 1 / 3; grid-row: 2 / 3; align-self: start; }
+.intro__h h1 {
+  margin: 0;
+  font-size: var(--t-h1);
+  line-height: 1.1;
+  letter-spacing: -.032em;
+  font-weight: 500;
+}
+.intro__body { grid-column: 3 / 4; grid-row: 2 / 3; align-self: start; }
+.intro__body p { margin: 0 0 14px; font-size: var(--t-body); line-height: 1.5; color: var(--ink-2); max-width: 38ch; }
+.intro__body p + p { font-size: var(--t-base); line-height: 1.6; }
+.intro__cta { grid-column: 4 / 5; grid-row: 2 / 3; align-self: start; text-align: right; }
+.intro__cta a {
+  display: block; width: fit-content; margin-left: auto;
+  font-size: var(--t-meta);
+  color: var(--ink);
+  text-decoration: none;
+}
+.intro__cta .arrow { display: inline-block; letter-spacing: 0; transition: transform .35s var(--ez); }
+.intro__cta a:hover .arrow { transform: translateX(.5ch); }
 
-/* indeks — hårstrek per trinn, aktiv rad får full sverte og full linje */
-.idx { list-style: none; margin: 0; padding: 0; }
-.idx li {
-  display: grid; grid-template-columns: 2.75rem 1fr;
-  gap: 14px; align-items: baseline;
-  padding: 13px 0;
-  border-top: 1px solid var(--line);
-  color: #A8A49E;
-  transition: color .45s ease;
+/* ══ 02 · APP — én modul (2 rader) ═══════════════════════════
+   Tre ekte skjermopptak i kolonne 1–3, hver i sin rute over
+   begge rader — telefonens kant lever i nettets kolonne.
+   Label + figcaption-tekstene samlet i rute 4/8 (møblement).
+   Rammen er nettets egen grammatikk: hårlinje + 6px hjørne-
+   noder — ingen tegnet telefon.                                */
+.app .cols {
+  height: var(--box);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
 }
-.idx li:last-child { border-bottom: 1px solid var(--line); }
-.idx li.on { color: var(--ink); }
-.idx__nr { font-family: var(--font-mono); font-size: var(--t-label); letter-spacing: 0.12em; }
-.idx__nm { font-size: 1rem; letter-spacing: -0.01em; }
-.idx li.on .idx__nm { font-weight: 500; }
-
-.method__track { padding-block: clamp(56px, 7vw, 104px); }
-
-.step {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 12rem);
-  gap: clamp(20px, 3vw, 56px);
-  align-items: start;
-  padding: clamp(40px, 5.5vw, 84px) 0;
-  border-top: 1px solid var(--line);
+.app__item {
+  margin: 0; min-width: 0;
+  grid-row: 1 / 3;
+  align-self: center;
 }
-.step:first-of-type { border-top: 0; padding-top: 0; }
-@media (max-width: 940px) { .step { grid-template-columns: 1fr; gap: 18px; } }
-
-.step__nr {
-  font-family: var(--font-mono); font-size: var(--t-label);
-  letter-spacing: 0.14em; color: var(--ink-soft);
-  display: block; margin-bottom: 14px;
+.app__item:nth-child(1) { grid-column: 1 / 2; }
+.app__item:nth-child(2) { grid-column: 2 / 3; }
+.app__item:nth-child(3) { grid-column: 3 / 4; }
+.app__frame {
+  position: relative;
+  border: var(--hair) solid rgba(255, 255, 255, .3);
+  width: fit-content;
+  margin: 0 auto;
 }
-.step__label {
-  font-size: clamp(1.5rem, 2.4vw, 2.375rem);
-  font-weight: 500; letter-spacing: -0.032em; line-height: 1.04;
-  display: block; margin-bottom: 16px;
-}
-.step__text { color: var(--ink); max-width: 44ch; margin: 0; line-height: 1.55; }
-.step__ctrl {
-  font-family: var(--font-mono); font-size: var(--t-label);
-  letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink);
-  border-top: 2px solid var(--ink); padding-top: 12px;
+.app__frame video {
   display: block;
+  height: calc(var(--box) - var(--cell) * 6);
+  width: auto;
+  aspect-ratio: 1170 / 2532;
+  background: #0c0c0c;
 }
-@media (max-width: 940px) { .step__ctrl { max-width: 12rem; } }
+.app__frame::before, .app__frame::after,
+.app__frame .node::before, .app__frame .node::after {
+  content: '';
+  position: absolute;
+  width: var(--node); height: var(--node);
+  background: #FFFFFF;
+  z-index: 1;
+}
+.app__frame::before { top: -3px; left: -3px; }
+.app__frame::after  { top: -3px; right: -3px; }
+.app__frame .node::before { bottom: -3px; left: -3px; }
+.app__frame .node::after  { bottom: -3px; right: -3px; }
+.app__item figcaption {
+  margin: 12px auto 0; width: fit-content;
+  font-size: var(--t-fine); line-height: 1.4;
+  text-align: center;
+}
+.app__item figcaption b {
+  display: block;
+  font-weight: 500;
+  font-size: var(--t-caption);
+  color: var(--ink);
+}
+.app__item figcaption span { color: rgba(255, 255, 255, .42); }
+/* Label i rute 8 — hengende under midtstreken, klar av naven.  */
+.app__cap { grid-column: 4 / 5; grid-row: 2 / 3; align-self: start; text-align: right; }
+.app__cap p { margin: 0; }
+/* KAIZEN-instansen: ÉN liggende film som fyller rute 1–3 og
+   5–7 helt (CEO 08-16). Ingen egen ramme her — nettets egne
+   hårlinjer og noder ligger uansett OVER filmen (z:40), så en
+   ramme til ville bare doblet strekene. Kilden er 16:9 med
+   innbrente pilarer rundt et 4:3-bilde; object-fit: cover
+   spiser dem, så det er bildet som møter gridlinja.
 
-/* ============================ CTA ============================ */
-.close { padding-block: var(--sec); background: var(--ink); color: var(--paper); }
-.close__grid {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: clamp(32px, 5vw, 80px); align-items: start;
+   Oppå ligger tre kort som veksler med filmens egen tid —
+   grensen, løftet, avsenderen. Teksten står øverst til venstre
+   i rute 5, hengende under midtstreken (CEO 08-16: tallene ut). */
+.app--wide .app__item {
+  grid-column: 1 / 4; grid-row: 1 / 3;
+  align-self: stretch;
+  position: relative;
+  padding: 0;
 }
-@media (max-width: 940px) { .close__grid { grid-template-columns: 1fr; } }
-.close__title {
-  font-size: var(--t-h2); line-height: 1.04; letter-spacing: -0.03em;
-  font-weight: 500; margin: 16px 0 0; text-transform: uppercase; max-width: 12ch;
+.app--wide .app__frame {
+  width: 100%; height: 100%; margin: 0;
+  border: 0;
+  aspect-ratio: auto;
 }
-.close .label { color: rgba(255,255,255,.5); }
-.close p { color: rgba(255,255,255,.72); line-height: 1.62; max-width: 46ch; margin: 0 0 20px; }
-.close__act { margin-top: clamp(28px, 3.5vw, 44px); display: flex; flex-wrap: wrap; gap: 18px 24px; align-items: center; }
+.app--wide .app__frame::before, .app--wide .app__frame::after,
+.app--wide .app__frame .node::before, .app--wide .app__frame .node::after { display: none; }
+.app--wide .app__frame video {
+  width: 100%; height: 100%;
+  aspect-ratio: auto;
+  object-fit: cover;
+}
 
-/* ============================ FOOT ============================ */
-.foot { background: var(--ink); color: rgba(255,255,255,.5); border-top: 1px solid var(--line-dark); padding-block: 30px; }
-.foot__in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
-.foot .label { color: rgba(255,255,255,.72); }
+/* Scrim — filmen er lys grus og himmel; uten den forsvinner
+   hvit type i veien. Maskert til nedre venstre, der kortene
+   står, så resten av bildet blir stående urørt.               */
+.app--wide .film__scrim {
+  position: absolute; inset: 0;
+  z-index: 1; pointer-events: none;
+  background:
+    linear-gradient(to top, rgba(0, 0, 0, .80) 0%, rgba(0, 0, 0, .46) 32%, rgba(0, 0, 0, 0) 64%),
+    linear-gradient(to right, rgba(0, 0, 0, .55) 0%, rgba(0, 0, 0, .18) 38%, rgba(0, 0, 0, 0) 70%);
+}
+/* Kortene marsjerer mot høyre gjennom klippet: rute 5 → 6 → 7,
+   ett per tredjedel. Egen 3-kolonners grid oppå filmen, låst
+   til nettets kolonner, hengende under midtstreken.           */
+.app--wide .film__cards {
+  grid-column: 1 / 4; grid-row: 2 / 3;
+  align-self: start;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  z-index: 3;
+  padding: 0;
+}
+.app--wide .film__card {
+  opacity: 0;
+  transition: opacity .5s var(--ez);
+}
+.app--wide .film__card.is-on { opacity: 1; }
+.app--wide .film__card p {
+  margin: 0;
+  /* CEO 08-16: ett trinn ned — h3, ikke h2. */
+  font-size: var(--t-h3);
+  line-height: 1.05;
+  letter-spacing: -.02em;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+/* Noten om filmen: rute 8, nederst til høyre, minste trinn —
+   den forklarer hvorfor klippet er her, ikke hva det viser.   */
+.app--wide .film__note {
+  grid-column: 4 / 5; grid-row: 2 / 3;
+  align-self: end;
+  text-align: right;
+  z-index: 3;
+}
+.app--wide .film__note p {
+  margin: 0;
+  font-size: var(--t-fine);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+@media (max-width: 1023px) {
+  /* Høyre og tre kolonner er desktop-geometri. I flytkolonnen
+     legger kortene seg oppå hverandre igjen, ett om gangen.   */
+  .app--wide .film__note { text-align: left; }
+  .app--wide .film__cards { grid-template-columns: 1fr; }
+  .app--wide .film__card { grid-area: 1 / 1; }
+  .app--wide .app__item { flex: 0 0 100%; }
+  .app--wide .app__frame { width: 100%; height: auto; }
+  .app--wide .app__frame video { height: auto; aspect-ratio: 4 / 3; }
+}
+
+/* ══ 03 · PIPELINE — tre rader (1.5 modul) ═══════════════════
+   Kjedens spor ligger PÅ nettets v2 (50 %); leveranseviftens
+   bus spenner v1→v3. Cap henger under modulens topplinje i
+   rute 1. Motor, falloff-lys og registreringsmerker uendret.   */
+.pipe { height: calc(var(--row) * 3); }
+/* KAIZEN-instansen: fire trinn, ingen leveransevifte — modulen
+   trenger to rader, ikke tre.                                  */
+.pipe--method { height: calc(var(--row) * 2); }
+/* Cap sentrert over animasjonen (CEO 08-13): de tre titlene
+   STABLET vertikalt med trange gaps — h4-trinnet, møblement-
+   stemmen. Størrelsen står; det var hooken som skulle bli
+   Section 3, ikke denne.                                       */
+.pipe__cap {
+  /* CEO 08-13: linjene hører sammen — leding 1.15; blokken
+     sluppet ned fra topplinja (cell-multipler, ikke frie tall). */
+  margin: calc(var(--cell) * 4) 0 auto;
+  text-align: center;
+  font-size: var(--t-h4); line-height: 1.15;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-2);
+}
+.pipe__cap span { display: block; }
+.pipe__stage {
+  position: relative; z-index: 2;
+  height: 100%;
+  padding: var(--cell) var(--cell) calc(var(--cell) * 2);
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+}
+.pipe__list {
+  margin: 0; padding: 0; list-style: none;
+  position: relative;
+  flex: none;
+  display: flex; flex-direction: column;
+  /* Gapet er én variabel nå — koblingsprikken mellom trinnene
+     regnes ut fra den, så en instans med færre trinn kan puste
+     uten at prikken havner på feil sted.                       */
+  --pgap: clamp(40px, 6.5vh, 84px);
+  gap: var(--pgap);
+}
+/* KAIZEN: fire trinn i en to-raders modul — uten et videre gap
+   står lista klumpet i bunn med et hull under capen.           */
+/* ...og kjeden henger fra capen, ikke fra modulbunnen — ellers
+   står det et hull mellom overskrift og første trinn.          */
+.pipe--method .pipe__stage { justify-content: flex-start; }
+.pipe--method .pipe__cap { margin-bottom: 0; }   /* auto-margin ut */
+.pipe--method .pipe__list {
+  --pgap: clamp(56px, 11vh, 132px);
+  margin-top: calc(var(--cell) * 3);
+}
+.pipe__list::before {
+  content: "";
+  position: absolute;
+  left: calc(50% - .5px); top: 11px; bottom: 11px;
+  width: 1px;
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, .38) 0%,
+    rgba(255, 255, 255, .28) 45%,
+    rgba(255, 255, 255, .16) 100%);
+}
+.pipe__list::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - .5px); top: 11px; bottom: 11px;
+  width: 1px;
+  background: var(--paper);
+  transform: scaleY(var(--pp, 0));
+  transform-origin: top;
+  transition: transform .7s var(--ez);
+}
+.pipe__step {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 22px 1fr;
+  gap: 14px;
+  align-items: center;
+  font-size: var(--t-fine); line-height: 1.3;
+}
+.pipe__step + .pipe__step::before {
+  content: "";
+  position: absolute;
+  left: calc(50% - 1.5px);
+  top: calc(var(--pgap) / -2 - 1.5px);
+  width: 3px; height: 3px;
+  background: rgba(255, 255, 255, .45);
+}
+.pipe__step b { font-size: var(--t-caption); }
+.pipe__step svg { display: block; }
+.pipe__step .ring {
+  fill: var(--ground);
+  stroke: rgba(255, 255, 255, .35);
+  stroke-width: 1;
+  transition: stroke .4s var(--ez);
+}
+.pipe__step .tick {
+  fill: none;
+  stroke: var(--paper);
+  stroke-width: 1.5;
+  stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 12;
+  stroke-dashoffset: 12;
+  transition: stroke-dashoffset .45s var(--ez) .15s;
+}
+.pipe__step.is-done .ring { stroke: var(--paper); }
+.pipe__step.is-done .tick { stroke-dashoffset: 0; }
+.pipe__step.is-done svg { filter: drop-shadow(0 0 7px rgba(255, 255, 255, .38)); }
+.pipe__step:nth-child(n+4).is-done svg { filter: drop-shadow(0 0 6px rgba(255, 255, 255, .26)); }
+.pipe__step:nth-child(n+7).is-done svg { filter: drop-shadow(0 0 5px rgba(255, 255, 255, .16)); }
+.pipe__step b {
+  font-weight: 500;
+  text-align: right;
+  color: rgba(255, 255, 255, .45);
+  transition: color .4s var(--ez);
+}
+.pipe__step span {
+  position: relative; top: 1px;
+  color: rgba(255, 255, 255, .42);
+  transition: color .4s var(--ez);
+}
+.pipe__step.is-done b { color: var(--ink); }
+.pipe__step.is-done span { color: rgba(255, 255, 255, .62); }
+/* Viften: stem på v2, bus v1→v3, droppene på kolonnemidtene.   */
+.pipe__fork { position: relative; height: 88px; flex: none; }
+.pipe__fork span { position: absolute; background: var(--paper); }
+.fork__stem { left: calc(50% - .5px); top: -11px; width: 1px; height: 43px; transform: scaleY(0); transform-origin: top; }
+.fork__bus  { left: 25%; width: 50%; top: 32px; height: 1px; transform: scaleX(0); transform-origin: center; }
+.fork__d1   { left: calc(25% - .5px); top: 32px; width: 1px; height: 56px; transform: scaleY(0); transform-origin: top; }
+.fork__d2   { left: calc(50% - .5px); top: 32px; width: 1px; height: 56px; transform: scaleY(0); transform-origin: top; }
+.fork__d3   { left: calc(75% - .5px); top: 32px; width: 1px; height: 56px; transform: scaleY(0); transform-origin: top; }
+.pipe--out .pipe__fork span { transform: none; }
+.pipe--out .fork__stem { transition: transform .2s var(--ez); }
+.pipe--out .fork__bus  { transition: transform .4s var(--ez) .18s; }
+.pipe--out .fork__d1   { transition: transform .25s var(--ez) .3s; }
+.pipe--out .fork__d2   { transition: transform .25s var(--ez) .42s; }
+.pipe--out .fork__d3   { transition: transform .25s var(--ez) .56s; }
+.pipe__out {
+  margin: 6px 0 0;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  font-size: var(--t-fine); line-height: 1.3;
+}
+.pipe__out .itm {
+  grid-row: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  opacity: .3;
+  transition: opacity .5s var(--ez);
+}
+/* Leveransene sentrert på droppene: v1, v2, v3.                */
+.pipe__out .itm:nth-child(1) { grid-column: 1 / 3; }
+.pipe__out .itm:nth-child(2) { grid-column: 2 / 4; }
+.pipe__out .itm:nth-child(3) { grid-column: 3 / 5; }
+.pipe--out .pipe__out .itm { opacity: 1; }
+.pipe--out .pipe__out .itm:nth-child(1) { transition-delay: .45s; }
+.pipe--out .pipe__out .itm:nth-child(2) { transition-delay: .57s; }
+.pipe--out .pipe__out .itm:nth-child(3) { transition-delay: .69s; }
+.pipe__out .itm svg .sheet { fill: #fff; stroke: rgba(65, 65, 62, .16); stroke-width: .78; }
+.pipe__out .itm svg line,
+.pipe__out .itm svg rect:not(.sheet) { fill: none; stroke: rgba(65, 65, 62, .42); stroke-width: .78; }
+.pipe__out .itm svg .hvy { stroke: #41413e; stroke-width: 1.17; }
+.pipe__out .itm b { font-weight: 500; color: var(--ink); }
+.pipe--out .pipe__new {
+  opacity: 1; transform: none;
+  transition: opacity .5s var(--ez), transform .5s var(--ez);
+}
+.pipe__new {
+  margin: 40px 0 0;
+  font-size: var(--t-fine); line-height: 1.3;
+  text-align: center;
+  color: var(--ink-2);
+  opacity: 0; transform: translateY(5px);
+}
+.pipe--out .pipe__new { transition-delay: .95s; }
+
+/* ══ 04 · HOOK — Section 3-oppsettet fra how-i-work (CEO
+   08-13, presisert): fittet kjempetittel center i rute 2–3
+   øvre rad (fitTitle skalerer lengste linje til gridlinjene,
+   t-xxl er fallback), tekstblokken sentrert i rute 5–6 nedre
+   rad i h4-stemmen. Copywriter 08-13: leveransene TOLKES.      */
+.hook .cols {
+  height: var(--box);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+.hook__title {
+  grid-row: 1 / 2; grid-column: 2 / 4;
+  padding: 0;
+  display: flex; justify-content: center; align-items: center;
+  text-align: center;
+}
+.hook__title h2 {
+  margin: 0;
+  font-size: var(--t-xxl);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.hook__body {
+  grid-row: 2 / 3; grid-column: 2 / 4;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+.hook__body p {
+  margin: 0;
+  font-size: var(--t-h4);
+  line-height: 1.4;
+  letter-spacing: -.012em;
+  font-weight: 500;
+  color: var(--ink);
+  max-width: 44ch;
+  text-wrap: balance;
+}
+
+/* ══ 05 · CLOSE — én modul (2 rader) ═════════════════════════
+   Landingspunktet i forsidens Contact-grammatikk: tom topprad,
+   claim rute 5–6 under midtstreken, kolofon rute 7, CTA rute 8
+   topp/høyre. Kolofonen bærer footer-lenkene — siden slutter i
+   nettet, ikke i en løs footer under det.                      */
+.close .cols {
+  height: var(--box);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+.close__h { grid-column: 1 / 3; grid-row: 2 / 3; align-self: start; }
+.close__h h2 {
+  margin: 0;
+  font-size: var(--t-h1);
+  line-height: 1.1;
+  letter-spacing: -.032em;
+  font-weight: 500;
+  /* KAIZEN-claimen er lengre enn NYMEs: 16ch etterlot «— and»
+     alene på en linje. Måltallet er fortsatt rute 1–2.        */
+  max-width: 20ch;
+  text-wrap: balance;
+}
+/* ── FOOTER — forsidens fulle kolofonmodul (CEO 08-14: samme
+   footer på alle sider, inkludert reel-klippet i rute 1–2). ── */
+.footer { position: relative; z-index: 1; overflow: hidden; }
+.footer .cols {
+  height: var(--box);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+.footer__reel {
+  grid-column: 1 / 3; grid-row: 1 / 2;
+  position: relative; overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .55);
+}
+.footer__reel video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.footer__colophon {
+  grid-column: 4 / 5; grid-row: 1 / 2; align-self: stretch;
+  display: grid; grid-template-rows: repeat(2, 1fr);
+  font-size: var(--t-fine); line-height: 1.4;
+}
+.footer__colophon .footer__name { grid-area: 1 / 1; align-self: start; }
+.colo__mid {
+  grid-area: 1 / 1; align-self: end;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.colo__bottom {
+  grid-area: 2 / 1; align-self: end;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.footer__name { letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+/* Bevisst 2 × 2-grid — forsidens kanon; ingen tilfeldig knekk. */
+.footer__nav { display: grid; grid-template-columns: repeat(2, max-content); gap: 6px 2.5ch; }
+.footer__nav a, .footer__mail {
+  color: var(--ink-2);
+  text-decoration: none;
+  letter-spacing: .14em; text-transform: uppercase;
+  transition: color .3s var(--ez);
+}
+.footer__nav a:hover, .footer__mail:hover { color: var(--ink); }
+.footer__mail { text-transform: none; letter-spacing: 0; }
+.footer__cta {
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: .14em; text-transform: uppercase;
+  font-weight: 500;
+}
+.footer__cta .arrow { display: inline-block; transition: transform .35s var(--ez); }
+.footer__cta:hover .arrow { transform: translateX(.5ch); }
+.footer__c {
+  grid-column: 4 / 5; grid-row: 2 / 3; align-self: end;
+  font-size: var(--t-fine); line-height: 1.4;
+  color: var(--ink-3); letter-spacing: .14em;
+}
+/* TICKER — portert fra forsiden. Lineær tid: på en ticker er
+   farten konstant per definisjon.                              */
+.footer__ticker {
+  grid-column: 1 / 3; grid-row: 2 / 3;
+  align-self: stretch;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+.ticker__track {
+  display: flex;
+  flex: none;
+  animation: tick 40s linear infinite;
+}
+.ticker__seq {
+  display: flex; flex: none;
+  white-space: nowrap;
+  gap: .8ch;            /* CEO 08-16 (3): mindre gap mellom ordene */
+  padding-right: .8ch;
+  /* Ordene uten bindestrek, store nok til å dekke halve ruta —
+     størrelsen er geometri (row/2), ikke et skalatrinn.        */
+  font-size: calc(var(--row) / 2);
+  line-height: 1;
+  letter-spacing: -.02em;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.ticker__seq i { font-style: normal; }
+@keyframes tick {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.close__cta { grid-column: 4 / 5; grid-row: 2 / 3; align-self: start; text-align: right; }
+.close__cta a {
+  text-decoration: none;
+  font-size: var(--t-h4);
+  line-height: 1.3;
+  letter-spacing: -.012em;
+  font-weight: 500;
+  color: var(--ink);
+}
+.close__cta .arrow { display: inline-block; transition: transform .35s var(--ez); }
+.close__cta a:hover .arrow { transform: translateX(.5ch); }
+
+/* ═══ MOBIL ≤1023 — forsidens modulgrid-grammatikk ═══════════ */
+@media (max-width: 1023px) {
+  html { font-size: clamp(13px, calc(100vw / 24.375), 18px); }
+  :root {
+    --pad: 8px; --cell: 1rem;
+    --t-display: 13vw;
+    --t-xl: 2.8125rem;
+    --t-h1: 1.875rem;
+    --t-h2: 1.875rem;
+    --t-h3: 1.31rem;
+  }
+  .grid { display: none; }
+  .page::before, .page::after {
+    content: '';
+    position: absolute; top: 0; bottom: 0;
+    width: var(--hair);
+    background: rgba(255, 255, 255, .3);
+    z-index: 40; pointer-events: none;
+  }
+  .page::before { left: 0; }
+  .page::after  { right: 0; }
+  .mline {
+    display: block;
+    position: absolute; top: 0; left: 0; right: 0;
+    height: var(--hair);
+    background: rgba(255, 255, 255, .3);
+    z-index: 40; pointer-events: none;
+  }
+  .mline::before, .mline::after {
+    content: '';
+    position: absolute;
+    top: calc(var(--node) / -2 + var(--hair) / 2);
+    width: var(--node); height: var(--node);
+    background: #FFFFFF;
+  }
+  .mline::before { left: calc(var(--node) / -2); }
+  .mline::after  { right: calc(var(--node) / -2); }
+
+  .nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    background: var(--paper);
+    box-shadow: 0 calc(var(--pad) * -1) 0 0 var(--paper);
+    border-bottom: var(--hair) solid rgba(5, 5, 5, .14);
+  }
+  .nav .cell { font-size: var(--t-meta); line-height: 1.4; padding: var(--cell); }
+  .nav a, .nav.is-paper a { color: #000000; }
+  .nav__name  { grid-column: 1 / 2; grid-row: 1; }
+  .nav__cta   { grid-column: 2 / 3; grid-row: 1; }
+  .nav__links { grid-column: 1 / 3; grid-row: 2; padding-top: 0; }
+  .nav .nav__jumps { display: none; }
+  .nav.is-paper { padding-top: 0; padding-bottom: 0; }
+
+  .intro, .app, .pipe, .hook, .close { position: relative; height: auto; }
+  .cols {
+    position: static !important;
+    display: flex; flex-direction: column; gap: 40px;
+    padding: 72px 0; min-height: 0 !important;
+    height: auto !important;
+  }
+  .intro .cols { padding-top: calc(var(--cell) * 8); }
+
+  /* App-raden blir snap-spor — ett klipp i fokus, neste stikker
+     inn fra kanten (mekanikken fra forrige versjon, bevart).   */
+  .app .cols { display: block; padding: 72px 0; }
+  .app__cap { display: block; padding: 0 var(--cell) var(--cell); text-align: left; }
+  .app__row {
+    display: flex;
+    gap: var(--cell);
+    padding: 3px var(--cell);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .app__row::-webkit-scrollbar { display: none; }
+  .app__item { flex: 0 0 64%; scroll-snap-align: center; }
+  .app__frame { width: auto; margin: 0; }
+  .app__frame video { height: auto; width: 100%; }
+  .app__item figcaption { margin-left: 0; width: auto; text-align: left; }
+
+  .pipe__stage { padding: var(--cell); }
+  .close__h h2 { max-width: none; }
+  .close__colophon { gap: 1.5rem; }
+  .close__cta { text-align: left; }
+
+  /* FOOTER — kolofonmodul portert fra how-i-work-mobil (CEO
+     08-16: brukertesting-runden — navn og lenker overlappet i
+     grid-area 1/1-stablingen; ticker sto på desktop-geometri). */
+  .footer { overflow: visible; }
+  .footer .cols {
+    position: static;
+    display: flex; flex-direction: column; gap: 2.5rem;
+    height: auto;
+    padding: calc(var(--cell) * 5) 0 calc(var(--cell) * 2);
+  }
+  .footer__colophon { display: flex; flex-direction: column; gap: 1.5rem; }
+  .footer__colophon .footer__name,
+  .footer__colophon .colo__mid,
+  .footer__colophon .colo__bottom { align-self: flex-start; }
+  .footer__nav { grid-template-columns: 1fr; gap: .65rem; }
+  .footer__ticker { align-self: stretch; overflow: hidden; }
+  .ticker__seq { font-size: var(--t-h1); }
+  .footer__nav a {
+    font-size: var(--t-h4); line-height: 1.3;
+    letter-spacing: -.012em; font-weight: 500;
+    text-transform: none;
+    color: var(--ink);
+  }
+  .footer__mail {
+    font-size: var(--t-h4); line-height: 1.3;
+    letter-spacing: -.012em; font-weight: 500;
+    color: var(--ink-2);
+  }
+  .footer__mail, .footer__c { text-align: left; }
+  .footer__c { align-self: flex-start; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .rv { opacity: 1; transform: none; transition: none; }
-  .hero__display em::after { transform: scaleX(1); transition: none; }
-  .takeover__state, .btn, .btn__arrow, .link-arrow span { transition: none; }
+  .pipe__list::after, .pipe__step .tick { transition: none; }
 }
+
+/* ── CEO 08-15: footer/nav-detaljer ──────────────────────────
+   1) Back to top i kolofonen — CTA-stemmen, pil opp på hover.
+   2) Hover-prikk foran nav-jump-titlene (Dado-referansen).
+   3) Jump-titlene på nav-cellens trinn — bare Rune Øverland-
+      merket står igjen på sitt.
+   4) Click to copy-tooltip på adressene (kun hover-flater).   */
+.footer__top {
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: .14em; text-transform: uppercase;
+  font-weight: 500;
+}
+.footer__top .arrow { display: inline-block; transition: transform .35s var(--ez); }
+.footer__top:hover .arrow { transform: translateY(-.35ch); }
+
+.nav .nav__jumps { font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 400; }
+.nav__jumps button { position: relative; }
+.nav__jumps button::before {
+  content: ""; position: absolute;
+  left: -.8em; top: 50%;
+  width: .34em; height: .34em; border-radius: 50%;
+  background: currentColor;
+  transform: translateY(-50%) scale(0);
+  transition: transform .3s var(--ez);
+}
+.nav__jumps button:hover::before,
+.nav__jumps button.is-here::before { transform: translateY(-50%) scale(1); }
+
+.copytip {
+  position: fixed; left: 0; top: 0; z-index: 200;
+  pointer-events: none;
+  background: #111111; color: #FFFFFF;
+  border: var(--hair) solid rgba(255, 255, 255, .18);
+  font-size: var(--t-fine); line-height: 1;
+  letter-spacing: .02em;
+  padding: 9px 12px; border-radius: 2px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .2s var(--ez);
+}
+.copytip.is-on { opacity: 1; }
+.footer__c { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+
+/* CEO 08-15 (2): sidelenkene (Nyme / How I work) vertikalt som
+   jump-lista, med samme hover-prikk; prikken står fast på
+   aktiv side (aria-current).                                  */
+.nav__links { flex-direction: column; gap: 0; align-items: flex-start; }
+.nav__links a { position: relative; }
+.nav__links a::before {
+  content: ""; position: absolute;
+  left: -.8em; top: 50%;
+  width: .34em; height: .34em; border-radius: 50%;
+  background: currentColor;
+  transform: translateY(-50%) scale(0);
+  transition: transform .3s var(--ez);
+}
+.nav__links a:hover::before,
+.nav__links a[aria-current="page"]::before { transform: translateY(-50%) scale(1); }
+
+/* CEO 08-15 (3): Contact-CTA paa samme prikk-grammatikk som resten
+   av naven -- pilen ut. Fargepar: hover = noeytral prikk (teksten
+   staar), valgt state = accent paa baade prikk og tekst.          */
+.nav__cta a { position: relative; }
+.nav__cta a::before {
+  content: ""; position: absolute;
+  left: -.8em; top: 50%;
+  width: .34em; height: .34em; border-radius: 50%;
+  background: currentColor;
+  transform: translateY(-50%) scale(0);
+  transition: transform .3s var(--ez);
+}
+.nav__cta a:hover::before { transform: translateY(-50%) scale(1); }
+.nav__cta a[aria-current="page"] { color: var(--accent); }
+.nav__cta a[aria-current="page"]::before { transform: translateY(-50%) scale(1); }
+
+/* CEO 08-16: hover paa EN nav-lenke graaner resten -- den du
+   peker paa staar i fullt blekk, alt annet faller til .45.     */
+.nav__name, .nav__links a, .nav__jumps button, .nav__cta a {
+  transition: opacity .3s var(--ez), color .3s var(--ez);
+}
+.nav:has(.nav__links a:hover, .nav__jumps button:hover, .nav__cta a:hover)
+  :is(.nav__name, .nav__links a, .nav__jumps button, .nav__cta a) { opacity: .45; }
+.nav:has(.nav__links a:hover, .nav__jumps button:hover, .nav__cta a:hover)
+  :is(.nav__links a, .nav__jumps button, .nav__cta a):hover { opacity: 1; }
+
+
+
 </style>
 </head>
 <body>
 
-<header class="nav">
-  <div class="shell nav__in">
-    <a class="nav__brand" href="#top">KAIZEN</a>
-    <nav class="nav__links" aria-label="Hovednavigasjon">
-      <a href="#arbeidsflyter">Arbeidsflyter</a>
-      <a href="#metode">Metode</a>
-      <a href="#om">Om oss</a>
-      <a class="nav__cta" href="#kontakt">Kontakt</a>
-    </nav>
+<!-- ══ NAV — samme system som forsiden/how-i-work ══════════════ -->
+<nav class="nav" aria-label="Main">
+  <div class="cell nav__name"><a href="grid-video.html">Rune &Oslash;verland</a></div>
+  <div class="cell nav__links">
+    <a href="nyme.html">Nyme</a>
+    <a href="kaizen.html" aria-current="page">Kaizen</a>
+    <a href="how-i-work.html">How I work</a>
   </div>
-</header>
+  <div class="cell nav__jumps" aria-label="Sections on this page">
+    <button type="button" data-jump="1"><span class="jno">01</span><span class="jt">Film</span></button>
+    <button type="button" data-jump="2"><span class="jno">02</span><span class="jt">Method</span></button>
+    <button type="button" data-jump="3"><span class="jno">03</span><span class="jt">Contact</span></button>
+  </div>
+  <div class="cell nav__cta"><a href="contact.html">Contact</a></div>
+</nav>
 
-<main id="top">
+<div class="page">
 
-  <!-- ============ HERO — alt som avgjør, over folden ============ -->
-  <div class="stage" id="stage">
-  <section class="hero" id="hero">
-    <div class="shell hero__grid">
+  <!-- Rullende nett — forsidens system. -->
+  <div class="grid" aria-hidden="true">
+    <span class="v v1"></span><span class="v v2"></span><span class="v v3"></span>
+    <div class="rows"></div>
+    <span class="nodes n1"></span><span class="nodes n2"></span><span class="nodes n3"></span>
+  </div>
 
-      <div>
-        <h1 class="hero__display rv" data-d="1">
-          <span>Arbeid som</span>
-          <span><em>skalerer</em></span>
-        </h1>
+  <!-- ══ 01 · INTRO — én modul ══════════════════════════════ -->
+  <section class="intro" id="intro">
+    <div class="cols">
+      <!-- H1 = forsidens KAIZEN-kort ordrett (card__say, CEO-
+           godkjent 08-14). Linjeknekken er satt, ikke tilfeldig. -->
+      <div class="cell intro__h iv" style="--d:80ms">
+        <h1>We build systems<br>that do the routine<br>work for you.</h1>
+      </div>
+      <!-- CEO-copy 08-16 (samlet tekstversjon, STATUS: Review). -->
+      <div class="cell intro__body iv" style="--d:160ms">
+        <p>We start with the work: what repeats, where time disappears, and which decisions still need a person. That might be the quotes that take too long, the inbox no one has time to answer, or an entirely new system the work now needs.</p>
+        <p>KAIZEN turns that into a working system &mdash; built from scratch or connected to the tools already in place. Routine work keeps moving. Exceptions stay human. You see it run before it goes live, and it keeps improving as the work changes.</p>
+      </div>
+    </div>
+  </section>
 
-        <p class="hero__support rv" data-d="2">Frigjør mer kapasitet.</p>
+  <!-- ══ 02 · MEDIA — én modul, casens eget materiale ═══════
+       Filmen er den samme som bærer KAIZEN-kortet på forsiden;
+       ingen ny ressurs innført på denne flaten.               -->
+  <section class="app app--wide" id="app" aria-label="KAIZEN in use">
+    <i class="mline" aria-hidden="true"></i>
+    <div class="cols">
+      <div class="app__row" style="display: contents;">
+        <figure class="cell app__item iv" style="--d:0ms">
+          <div class="app__frame">
+            <span class="node" aria-hidden="true"></span>
+            <video id="film" src="assets/opt/morfar.mp4" poster="assets/opt/morfar-poster.jpg" muted loop playsinline preload="none"></video>
+          </div>
+          <i class="film__scrim" aria-hidden="true"></i>
+        </figure>
+      </div>
+      <!-- Tre kort, én per tredjedel av klippet, marsjerende
+           mot høyre gjennom rute 5, 6 og 7. -->
+      <div class="film__cards">
+        <div class="cell film__card is-on"><p>Work doesn&rsquo;t<br>get every hour.</p></div>
+        <div class="cell film__card"><p>The routine<br>still gets done.</p></div>
+        <div class="cell film__card film__sig"><p>KAIZEN<br>Custom systems</p></div>
+      </div>
+      <div class="cell film__note"><p>This is my family.<br>The reason I care about where the hours go.</p></div>
+    </div>
+  </section>
 
-        <p class="hero__body rv" data-d="2">
-          KAIZEN bygger AI-agenter som tar ansvar for konkrete arbeidsflyter i
-          systemene dere bruker. De lærer av hvordan dere arbeider, og utvikles
-          videre i takt med virksomheten.
-        </p>
+  <!-- ══ 03 · METODE — to rader, sporet på v2 ═══════════════
+       Samme motor som NYMEs kjede: sporet fylles av scroll,
+       hvert trinn kvitteres. Fire trinn, ingen leveransevifte.
+       CEO-copy 08-16 (samlet tekstversjon, STATUS: Review). -->
+  <section class="pipe pipe--method" id="pipeline">
+    <i class="mline" aria-hidden="true"></i>
+    <div class="pipe__stage">
+      <p class="pipe__cap"><span>One workflow</span><span>Four moves</span><span>Built to keep running</span></p>
+      <ol class="pipe__list" id="pipe">
+        <li class="pipe__step"><b>Map the work</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>Find what repeats and where time disappears.</span></li>
+        <li class="pipe__step"><b>Set the boundary</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>Decide what runs and what stays human.</span></li>
+        <li class="pipe__step"><b>Build the system</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>From scratch or inside the tools.</span></li>
+        <li class="pipe__step"><b>Run and improve</b><svg width="22" height="22" viewBox="0 0 17 17" aria-hidden="true"><circle class="ring" cx="8.5" cy="8.5" r="7.5"/><path class="tick" d="M5.2 8.7l2.2 2.2 4.2-4.6"/></svg><span>Watch the exceptions and refine the flow.</span></li>
+      </ol>
+      <p class="pipe__new">Nothing goes live until you have seen it work.</p>
+    </div>
+  </section>
 
-        <p class="hero__signoff rv" data-d="3">
-          Agentene holder flyten i gang, mens dere beholder kontrollen.
-        </p>
+  <!-- ══ 04 · HOOK — premisset i XXL, de tre linjene som
+       tolkning under. CEO-copy 08-16.                          -->
+  <section class="hook" id="hook">
+    <i class="mline" aria-hidden="true"></i>
+    <div class="cols">
+      <div class="cell hook__title iv" style="--d:0ms">
+        <h2>The work decides<br>what gets built.</h2>
+      </div>
+      <div class="cell hook__body iv" style="--d:120ms">
+        <p>Built from scratch or inside existing tools.</p>
+        <p>Clear rules for what runs automatically.</p>
+        <p>The decisions that matter stay with you.</p>
+      </div>
+    </div>
+  </section>
 
-        <div class="hero__act rv" data-d="3">
-          <a class="btn" href="#kontakt">
-            Start med én ting <span class="btn__arrow" aria-hidden="true">→</span>
-          </a>
-          <p class="guarantee">Virker det ikke, betaler dere ikke</p>
+  <!-- ══ 05 · CLOSE — én modul, kolofonen i nettet ══════════ -->
+  <section class="close" id="contact">
+    <i class="mline" aria-hidden="true"></i>
+    <div class="cols">
+      <div class="cell close__h iv" style="--d:0ms">
+        <!-- CEO-copy 08-16 (samlet tekstversjon, STATUS: Review). -->
+        <h2>I built KAIZEN to give routine work a system &mdash; and people their time back.</h2>
+      </div>
+      <div class="cell close__cta iv" style="--d:120ms">
+        <a href="contact.html">Contact <span class="arrow">&rarr;</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 06 · FOOTER — forsidens fulle kolofonmodul (CEO 08-14:
+       samme footer på alle sider, inkludert reel-klippet) ═════ -->
+  <footer class="footer">
+    <i class="mline" aria-hidden="true"></i>
+    <div class="cols">
+      <div class="footer__reel" aria-hidden="true">
+        <video src="assets/opt/rune-flyr-m1.mp4" poster="assets/opt/rune-flyr-m1-poster.jpg" muted loop playsinline preload="none"></video>
+      </div>
+      <div class="cell footer__colophon">
+        <div class="footer__name">Rune &Oslash;verland</div>
+        <div class="colo__mid">
+          <nav class="footer__nav" aria-label="Footer">
+            <a href="grid-video.html#approach">Approach</a>
+            <a href="grid-video.html#work">Work</a>
+            <a href="how-i-work.html">How I work</a>
+            <a href="contact.html">Contact</a>
+          </nav>
+        </div>
+        <div class="colo__bottom">
+          <a class="footer__mail" href="tel:+4741167940">0047 411 67 940</a>
+          <a class="footer__mail" href="mailto:rune@kaizenstudio.no">rune@kaizenstudio.no</a>
         </div>
       </div>
 
-      <!-- Panelet er ekte copy fra COPY v0.2 §3, ikke et påstått produktskjermbilde.
-           Vi har ingen ekte agentlogger å vise ennå. Da viser vi metoden,
-           ikke en oppdiktet skjerm. -->
-      <!-- Panelet viser oppdraget, ikke en produktmeny.
-           Venstre kolonne er hva KAIZEN gjør. Høyre kolonne er hvem som
-           bestemmer. All copy er ordrett fra COPY v0.2 §sec-metode —
-           ingenting her er skrevet for denne flaten. -->
-      <aside class="takeover rv" data-d="2" aria-label="Fra avtale til drift">
-        <div class="takeover__head">
-          <p class="label">Fra avtale til drift</p>
-          <p class="label"><span id="cap-n">01</span>&thinsp;/&thinsp;04</p>
-        </div>
-
-        <ul class="takeover__list">
-          <li class="takeover__row"><div class="takeover__task"><span class="takeover__kind">01</span><span class="takeover__name">Vi blir enige</span></div><span class="takeover__state">Dere godkjenner listen</span></li>
-          <li class="takeover__row"><div class="takeover__task"><span class="takeover__kind">02</span><span class="takeover__name">Vi bygger</span></div><span class="takeover__state">Vi gjør jobben</span></li>
-          <li class="takeover__row"><div class="takeover__task"><span class="takeover__kind">03</span><span class="takeover__name">Vi kjører dem sammen</span></div><span class="takeover__state">Dere ser dem gå</span></li>
-          <li class="takeover__row"><div class="takeover__task"><span class="takeover__kind">04</span><span class="takeover__name">Jobben er gjort</span></div><span class="takeover__state">Dere avgjør</span></li>
-        </ul>
-      </aside>
-
-    </div>
-  </section>
-  </div>
-
-  <!-- ============ AVTALEN — innvendingsfjerneren ============ -->
-  <section class="deal" id="om">
-    <div class="shell deal__grid">
-      <div>
-        <p class="label rv">Avtalen</p>
-        <h2 class="deal__statement rv" data-d="1">
-          Vi finner arbeidet som spiser uka deres, og tar det bort.
-        </h2>
-        <p class="deal__guarantee rv" data-d="2">Virker det ikke, betaler dere ikke.</p>
-      </div>
-
-      <div class="deal__body">
-        <p class="rv">
-          Vi ser på hvordan dere jobber i dag, og finner ut hva som er verdt å ta
-          først. Det kan være tilbudene som tar for lang tid, eller e-posten ingen
-          rekker å svare på. Hva vi bygger, blir vi enige om sammen.
-        </p>
-        <p class="rv" data-d="1">
-          Installasjonen koster 9 900 kroner. Vi bygger så mange agenter som jobben
-          krever, og setter dem opp i systemene dere bruker, eller skal ta i bruk.
-          Så kjører vi det sammen.
-        </p>
-
-        <a class="link-arrow rv" data-d="2" href="#kontakt">Se eksempler <span aria-hidden="true">→</span></a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ ARBEIDSFLYTER — degradert til bredde-bevis ============
-       Seksjonen står fortsatt (COPY v0.2 §sec-arbeidsflyter, CCO-gatet),
-       men ikke lenger som sidens bilde. Den svarer på «gjelder dette meg?»
-       ETTER at posisjonen er etablert — ikke i stedet for den. -->
-  <section class="ex" id="arbeidsflyter">
-    <div class="shell">
-      <p class="label rv">Eksempler. Deres flyt ser annerledes ut.</p>
-      <ul class="ex__list rv" data-d="1">
-        <li>Skriver tilbud</li>
-        <li>Sender faktura</li>
-        <li>Svarer kunder</li>
-        <li>Tar bestillinger</li>
-        <li>Setter vaktplan</li>
-        <li>Sorterer post</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- ============ METODE — hva må jeg gjøre? ============ -->
-  <section class="method" id="metode">
-    <div class="shell method__grid">
-
-      <aside class="method__aside">
-        <p class="label">Fra avtale til drift</p>
-        <ol class="idx" id="idx">
-          <li data-i="0"><span class="idx__nr">01</span><span class="idx__nm">Vi blir enige</span></li>
-          <li data-i="1"><span class="idx__nr">02</span><span class="idx__nm">Vi bygger</span></li>
-          <li data-i="2"><span class="idx__nr">03</span><span class="idx__nm">Vi kjører dem sammen</span></li>
-          <li data-i="3"><span class="idx__nr">04</span><span class="idx__nm">Jobben er gjort</span></li>
-        </ol>
-      </aside>
-
-      <div class="method__track">
-        <article class="step rv" data-i="0">
-          <div>
-            <span class="step__nr">01</span>
-            <span class="step__label">Vi blir enige</span>
-            <p class="step__text">Vi går gjennom en vanlig arbeidsuke med dere og skriver ned hva agentene skal gjøre.</p>
-          </div>
-          <span class="step__ctrl">Dere godkjenner listen</span>
-        </article>
-
-        <article class="step rv" data-i="1">
-          <div>
-            <span class="step__nr">02</span>
-            <span class="step__label">Vi bygger</span>
-            <p class="step__text">Agentene settes opp i systemene dere allerede bruker, og gjør jobben der.</p>
-          </div>
-          <span class="step__ctrl">Vi gjør jobben</span>
-        </article>
-
-        <article class="step rv" data-i="2">
-          <div>
-            <span class="step__nr">03</span>
-            <span class="step__label">Vi kjører dem sammen</span>
-            <p class="step__text">Vi går gjennom listen med dere mens agentene står i faktisk arbeid.</p>
-          </div>
-          <span class="step__ctrl">Dere ser dem gå</span>
-        </article>
-
-        <article class="step rv" data-i="3">
-          <div>
-            <span class="step__nr">04</span>
-            <span class="step__label">Jobben er gjort</span>
-            <p class="step__text">Står alt på listen, er jobben gjort. Mener dere noe annet, får dere ingen faktura.</p>
-          </div>
-          <span class="step__ctrl">Dere avgjør</span>
-        </article>
-
-        <a class="link-arrow rv" href="#kontakt">Hva skjer hvis en agent gjør feil? <span aria-hidden="true">→</span></a>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ============ FØRSTE STEG — sidens CTA ============ -->
-  <section class="close" id="kontakt">
-    <div class="shell close__grid">
-      <div>
-        <p class="label rv">Første steg</p>
-        <h2 class="close__title rv" data-d="1">Start med én ting</h2>
-      </div>
-
-      <div>
-        <p class="rv">
-          Første steg er en samtale, ikke en demo. Vi ser på hvordan dere jobber i
-          dag, og foreslår hva som er verdt å ta først. Dere sitter igjen med et
-          forslag dere kan si nei til.
-        </p>
-        <p class="rv" data-d="1">
-          Passer oppdraget ikke for oss, sier vi det med en gang. Vi tar ikke på oss
-          arbeid vi ikke tror vi kan levere. Det er derfor garantien over er mulig å
-          stå i.
-        </p>
-
-        <div class="close__act rv" data-d="2">
-          <a class="btn" href="#kontakt">
-            Start med én ting <span class="btn__arrow" aria-hidden="true">→</span>
-          </a>
-          <p class="guarantee">Virker det ikke, betaler dere ikke</p>
+      <div class="cell footer__ticker" aria-hidden="true">
+        <div class="ticker__track">
+          <span class="ticker__seq"><i>ADS</i><i>VIDEO</i><i>DESIGN</i><i>CODE</i><i>AGENTS</i></span>
+          <span class="ticker__seq"><i>ADS</i><i>VIDEO</i><i>DESIGN</i><i>CODE</i><i>AGENTS</i></span>
         </div>
       </div>
+
+      <div class="cell footer__c">
+        <a class="footer__top" href="#top">Back to top <span class="arrow">&uarr;</span></a>
+        <span>&copy; 2026</span>
+      </div>
     </div>
-  </section>
+  </footer>
 
-</main>
-
-<footer class="foot">
-  <div class="shell foot__in">
-    <p class="label">KAIZEN</p>
-    <!-- Footer-copy er eksplisitt uskrevet i COPY v0.2 §5 (funn F4). Står tom med vilje. -->
-  </div>
-</footer>
+</div>
 
 <script>
 (function () {
-  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* --- reveal --- */
-  var items = document.querySelectorAll(".rv");
-  if (reduce || !("IntersectionObserver" in window)) {
-    items.forEach(function (el) { el.classList.add("in"); });
-    document.getElementById("hero").classList.add("in");
-  } else {
+  /* ── IN VIEW — forsidens observer ──────────────────────────── */
+  var targets = document.querySelectorAll('.iv');
+  if ('IntersectionObserver' in window && !reduce) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+        if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
       });
-    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.1 });
-    items.forEach(function (el) { io.observe(el); });
-    requestAnimationFrame(function () { document.getElementById("hero").classList.add("in"); });
+    }, { rootMargin: '0px 0px -30% 0px', threshold: 0 });
+    Array.prototype.forEach.call(targets, function (el) { io.observe(el); });
+  } else {
+    Array.prototype.forEach.call(targets, function (el) { el.classList.add('is-in'); });
   }
 
-  /* ---------------------------------------------------------------
-     HERO-MEKANIKK — scroll er dramaturgien, ikke en avspiller.
-
-     Leseren driver den selv, begge veier, og kan stoppe hvor som helst.
-     Fire tilstander over 300vh:
-       01  0.00–0.40   lesestreken går nedover listen
-       02  0.44–0.70   de fem andre trekker seg tilbake
-       03  0.76–0.94   den ene raden flipper til Agent
-     Ingen bibliotek. Én rAF-lås, én DOM-skriving per tilstandsendring —
-     class-toggle er idempotent, så vi skriver ikke hver frame.
-     --------------------------------------------------------------- */
-  var stage = document.getElementById("stage");
-  var rows  = Array.prototype.slice.call(document.querySelectorAll(".takeover__row"));
-  var capN  = document.getElementById("cap-n");
-
-  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
-
-  function setStep(cur) {
-    rows.forEach(function (row, i) {
-      row.classList.toggle("is-seen",  i < cur);
-      row.classList.toggle("is-agent", i === cur);
+  /* ── FIT TITLE — portert fra how-i-work (sec2/sec3-tittelen):
+     lengste linje skaleres til å treffe gridlinjene eksakt.    */
+  var fitEls = Array.prototype.slice.call(document.querySelectorAll('.hook__title h2'));
+  function fitTitle() {
+    fitEls.forEach(function (el) {
+      if (window.innerWidth < 1024) { el.style.fontSize = ''; return; }
+      el.style.fontSize = '100px';
+      var w = el.scrollWidth;
+      if (w > 0) { el.style.fontSize = (100 * el.parentElement.clientWidth / w) + 'px'; }
     });
-    if (capN) capN.textContent = "0" + (cur + 1);
   }
+  fitTitle();
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fitTitle); }
+  var ft; window.addEventListener('resize', function () {
+    clearTimeout(ft); ft = setTimeout(fitTitle, 120);
+  });
 
-  /* Statisk fallback: redusert bevegelse, ingen JS-scroll, eller mobil
-     der sticky-en er koblet ut. Da vises hele oppdraget, ikke ingenting. */
-  var small = window.matchMedia("(max-width: 940px)");
-
-  function staticState() {
-    rows.forEach(function (row) {
-      row.classList.add("is-seen");
-      row.classList.remove("is-agent");
-    });
-    if (capN) capN.textContent = "0" + rows.length;
-  }
-
-  var qf = false;
-
-  function heroFrame() {
-    qf = false;
-    var travel = stage.offsetHeight - window.innerHeight;
-    if (travel <= 0) { staticState(); return; }
-
-    var p = clamp01(-stage.getBoundingClientRect().top / travel);
-    /* Siste 12 % er pust før neste seksjon overtar — ellers hopper
-       trinn 04 forbi før leseren rekker å se det. */
-    var cur = Math.min(rows.length - 1, Math.floor(clamp01(p / 0.88) * rows.length));
-    setStep(cur);
-  }
-
-  function onHeroScroll() {
-    if (!qf) { qf = true; requestAnimationFrame(heroFrame); }
-  }
-
-  if (stage && rows.length) {
-    if (reduce || small.matches) {
-      staticState();
+  /* ── PIPELINE — scroll-drevet motor, uendret ──────────────── */
+  var pipe = document.getElementById('pipe');
+  if (pipe) {
+    var steps = pipe.querySelectorAll('.pipe__step');
+    var n = steps.length;
+    var wrap = pipe.closest('.pipe__stage');
+    var out = wrap.querySelector('.pipe__out');
+    var done = function (k) {
+      for (var i = 0; i < n; i++) { steps[i].classList.toggle('is-done', i < k); }
+      pipe.style.setProperty('--pp', n > 1 ? Math.max(0, (k - 1) / (n - 1)) : 0);
+    };
+    if (reduce) {
+      done(n);
+      wrap.classList.add('pipe--out');
     } else {
-      window.addEventListener("scroll", onHeroScroll, { passive: true });
-      window.addEventListener("resize", onHeroScroll, { passive: true });
-      heroFrame();
+      var raf = null;
+      var update = function () {
+        raf = null;
+        var line = window.innerHeight * .62;
+        var k = 0;
+        for (var i = 0; i < n; i++) {
+          if (steps[i].getBoundingClientRect().top + 11 <= line) { k = i + 1; }
+        }
+        done(k);
+        /* KAIZEN-instansen har ingen leveransevifte — da er «alle
+           trinn kvittert» selve åpningen.                        */
+        var open = k === n && (!out || out.getBoundingClientRect().top <= line);
+        wrap.classList.toggle('pipe--out', open);
+      };
+      var queue = function () {
+        if (raf === null) { raf = requestAnimationFrame(update); }
+      };
+      window.addEventListener('scroll', queue, { passive: true });
+      window.addEventListener('resize', queue);
+      update();
     }
   }
 
-  /* --- sticky-metode: indeksen følger trinnet som eier skjermen ---
-     Aktiv rad avgjøres av hvilket trinn som er nærmest en linje 42 % nede
-     i viewporten. Én kilde til sannhet, ingen konkurrerende observere. */
-  var steps = Array.prototype.slice.call(document.querySelectorAll(".step[data-i]"));
-  var idx   = Array.prototype.slice.call(document.querySelectorAll("#idx li"));
-
-  if (steps.length && idx.length) {
-    var active = -1, queued = false;
-
-    function sync() {
-      queued = false;
-      var line = window.innerHeight * 0.42;
-      var best = 0, bestDist = Infinity;
-
-      steps.forEach(function (el, i) {
-        var r = el.getBoundingClientRect();
-        var d = Math.abs(r.top + r.height / 2 - line);
-        if (r.bottom > 0 && r.top < window.innerHeight && d < bestDist) {
-          bestDist = d; best = i;
+  /* ── FILM-KORTENE — tre tredjedeler av filmens egen lengde:
+     0–7 grensen, 7–14 løftet, 14–21 avsenderen. Vi regner fra
+     duration, ikke fra hardkodede sekunder, så kortene henger
+     sammen med klippet om det byttes.                          */
+  var film = document.getElementById('film');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.film__card'));
+  if (film && cards.length) {
+    var show = function (i) {
+      cards.forEach(function (c, k) { c.classList.toggle('is-on', k === i); });
+    };
+    if (reduce) {
+      show(cards.length - 1);          /* stillbilde: avsenderen */
+    } else {
+      /* CEO 08-16: kort 2 og 3 slippes 2 sek etter den rene
+         tredjedelen — første kort får puste, avsenderen lander
+         seinere. Forskyvningen er flat, ikke akkumulert.        */
+      var LAG = 2;
+      var tick = function () {
+        var d = film.duration;
+        if (!d || !isFinite(d)) { return; }
+        var seg = d / cards.length;
+        var t = film.currentTime;
+        var i = 0;
+        for (var k = 1; k < cards.length; k++) {
+          if (t >= k * seg + LAG) { i = k; }
         }
+        show(i);
+      };
+      film.addEventListener('timeupdate', tick);
+      film.addEventListener('loadedmetadata', tick);
+      tick();
+    }
+  }
+
+  /* ── APP-KLIPPENE — spiller kun i syne ────────────────────── */
+  var vids = Array.prototype.slice.call(document.querySelectorAll('.app video, .footer__reel video'));
+  if (vids.length && !reduce) {
+    if ('IntersectionObserver' in window) {
+      var vio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.play().catch(function () {}); }
+          else { e.target.pause(); }
+        });
+      }, { threshold: .25 });
+      vids.forEach(function (v) { vio.observe(v); });
+    } else {
+      vids.forEach(function (v) { v.play().catch(function () {}); });
+    }
+  }
+
+  /* ── NAV — ingen hero her: hvit rygg straks scrollet ──────── */
+  var nav = document.querySelector('.nav');
+  var navJumps = Array.prototype.slice.call(document.querySelectorAll('.nav__jumps button'));
+  var navTargets = ['app', 'pipeline', 'contact'].map(function (id) { return document.getElementById(id); });
+  var navPad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pad')) || 10;
+  if (nav) {
+    /* CEO 08-13: terskel mot for sensitiv nav — 120px akkumulert
+       opp-scroll for vise den igjen; ned-scroll nullstiller.   */
+    var navLastY = window.scrollY, navTick = false, navUpAcc = 0;
+    var onNavScroll = function () {
+      if (navTick) { return; }
+      navTick = true;
+      requestAnimationFrame(function () {
+        navTick = false;
+        var y = window.scrollY;
+        var dy = y - navLastY;
+        navUpAcc = dy > 0 ? 0 : navUpAcc - dy;
+        if (y <= 40) { nav.classList.remove('is-hidden'); }
+        else if (dy > 0) { nav.classList.add('is-hidden'); }
+        else if (navUpAcc >= 120) { nav.classList.remove('is-hidden'); }
+        nav.classList.toggle('is-paper', y > 40);
+        navLastY = y;
+        var active = 0;
+        navTargets.forEach(function (el, i) {
+          if (el && el.getBoundingClientRect().top <= window.innerHeight * 0.45) { active = i + 1; }
+        });
+        navJumps.forEach(function (b) {
+          b.classList.toggle('is-here', parseInt(b.dataset.jump, 10) === active);
+        });
       });
-
-      if (best !== active) {
-        active = best;
-        idx.forEach(function (li, i) { li.classList.toggle("on", i === active); });
-      }
-    }
-
-    function onScroll() {
-      if (!queued) { queued = true; requestAnimationFrame(sync); }
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    sync();
+    };
+    window.addEventListener('scroll', onNavScroll, { passive: true });
+    onNavScroll();
+    navJumps.forEach(function (b) {
+      b.addEventListener('click', function () {
+        var el = navTargets[parseInt(b.dataset.jump, 10) - 1];
+        if (!el) { return; }
+        window.scrollTo({
+          top: el.getBoundingClientRect().top + window.scrollY - navPad,
+          behavior: reduce ? 'auto' : 'smooth'
+        });
+      });
+    });
   }
 })();
 </script>
+
+<script>
+/* Kopier-CTA (CEO 08-15): mailto skal aldri rive besøkeren ut i
+   en mail-app — klikk legger adressen på utklippstavlen. På
+   hover-flater bærer «Click to copy»-tooltipen (Dado-ref.) både
+   affordance og kvittering; på touch svarer lenka selv
+   (adresse + ✓). mailto-href beholdes kun som fallback.        */
+(function () {
+  var tip = null;
+  if (window.matchMedia('(hover: hover)').matches) {
+    tip = document.createElement('div');
+    tip.className = 'copytip';
+    tip.textContent = 'Copy email \u2192';
+    document.body.appendChild(tip);
+    document.addEventListener('mousemove', function (e) {
+      tip.style.transform = 'translate(' + (e.clientX + 14) + 'px, ' + (e.clientY + 18) + 'px)';
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('a[href^="mailto:"]'), function (a) {
+    var addr = a.getAttribute('href').replace(/^mailto:/, '').split('?')[0];
+    a.setAttribute('aria-live', 'polite');
+    if (tip) {
+      a.addEventListener('mouseenter', function () { tip.textContent = 'Copy email \u2192'; tip.classList.add('is-on'); });
+      a.addEventListener('mouseleave', function () { tip.classList.remove('is-on'); });
+    }
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      function kvitter() {
+        if (tip && tip.classList.contains('is-on')) {
+          tip.textContent = 'Copied \u2713';
+          return;
+        }
+        if (a.dataset.orig) return;
+        a.dataset.orig = a.innerHTML;
+        a.innerHTML = addr + ' <span class="arrow">\u2713</span>';
+        setTimeout(function () {
+          a.innerHTML = a.dataset.orig;
+          delete a.dataset.orig;
+        }, 1800);
+      }
+      function fallback() {
+        var t = document.createElement('textarea');
+        t.value = addr;
+        t.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(t);
+        t.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (err) {}
+        document.body.removeChild(t);
+        if (ok) kvitter(); else location.href = 'mailto:' + addr;
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(addr).then(kvitter, fallback);
+      } else {
+        fallback();
+      }
+    });
+  });
+})();
+
+/* Back to top — footerens vei hjem (CEO 08-15). */
+(function () {
+  Array.prototype.forEach.call(document.querySelectorAll('.footer__top'), function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    });
+  });
+})();
+</script>
+
 </body>
 </html>

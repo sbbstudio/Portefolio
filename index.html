@@ -798,6 +798,20 @@ body.ready .rl { opacity: 1; transform: none; }
   text-transform: none;
   color: var(--ink);   /* avgjørende linje — fullt blekk, ikke dempet */
 }
+/* CEO 08-16: CTA til undersiden — rute 8, topp/høyre. Samme
+   plassering og samme lenkestil som NYME-kortets; z:1 fordi
+   full-bleed-klippet ellers ligger over.                       */
+.card--kzai .kz__cta {
+  grid-column: 4 / 5; grid-row: 2 / 3;
+  align-self: start;
+  text-align: right;
+  position: relative; z-index: 1;
+}
+.card--kzai .kz__cta a {
+  display: block; width: fit-content; margin-left: auto;
+  margin-top: 0;
+  border-bottom: none; padding-bottom: 0;
+}
 /* Scrimmen tilbake på begge (CEO 08-13 r2: SBB som før,
    med vignett).                                                */
 .card--bleed .card__col::after {
@@ -825,7 +839,7 @@ body.ready .rl { opacity: 1; transform: none; }
   color: var(--ink-2);
   max-width: 34ch;
 }
-.card__note a, .nyme__cta a, .card__link {
+.card__note a, .nyme__cta a, .kz__cta a, .card__link {
   display: inline-block;
   margin-top: var(--cell);
   font-size: var(--t-meta);
@@ -835,7 +849,7 @@ body.ready .rl { opacity: 1; transform: none; }
   padding-bottom: 2px;
   transition: border-color .3s var(--ez);
 }
-.card__note a:hover, .nyme__cta a:hover, .card__link:hover { border-bottom-color: var(--ink); }
+.card__note a:hover, .nyme__cta a:hover, .kz__cta a:hover, .card__link:hover { border-bottom-color: var(--ink); }
 
 /* HELE kortet i ÉN grid rute. Glass på hele stacken:
    panelkanten faller på gridlinjene, de 20px innenfor er samme
@@ -1210,6 +1224,8 @@ body.ready .rl { opacity: 1; transform: none; }
   .card__note { padding: var(--cell) 0 0; }
   .card--nyme .nyme__cta { text-align: left; }
   .card--nyme .nyme__cta a { margin-left: 0; }
+  .card--kzai .kz__cta { text-align: left; }
+  .card--kzai .kz__cta a { margin-left: 0; }
   .hero__cta { text-align: left; }
   .hero__cta a { margin-left: 0; }
   /* CEO 08-16 (4): How I work mot heroens bunn.                */
@@ -1399,6 +1415,7 @@ body.ready .rl { opacity: 1; transform: none; }
     <div class="cell nav__name"><a href="grid-video.html">Rune &Oslash;verland</a></div>
     <div class="cell nav__links">
       <a href="nyme.html">Nyme</a>
+    <a href="kaizen.html">Kaizen</a>
       <a href="how-i-work.html">How I work</a>
     </div>
     <div class="cell nav__jumps" aria-label="Sections on this page">
@@ -1588,6 +1605,9 @@ body.ready .rl { opacity: 1; transform: none; }
       <div class="cell kz__claim">
         <p class="captrim">You get your<br>time back.</p>
         <p class="kz__sub captrim">The work still gets done.</p>
+      </div>
+      <div class="cell kz__cta iv" style="--d:240ms">
+        <a href="kaizen.html">How KAIZEN works&nbsp;&rarr;</a>
       </div>
       <div class="card__box">
 
