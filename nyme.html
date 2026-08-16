@@ -641,8 +641,8 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .ticker__seq {
   display: flex; flex: none;
   white-space: nowrap;
-  gap: 1.5ch;
-  padding-right: 1.5ch;
+  gap: .8ch;            /* CEO 08-16 (3): mindre gap mellom ordene */
+  padding-right: .8ch;
   /* Ordene uten bindestrek, store nok til å dekke halve ruta —
      størrelsen er geometri (row/2), ikke et skalatrinn.        */
   font-size: calc(var(--row) / 2);
@@ -751,6 +751,37 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   .close__h h2 { max-width: none; }
   .close__colophon { gap: 1.5rem; }
   .close__cta { text-align: left; }
+
+  /* FOOTER — kolofonmodul portert fra how-i-work-mobil (CEO
+     08-16: brukertesting-runden — navn og lenker overlappet i
+     grid-area 1/1-stablingen; ticker sto på desktop-geometri). */
+  .footer { overflow: visible; }
+  .footer .cols {
+    position: static;
+    display: flex; flex-direction: column; gap: 2.5rem;
+    height: auto;
+    padding: calc(var(--cell) * 5) 0 calc(var(--cell) * 2);
+  }
+  .footer__colophon { display: flex; flex-direction: column; gap: 1.5rem; }
+  .footer__colophon .footer__name,
+  .footer__colophon .colo__mid,
+  .footer__colophon .colo__bottom { align-self: flex-start; }
+  .footer__nav { grid-template-columns: 1fr; gap: .65rem; }
+  .footer__ticker { align-self: stretch; overflow: hidden; }
+  .ticker__seq { font-size: var(--t-h1); }
+  .footer__nav a {
+    font-size: var(--t-h4); line-height: 1.3;
+    letter-spacing: -.012em; font-weight: 500;
+    text-transform: none;
+    color: var(--ink);
+  }
+  .footer__mail {
+    font-size: var(--t-h4); line-height: 1.3;
+    letter-spacing: -.012em; font-weight: 500;
+    color: var(--ink-2);
+  }
+  .footer__mail, .footer__c { text-align: left; }
+  .footer__c { align-self: flex-start; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -841,6 +872,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   :is(.nav__name, .nav__links a, .nav__jumps button, .nav__cta a) { opacity: .45; }
 .nav:has(.nav__links a:hover, .nav__jumps button:hover, .nav__cta a:hover)
   :is(.nav__links a, .nav__jumps button, .nav__cta a):hover { opacity: 1; }
+
 
 
 </style>
@@ -1027,7 +1059,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
             <a href="grid-video.html#approach">Approach</a>
             <a href="grid-video.html#work">Work</a>
             <a href="how-i-work.html">How I work</a>
-            <a href="grid-video.html#contact">Contact</a>
+            <a href="contact.html">Contact</a>
           </nav>
         </div>
         <div class="colo__bottom">

@@ -668,8 +668,8 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .ticker__seq {
   display: flex; flex: none;
   white-space: nowrap;
-  gap: 1.5ch;
-  padding-right: 1.5ch;
+  gap: .8ch;            /* CEO 08-16 (3): mindre gap mellom ordene */
+  padding-right: .8ch;
   /* Ordene uten bindestrek, store nok til å dekke halve ruta —
      størrelsen er geometri (row/2), ikke et skalatrinn.        */
   font-size: calc(var(--row) / 2);
@@ -938,6 +938,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   :is(.nav__links a, .nav__jumps button, .nav__cta a):hover { opacity: 1; }
 
 
+
 </style>
 </head>
 <body>
@@ -1131,7 +1132,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
             <a href="grid-video.html#approach">Approach</a>
             <a href="grid-video.html#work">Work</a>
             <a href="how-i-work.html">How I work</a>
-            <a href="grid-video.html#contact">Contact</a>
+            <a href="contact.html">Contact</a>
           </nav>
         </div>
         <div class="colo__bottom">

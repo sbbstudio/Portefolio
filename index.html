@@ -647,7 +647,9 @@ body.ready .rl { opacity: 1; transform: none; }
 .card--nyme .nyme__statement-lead span:last-child {
   position: absolute;
   left: 50%; top: var(--cell);
-  font-size: min(9.375rem, 6.4vw);
+  /* CEO 08-16 (3): samme trinn som resten av statementet —
+     egen 6.4vw-brems gjorde APPLICATION synlig mindre.        */
+  font-size: var(--t-xxl);
 }
 .card--nyme .nyme__statement-rest {
   text-align: center;
@@ -985,8 +987,8 @@ body.ready .rl { opacity: 1; transform: none; }
 .ticker__seq {
   display: flex; flex: none;
   white-space: nowrap;
-  gap: 1.5ch;
-  padding-right: 1.5ch;
+  gap: .8ch;            /* CEO 08-16 (3): mindre gap mellom ordene */
+  padding-right: .8ch;
   /* CEO: ordene UTEN bindestrek, store nok til å dekke halve
      ruta — størrelsen er geometri (row/2), ikke et skalatrinn. */
   font-size: calc(var(--row) / 2);
@@ -1191,7 +1193,9 @@ body.ready .rl { opacity: 1; transform: none; }
   .appr__top { display: flex; flex-direction: column; gap: var(--cell); }
   .appr__media { margin-top: 0; }
   .appr__frame img { height: auto; width: 100%; transform: none; }
-  .appr__top > h2 { padding-left: 0; }
+  /* CEO 08-16 (4): venstre — desktopens align-self: end betyr
+     HØYRE i flex-kolonne.                                      */
+  .appr__top > h2 { padding-left: 0; align-self: flex-start; }
 
   /* KORTENE — 4×2-gridden med --bc/--vc-plassering er desktop-
      geometri; på mobil stables modulen: media i rutens
@@ -1208,6 +1212,9 @@ body.ready .rl { opacity: 1; transform: none; }
   .card--nyme .nyme__cta a { margin-left: 0; }
   .hero__cta { text-align: left; }
   .hero__cta a { margin-left: 0; }
+  /* CEO 08-16 (4): How I work mot heroens bunn.                */
+  .hero .cols { min-height: calc(100vh - var(--pad) * 2) !important; padding-bottom: calc(var(--cell) * 2); }
+  .hero__cta { margin-top: auto; }
   .card--nyme .nyme__ph img { position: static; height: auto; }
   /* Stablet statement på mobil: APPLICATION, i flyt rett etter
      THE (ikke absolutt mot 50 %-linja som på desktop), og hele
@@ -1215,6 +1222,8 @@ body.ready .rl { opacity: 1; transform: none; }
   .card--nyme .nyme__statement p { font-size: 6.4vw; }
   .card--nyme .nyme__statement-lead { gap: .5ch; }
   .card--nyme .nyme__statement-lead span:last-child { position: static; font-size: inherit; }
+  /* CEO 08-16 (4): venstre på mobil — senter er desktop-geometri. */
+  .card--nyme .nyme__statement-rest { text-align: left; }
 
   /* Jelsa-veggen: hover finnes ikke på mobil — sidene VISES,
      to og to.                                                  */
@@ -1222,6 +1231,9 @@ body.ready .rl { opacity: 1; transform: none; }
   .card--jelsa .card__box { grid-column: 1 / -1; grid-row: auto; }
   .card--jelsa .jelsa-cell { grid-column: auto; grid-row: auto; aspect-ratio: 4 / 5; }
   .jelsa-cell img { opacity: 1; }
+  /* CEO 08-16 (4): tre av artiklene skjult på mobil — desktop-
+     rad 2 (--sr:2) ut, veggen blir ren 2×2.                    */
+  .card--jelsa .jelsa-cell[style*="--sr:2"] { display: none; }
   .card__say, .card__facts { text-align: left; }
   .card__col { position: relative; aspect-ratio: 9 / 16; max-height: 70vh; overflow: hidden; }
   /* Bleed-klippene (Morfar, Video Seksjon 2) er landskap —
@@ -1328,9 +1340,49 @@ body.ready .rl { opacity: 1; transform: none; }
   :is(.nav__links a, .nav__jumps button, .nav__cta a):hover { opacity: 1; }
 
 
+
+/* ── SPLASH (CEO 08-16 (4)): kun mobil — navnet + beskjed om at
+   flaten er designet for desktop. Vises én gang per besøk
+   (sessionStorage); Continue slipper deg inn.                  */
+.splash { display: none; }
+@media (max-width: 1023px) {
+  .splash {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; flex-direction: column; justify-content: space-between;
+    background: var(--ground); color: var(--ink);
+    padding: calc(var(--cell) * 2) var(--cell);
+    opacity: 1; transition: opacity .5s var(--ez);
+  }
+  .splash[hidden] { display: none; }
+  .splash.is-out { opacity: 0; pointer-events: none; }
+  .splash__name {
+    font-size: var(--t-meta); line-height: 1.4;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .splash__note {
+    margin: 0;
+    font-size: var(--t-h1); line-height: 1.15;
+    letter-spacing: -.025em; font-weight: 500;
+  }
+  .splash__enter {
+    background: none; border: 0; padding: 0;
+    font: inherit; color: var(--ink); cursor: pointer;
+    text-align: left;
+    font-size: var(--t-h4); line-height: 1.2;
+    letter-spacing: -.012em; font-weight: 500;
+  }
+  .splash__enter .arrow { display: inline-block; transition: transform .35s var(--ez); }
+  .splash__enter:hover .arrow, .splash__enter:focus-visible .arrow { transform: translateX(.5ch); }
+}
 </style>
 </head>
 <body>
+<div class="splash" id="splash" hidden>
+  <div class="splash__name">Rune &Oslash;verland</div>
+  <p class="splash__note">This website is designed for&nbsp;desktop.</p>
+  <button class="splash__enter" type="button">Continue <span class="arrow">&rarr;</span></button>
+</div>
 
 <div class="page">
 
@@ -1596,7 +1648,7 @@ body.ready .rl { opacity: 1; transform: none; }
             <a href="#approach">Approach</a>
             <a href="#work">Work</a>
             <a href="how-i-work.html">How I work</a>
-            <a href="#contact">Contact</a>
+            <a href="contact.html">Contact</a>
           </nav>
         </div>
         <div class="colo__bottom">
@@ -1982,5 +2034,23 @@ body.ready .rl { opacity: 1; transform: none; }
 })();
 </script>
 
+<script>
+/* Splash — kun mobil, én gang per besøk. */
+(function () {
+  var s = document.getElementById('splash');
+  if (!s || !window.matchMedia('(max-width: 1023px)').matches) return;
+  var seen = false;
+  try { seen = !!sessionStorage.getItem('splashSeen'); } catch (e) {}
+  if (seen) return;
+  s.hidden = false;
+  document.documentElement.style.overflow = 'hidden';
+  s.querySelector('.splash__enter').addEventListener('click', function () {
+    try { sessionStorage.setItem('splashSeen', '1'); } catch (e) {}
+    s.classList.add('is-out');
+    document.documentElement.style.overflow = '';
+    setTimeout(function () { s.hidden = true; }, 550);
+  });
+})();
+</script>
 </body>
 </html>
