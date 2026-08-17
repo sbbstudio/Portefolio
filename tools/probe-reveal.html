@@ -1,0 +1,100 @@
+<!doctype html>
+<!-- Reveal-probe (CEO 08-17: «animasjon slår inn for sent»).
+     Laster flaten i en iframe, scroller stegvis gjennom hele
+     dokumentet og noterer for HVERT .iv/.split-element hvor i
+     viewporten toppen sto da det tente. Tallet som betyr noe er
+     TOPP% : 90 = tente idet det kom inn nedenfra, 55 = tente
+     først da det var over midten (= for sent).
+     Bruk: probe-reveal.html?page=nyme.html&w=1440&h=900
+
+     ⚠ BEGRENSNING (verifisert 08-17): i --headless=new fyrer
+     IntersectionObserver IKKE på programmatisk scroll — kun det
+     som er i syne ved load blir tent, resten rapporteres som
+     «aldri tent». Proben er derfor gyldig i EN EKTE nettleser
+     (åpne URL-en i Chrome), ikke i skjermbilde-harnessen. Samme
+     begrensning som shot.html?r=1 finnes for.                   -->
+<meta charset="utf-8">
+<style>
+  html,body{margin:0;background:#111;color:#eee;font:12px/1.45 ui-monospace,monospace}
+  /* Iframen MÅ stå synlig i toppvinduet: IntersectionObserver i
+     et nested dokument måler også mot toppvinduets viewport, så
+     en iframe parkert utenfor skjermen gir null treff.          */
+  iframe{position:fixed;left:0;top:0;border:0}
+  #out{position:fixed;left:0;top:0;right:0;z-index:9;padding:14px;
+       white-space:pre;background:rgba(10,10,10,.94)}
+</style>
+<iframe id="f"></iframe>
+<div id="out">måler …</div>
+<script>
+var q = new URLSearchParams(location.search);
+var w = parseInt(q.get('w') || '1440', 10);
+var h = parseInt(q.get('h') || '900', 10);
+var page = q.get('page') || 'grid-video.html';
+var f = document.getElementById('f'), out = document.getElementById('out');
+try { sessionStorage.setItem('splashSeen', '1'); } catch (e) {}
+f.width = w; f.height = h; f.src = '../' + page;
+
+f.addEventListener('load', function () {
+  var doc = f.contentDocument, win = f.contentWindow;
+  var els = Array.prototype.slice.call(doc.querySelectorAll('.iv, .split'));
+  var seen = new Map();
+  var y = 0, max = 0, stepPx = 120;
+
+  function label(el) {
+    var c = (el.className || '').split(/\s+/)
+      .filter(function (n) { return n && n !== 'iv' && n !== 'is-in' && n !== 'cell'; });
+    return (c[0] || el.tagName.toLowerCase());
+  }
+
+  function sample() {
+    els.forEach(function (el) {
+      if (seen.has(el) || !el.classList.contains('is-in')) { return; }
+      var top = el.getBoundingClientRect().top;
+      seen.set(el, { name: label(el), pct: Math.round(top / h * 100), y: y });
+    });
+  }
+
+  function step() {
+    max = doc.documentElement.scrollHeight - h;
+    /* how-i-work er tusenvis av piksler høy (scroll-stage): fast
+       120 px ville kostet flere hundre frames. Maks 400 steg.   */
+    stepPx = Math.max(120, Math.ceil(max / 400));
+    if (y > max) { return report(); }
+    win.scrollTo(0, y);
+    win.dispatchEvent(new Event('scroll'));
+    /* setTimeout, ikke rAF: IO-callbacken leveres som en task, og
+       under --virtual-time-budget er rAF-kjeden upålitelig lang. */
+    setTimeout(function () {
+      sample();
+      y += stepPx;
+      step();
+    }, 20);
+  }
+
+  function report() {
+    sample();
+    var rows = [], late = 0;
+    seen.forEach(function (v) { rows.push(v); });
+    rows.sort(function (a, b) { return a.y - b.y; });
+    var lines = rows.map(function (r) {
+      /* r.y === 0 = elementet sto i første skjermbilde og ble
+         tent ved load. Det er ikke «for sent» — det er over
+         folden. Kun scroll-tente elementer kan feile.          */
+      var bad = r.y > 0 && r.pct < 70;
+      if (bad) { late++; }
+      return (bad ? '  LATE  ' : r.y === 0 ? '  load  ' : '  ok    ') +
+        String(r.pct).padStart(3) + '%  @y=' + String(r.y).padStart(6) + '  ' + r.name;
+    });
+    var missed = els.length - rows.length;
+    out.innerHTML =
+      'PAGE ' + page + '   viewport ' + w + '×' + h + '\n' +
+      'elementer: ' + els.length + '   tent: ' + rows.length +
+      '   aldri tent: ' + missed + '   for sent (<70%): ' + late + '\n\n' +
+      lines.join('\n') +
+      '\n\nRESULT ' + (late === 0 && missed === 0 ? 'PASS' : 'FAIL');
+    document.title = 'PROBE-DONE late=' + late + ' missed=' + missed;
+  }
+
+  setTimeout(step, 600);
+});
+</script>

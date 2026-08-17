@@ -292,10 +292,10 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
    Tidsbasert, ikke scrub — derfor er easing riktig her.        */
 .iv {
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(8px);
   transition:
-    opacity   .8s var(--ez) var(--d, 0ms),
-    transform .8s var(--ez) var(--d, 0ms);
+    opacity   .4s var(--ez) calc(var(--d, 0ms) * .5),
+    transform .4s var(--ez) calc(var(--d, 0ms) * .5);
   will-change: opacity, transform;
 }
 .iv.is-in { opacity: 1; transform: none; }
@@ -971,8 +971,8 @@ body.ready .rl { opacity: 1; transform: none; }
   opacity: 0;
   transform: translateY(.35em);
   transition:
-    opacity   .55s var(--ez) calc(var(--ci) * 14ms),
-    transform .55s var(--ez) calc(var(--ci) * 14ms);
+    opacity   .4s var(--ez) calc(var(--ci) * 7ms),
+    transform .4s var(--ez) calc(var(--ci) * 7ms);
   will-change: opacity, transform;
 }
 .split.is-in .ch { opacity: 1; transform: none; }
@@ -1724,7 +1724,7 @@ body.ready .rl { opacity: 1; transform: none; }
       entries.forEach(function (e) {
         if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
       });
-    }, { rootMargin: '0px 0px -45% 0px', threshold: 0 });
+    }, { rootMargin: '0px 0px 0px 0px', threshold: 0 });
     Array.prototype.forEach.call(targets, function (el) {
       if (el.closest('.hero')) { return; }
       io.observe(el);
@@ -1842,7 +1842,7 @@ body.ready .rl { opacity: 1; transform: none; }
     }
   }
   lazyPlay(Array.prototype.slice.call(document.querySelectorAll('.card__col video')), .25);
-  lazyPlay(Array.prototype.slice.call(document.querySelectorAll('.contact__reel video')), .5);
+  lazyPlay(Array.prototype.slice.call(document.querySelectorAll('.contact__reel video')), .25);
 
   var nav = document.querySelector('.nav');
   var heroEl = document.querySelector('.hero');

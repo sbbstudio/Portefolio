@@ -248,10 +248,10 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 /* ─── IN VIEW — tidsbasert, ikke scrub ──────────────────────── */
 .iv {
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(8px);
   transition:
-    opacity   .8s var(--ez) var(--d, 0ms),
-    transform .8s var(--ez) var(--d, 0ms);
+    opacity   .4s var(--ez) calc(var(--d, 0ms) * .5),
+    transform .4s var(--ez) calc(var(--d, 0ms) * .5);
   will-change: opacity, transform;
 }
 .iv.is-in { opacity: 1; transform: none; }
@@ -269,8 +269,8 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   opacity: 0;
   transform: translateY(.35em);
   transition:
-    opacity   .55s var(--ez) calc(var(--ci) * 14ms),
-    transform .55s var(--ez) calc(var(--ci) * 14ms);
+    opacity   .4s var(--ez) calc(var(--ci) * 7ms),
+    transform .4s var(--ez) calc(var(--ci) * 7ms);
   will-change: opacity, transform;
 }
 .split.is-in .ch { opacity: 1; transform: none; }
@@ -1189,7 +1189,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
       entries.forEach(function (e) {
         if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
       });
-    }, { rootMargin: '0px 0px -30% 0px', threshold: 0 });
+    }, { rootMargin: '0px 0px 0px 0px', threshold: 0 });
     Array.prototype.forEach.call(targets, function (el) {
       if (el.closest('.stage')) { return; }
       io.observe(el);
