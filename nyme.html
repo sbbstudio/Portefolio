@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NYME — how it works</title>
+<link rel="stylesheet" href="nav-system.css">
 <style>
 /* ═══ CASE-UNDERSIDE — delt mal, NYME er første instans ═══════
    (CEO 08-13: «case underside på alt — ikke for bespoke for
@@ -231,7 +232,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   padding-bottom: var(--cell);
   border-bottom: var(--hair) solid rgba(5, 5, 5, .14);
 }
-.nav .cell { font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 400; } /* CEO 08-16: 500 for tykk */
+.nav .cell { line-height: 1.3; letter-spacing: -.012em; font-weight: 400; }
 .nav a { text-decoration: none; color: #FFFFFF; transition: color .3s var(--ez); }
 .nav.is-paper a { color: #000000; }
 .nav__name { grid-column: 1 / 2; }
@@ -241,7 +242,6 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
   grid-column: 3 / 4;
   display: flex; flex-direction: column;
   align-items: flex-start; gap: 0;
-  font-size: var(--t-meta);
   line-height: 1.5;
   font-weight: 400;
   letter-spacing: 0;
@@ -712,7 +712,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
     box-shadow: 0 calc(var(--pad) * -1) 0 0 var(--paper);
     border-bottom: var(--hair) solid rgba(5, 5, 5, .14);
   }
-  .nav .cell { font-size: var(--t-meta); line-height: 1.4; padding: var(--cell); }
+  .nav .cell { line-height: 1.4; padding: var(--cell); }
   .nav a, .nav.is-paper a { color: #000000; }
   .nav__name  { grid-column: 1 / 2; grid-row: 1; }
   .nav__cta   { grid-column: 2 / 3; grid-row: 1; }
@@ -803,7 +803,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .footer__top .arrow { display: inline-block; transition: transform .35s var(--ez); }
 .footer__top:hover .arrow { transform: translateY(-.35ch); }
 
-.nav .nav__jumps { font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 400; }
+.nav .nav__jumps { line-height: 1.3; letter-spacing: -.012em; font-weight: 400; }
 .nav__jumps button { position: relative; }
 .nav__jumps button::before {
   content: ""; position: absolute;

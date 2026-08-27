@@ -7,13 +7,13 @@
 <!-- LCP: hero-bakgrunnen er CSS-bg og kan ikke få loading-attributt —
      preload med høy prioritet er hero-lasten. ALDRI lazy (perf-task). -->
 <link rel="preload" as="image" href="assets/opt/hero-placeholder.webp" type="image/webp" fetchpriority="high">
+<link rel="stylesheet" href="nav-system.css">
 <style>
 /* ============================================================
-   LAB — frittstående. Ingen imports, ingen deps, ingen build.
+   LAB — frittstående. Delt NAV-stil; ingen JS-deps eller build.
    Variant: VIDEO. Basert på grid-sticky.html, med:
-     · Tiktok Ad.mov (remuxet til assets/tiktok-ad.mp4) som egen
-       grid-kolonne i SBB-kortet — 9:16 fyller én rute-bredde
-       over to rows, kantene faller på gridlinjene
+     · Fem optimaliserte SBB-filmer i én transportstyrt gridflate
+       med egne romlige utsnitt og ett synkronisert mosaikkspor
      · Approach = 100vh, ingen sticky
      · Contact med CEO-copy 08-10 + bokstav-splittet reveal
      · Ticker i ÉN grid rute (Longbow-mekanikk: duplisert spor,
@@ -245,7 +245,7 @@ body {
   padding-bottom: var(--cell);
   border-bottom: var(--hair) solid rgba(5, 5, 5, .14);
 }
-.nav .cell { font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 400; } /* CEO 08-16: 500 for tykk */
+.nav .cell { line-height: 1.3; letter-spacing: -.012em; font-weight: 400; }
 
 .nav a { text-decoration: none; color: #FFFFFF; transition: color .3s var(--ez); }
 .nav.is-paper a { color: #000000; }
@@ -256,7 +256,6 @@ body {
   grid-column: 3 / 4;
   display: flex; flex-direction: column;
   align-items: flex-start; gap: 0;
-  font-size: var(--t-meta);
   line-height: 1.5;
   font-weight: 400;
   letter-spacing: 0;
@@ -494,10 +493,8 @@ body.ready .rl { opacity: 1; transform: none; }
 
 /* ══ 03 · WORK ═══════════════════════════════════════════════
    ÉN komponent, fire ganger. Hele kortets innhold i ÉN grid
-   rute (.card__box). SBB-kortet har i tillegg VIDEO som egen
-   grid-kolonne: 9:16-klippet fyller én rute-bredde over begge
-   rows, så videokantene ER gridlinjene — samme regel som
-   glasspanelet.                                                */
+   rute (.card__box). Mediemodifikatorene avgjør om materialet
+   fyller én rute, én kolonne eller hele seksjonen.               */
 
 .work { position: relative; background: var(--ground); }
 
@@ -686,6 +683,200 @@ body.ready .rl { opacity: 1; transform: none; }
   display: block;
 }
 
+/* SBB design-test 08-27: fem romlige filmer. Done fyller
+   1–2 / 5–6, mens Fight Club og TikTok-ad-en fyller 3–4 / 7–8.
+   Kalk 23 bruker 2–3 / 6–7. Story 3 bruker én videostrøm som
+   tegnes synkront i 1, 2, 3 og 4 stående ruter. Nye ruter slår
+   inn på 7, 13 og 19 sekunder; de gamle blir stående.         */
+.sbb__stage {
+  grid-column: 1 / 5;
+  grid-row: 1 / 3;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+  min-height: 0;
+}
+.card--sbb .card__col { box-shadow: none; visibility: hidden; }
+.card--sbb .card__col.is-selected-slot { visibility: visible; }
+.card--sbb .card__col--done {
+  grid-column: 1 / 3;
+  grid-row: 1 / 3;
+  background: var(--ground);
+}
+.card--sbb .card__col--fifth {
+  grid-column: 1 / 5;
+  grid-row: 1 / 3;
+  background: var(--ground);
+}
+.card--sbb .card__col--fifth video { opacity: 0 !important; }
+.sbb__mosaic {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+}
+.card--sbb .card__col--fifth video.is-active + .sbb__mosaic { opacity: 1; }
+.card--sbb .card__col--done video,
+.card--sbb .card__col--fifth video,
+.card--sbb .card__col--fourth video {
+  object-fit: cover;
+  background: var(--ground);
+}
+.card--sbb .card__col--ad,
+.card--sbb .card__col--fourth {
+  grid-column: 3 / 5;
+  grid-row: 1 / 3;
+  background: var(--ground);
+}
+.card--sbb .card__col--ad video { object-position: center; }
+.card--sbb .card__col--third {
+  grid-column: 2 / 4;
+  grid-row: 1 / 3;
+  background: var(--ground);
+}
+.card--sbb .card__col--third video { object-fit: cover; object-position: center; }
+.card--sbb .card__col video {
+  opacity: 0;
+  transition: opacity .4s var(--ez);
+}
+.card--sbb .card__col video.is-active { opacity: 1; }
+.sbb__still {
+  grid-column: 1 / 5;
+  grid-row: 1 / 3;
+  z-index: 1;
+  overflow: hidden;
+  background: var(--ground);
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity .4s var(--ez);
+}
+.sbb__still.is-hidden { opacity: 0; }
+.sbb__still img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+}
+.card--sbb .card__box { z-index: 3; }
+
+/* Filmvelger i rute 8: ikonbasert lyd, transport i sentrum
+   og filmnummer/tittel/lengde på nederste tekstbaseline.      */
+.sbb__controls {
+  grid-column: 4 / 5;
+  grid-row: 2 / 3;
+  align-self: stretch;
+  justify-self: stretch;
+  z-index: 4;
+  min-width: 0;
+  position: relative;
+  padding: var(--cell);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto 1fr auto;
+  pointer-events: none;
+}
+.sbb__control {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: rgba(0, 0, 0, .66);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--t-fine);
+  line-height: 1;
+  cursor: pointer;
+  opacity: .78;
+  transition: opacity .25s var(--ez), background-color .25s var(--ez);
+  pointer-events: auto;
+}
+.sbb__control:hover,
+.sbb__control:focus-visible { opacity: 1; }
+.sbb__control:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  background: rgba(0, 0, 0, .88);
+}
+.sbb__control:disabled { cursor: default; opacity: .28; }
+
+.sbb__sound {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  align-self: start;
+  justify-self: start;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.sbb__sound svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+.sbb__sound[aria-pressed="false"] .sbb__sound-wave { display: none; }
+.sbb__sound[aria-pressed="true"] .sbb__sound-slash { display: none; }
+.sbb__sound:disabled .sbb__sound-wave { display: none; }
+.sbb__sound:disabled .sbb__sound-slash { display: block; }
+.sbb__transport {
+  grid-column: 1 / -1;
+  grid-row: 2 / 3;
+  align-self: center;
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+}
+.sbb__transport .sbb__control {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  letter-spacing: 0;
+}
+.sbb__transport .sbb__control--play {
+  width: 48px;
+  height: 48px;
+  font-size: 17px;
+  background: rgba(0, 0, 0, .78);
+}
+.sbb__meta {
+  grid-column: 1 / -1;
+  grid-row: 3 / 4;
+  align-self: end;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  color: var(--ink);
+  font-size: var(--t-fine);
+  line-height: 1.2;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.sbb__meta-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sbb__meta-duration { text-align: right; }
+
 /* JELSA-KORTET (CEO 08-11 r4): STILLVEGGEN + HOVER 100.
    Sju ruter, sju ekte undersider (toppen av hver side),
    card__box i rute 4. Veggen står DEMPET i hvile; ruta du
@@ -769,8 +960,8 @@ body.ready .rl { opacity: 1; transform: none; }
 
 /* CEO 08-13: full-bleed-modifikator — klippet dekker HELE
    seksjonen, scrim-gradient (som card__media) så teksten leser
-   mot flaten. Brukes av KAIZEN- (Morfar, påstander i rute 5–6,
-   kort i rute 7, rute 8 tom) og SBB-seksjonen (Video Seksjon 2). */
+   mot flaten. Brukes av KAIZEN (Morfar, påstander i rute 5–6,
+   kort i rute 7, rute 8 tom).                                  */
 .card--bleed .card__col { grid-column: 1 / -1; grid-row: 1 / 3; }
 .card--kzai .kz__claim {
   grid-column: 1 / 3; grid-row: 2 / 3;   /* CEO r2: XXL trenger to ruter */
@@ -812,8 +1003,7 @@ body.ready .rl { opacity: 1; transform: none; }
   margin-top: 0;
   border-bottom: none; padding-bottom: 0;
 }
-/* Scrimmen tilbake på begge (CEO 08-13 r2: SBB som før,
-   med vignett).                                                */
+/* Scrim over full-bleed-klippet.                               */
 .card--bleed .card__col::after {
   content: ""; position: absolute; inset: 0;
   background: linear-gradient(to bottom,
@@ -1157,7 +1347,7 @@ body.ready .rl { opacity: 1; transform: none; }
     box-shadow: 0 calc(var(--pad) * -1) 0 0 var(--paper);
     border-bottom: var(--hair) solid rgba(5, 5, 5, .14);
   }
-  .nav .cell { font-size: var(--t-meta); line-height: 1.4; padding: var(--cell); }
+  .nav .cell { line-height: 1.4; padding: var(--cell); }
   .nav a, .nav.is-paper a { color: #000000; }
   .nav__name  { grid-column: 1 / 2; grid-row: 1; }
   .nav__cta   { grid-column: 2 / 3; grid-row: 1; }
@@ -1252,6 +1442,21 @@ body.ready .rl { opacity: 1; transform: none; }
   .card--jelsa .jelsa-cell[style*="--sr:2"] { display: none; }
   .card__say, .card__facts { text-align: left; }
   .card__col { position: relative; aspect-ratio: 9 / 16; max-height: 70vh; overflow: hidden; }
+  .sbb__stage {
+    flex: none;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+  }
+  .card--sbb .card__col:not(.is-selected-slot) { display: none; }
+  .card--sbb .card__col,
+  .card--sbb .sbb__still,
+  .card--sbb .sbb__controls { grid-row: 1 / 3; }
+  .sbb__stage .card__col { max-height: none; }
+  .card--sbb .card__col--ad { aspect-ratio: 9 / 16; }
+  .card--sbb .card__col--ad video { object-fit: contain; }
+  .card--sbb .card__col--third { aspect-ratio: 9 / 16; }
+  .sbb__still.is-hidden { display: none; }
+  .sbb__controls { align-self: stretch; width: 100%; min-height: 136px; }
   /* Bleed-klippene (Morfar, Video Seksjon 2) er landskap —
      16:9-flate i stedet for portrettbeskjæring.               */
   .card--bleed .card__col { aspect-ratio: 16 / 9; max-height: none; }
@@ -1264,6 +1469,8 @@ body.ready .rl { opacity: 1; transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .card--sbb .card__col video { transition: none; }
+  .sbb__still { transition: none; }
   .rl { transition: none; }
   .iv { opacity: 1; transform: none; transition: none; }
   .split .ch { opacity: 1; transform: none; transition: none; }
@@ -1285,7 +1492,7 @@ body.ready .rl { opacity: 1; transform: none; }
 .footer__top .arrow { display: inline-block; transition: transform .35s var(--ez); }
 .footer__top:hover .arrow { transform: translateY(-.35ch); }
 
-.nav .nav__jumps { font-size: var(--t-h4); line-height: 1.3; letter-spacing: -.012em; font-weight: 400; }
+.nav .nav__jumps { line-height: 1.3; letter-spacing: -.012em; font-weight: 400; }
 .nav__jumps button { position: relative; }
 .nav__jumps button::before {
   content: ""; position: absolute;
@@ -1523,15 +1730,49 @@ body.ready .rl { opacity: 1; transform: none; }
       </div>
     </article>
 
-    <!-- SBB: videoen ER caset — Tiktok-annonsen som kjøpte
-         publikummet. Én rute bred, to rows høy, kant på linje. -->
-    <!-- CEO 08-13: Video Seksjon 2 som BG på hele seksjonen —
-         samme full-bleed-mekanikk som KAIZEN-modulen. Reel-
-         kolonnen og glowen ut; kortet står igjen i rute 7.     -->
-    <article class="card card--bleed" style="--bc:3;--br:2">
+    <!-- SBB design-test 08-27: fem valgbare filmer med hver sin
+         gridfigur; kortet og kontrollen blir i rute 7 og 8. -->
+    <article class="card card--sbb" style="--bc:3;--br:2;--vc:2;--vr:1">
       <i class="mline" aria-hidden="true"></i>
-      <div class="card__col">
-        <video src="assets/opt/sbb-seksjon.mp4" poster="assets/opt/sbb-seksjon-poster.jpg" muted loop playsinline preload="none"></video>
+      <div class="sbb__stage">
+        <div class="card__col card__col--done">
+          <video id="sbb-done" src="assets/opt/sbb-done.mp4?v=2" poster="assets/opt/sbb-done-poster.webp" playsinline preload="none" data-user-paused="true"></video>
+        </div>
+        <div class="card__col card__col--fourth">
+          <video id="sbb-fight-club" src="assets/opt/sbb-fight-club.mp4?v=1" poster="assets/opt/sbb-fight-club-poster.webp?v=1" playsinline preload="none" data-user-paused="true"></video>
+        </div>
+        <div class="card__col card__col--fifth">
+          <video id="sbb-story-3-musikkfest" src="assets/opt/sbb-story-3-musikkfest.mp4?v=2" poster="assets/opt/sbb-story-3-musikkfest-poster.webp" playsinline preload="none" data-user-paused="true"></video>
+          <canvas class="sbb__mosaic" id="sbb-story-3-mosaic" aria-hidden="true"></canvas>
+        </div>
+        <div class="card__col card__col--third">
+          <video id="sbb-kalk23" src="assets/opt/sbb-kalk23.mp4?v=3" poster="assets/opt/sbb-kalk23-poster.webp" playsinline preload="none" data-user-paused="true"></video>
+        </div>
+        <div class="card__col card__col--ad is-selected-slot">
+          <video id="sbb-tiktok-ad" src="assets/opt/sbb-tiktok-ad.mp4?v=3" poster="assets/opt/sbb-tiktok-ad-poster.webp" playsinline preload="none" data-user-paused="true"></video>
+        </div>
+        <div class="sbb__still" data-sbb-still>
+          <img src="assets/opt/sbb-musikkfest-cover.webp?v=2" alt="Publikum og DJ under Musikkfest 2024" loading="lazy" decoding="async" width="1600" height="1202" />
+        </div>
+        <div class="sbb__controls" role="group" aria-label="SBB film selector">
+          <button class="sbb__control sbb__sound" type="button" data-sbb-sound aria-controls="sbb-tiktok-ad sbb-done sbb-kalk23 sbb-fight-club sbb-story-3-musikkfest" aria-label="Turn sound off" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 9h4l5-4v14l-5-4H4z"></path>
+              <path class="sbb__sound-wave" d="M16 9c1 1 1 5 0 6M19 7c2 2 2 8 0 10"></path>
+              <path class="sbb__sound-slash" d="M3 3l18 18"></path>
+            </svg>
+          </button>
+          <div class="sbb__transport">
+            <button class="sbb__control" type="button" data-sbb-back aria-controls="sbb-tiktok-ad sbb-done sbb-kalk23 sbb-fight-club sbb-story-3-musikkfest" aria-label="Previous video" disabled>&#124;&#9664;</button>
+            <button class="sbb__control sbb__control--play" type="button" data-sbb-play aria-controls="sbb-tiktok-ad sbb-done sbb-kalk23 sbb-fight-club sbb-story-3-musikkfest" aria-label="Play selected video">&#9654;</button>
+            <button class="sbb__control" type="button" data-sbb-forward aria-controls="sbb-tiktok-ad sbb-done sbb-kalk23 sbb-fight-club sbb-story-3-musikkfest" aria-label="Next video">&#9654;&#124;</button>
+          </div>
+          <div class="sbb__meta" aria-live="polite">
+            <span data-sbb-count>01 / 05</span>
+            <span class="sbb__meta-title" data-sbb-title>TikTok Ad</span>
+            <span class="sbb__meta-duration" data-sbb-duration aria-hidden="true">00:18</span>
+          </div>
+        </div>
       </div>
       <div class="card__box">
 
@@ -1832,17 +2073,291 @@ body.ready .rl { opacity: 1; transform: none; }
     if ('IntersectionObserver' in window) {
       var vio = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
-          if (e.isIntersecting) { e.target.play().catch(function () {}); }
+          if (e.isIntersecting && e.target.dataset.userPaused !== 'true') {
+            e.target.play().catch(function () {});
+          }
           else { e.target.pause(); }
         });
       }, { threshold: threshold });
       els.forEach(function (v) { vio.observe(v); });
     } else {
-      els.forEach(function (v) { v.play().catch(function () {}); });
+      els.forEach(function (v) {
+        if (v.dataset.userPaused !== 'true') { v.play().catch(function () {}); }
+      });
     }
   }
-  lazyPlay(Array.prototype.slice.call(document.querySelectorAll('.card__col video')), .25);
+  lazyPlay(Array.prototype.slice.call(document.querySelectorAll('.card:not(.card--sbb) .card__col video')), .25);
   lazyPlay(Array.prototype.slice.call(document.querySelectorAll('.contact__reel video')), .25);
+
+  /* SBB: transporten velger mellom fem romlige videoflater. */
+  var sbbVideoOne = document.getElementById('sbb-tiktok-ad');
+  var sbbVideoTwo = document.getElementById('sbb-done');
+  var sbbVideoThree = document.getElementById('sbb-kalk23');
+  var sbbVideoFour = document.getElementById('sbb-fight-club');
+  var sbbVideoFive = document.getElementById('sbb-story-3-musikkfest');
+  var sbbVideoFiveSlot = sbbVideoFive ? sbbVideoFive.closest('.card__col') : null;
+  var sbbVideoFiveCanvas = document.getElementById('sbb-story-3-mosaic');
+  var sbbPlay = document.querySelector('[data-sbb-play]');
+  var sbbSound = document.querySelector('[data-sbb-sound]');
+  var sbbBack = document.querySelector('[data-sbb-back]');
+  var sbbForward = document.querySelector('[data-sbb-forward]');
+  var sbbCount = document.querySelector('[data-sbb-count]');
+  var sbbTitle = document.querySelector('[data-sbb-title]');
+  var sbbDuration = document.querySelector('[data-sbb-duration]');
+  var sbbStill = document.querySelector('[data-sbb-still]');
+  if (sbbVideoOne && sbbVideoTwo && sbbVideoThree && sbbVideoFour && sbbVideoFive && sbbVideoFiveSlot && sbbVideoFiveCanvas && sbbPlay && sbbSound && sbbBack && sbbForward && sbbCount && sbbTitle && sbbDuration && sbbStill) {
+    var sbbVideos = [sbbVideoOne, sbbVideoTwo, sbbVideoThree, sbbVideoFour, sbbVideoFive];
+    var sbbTitles = ['TikTok Ad', 'TikTok Ad', 'TikTok Ad', 'TikTok Ad', 'TikTok Ad'];
+    var sbbDurations = ['00:18', '00:47', '00:37', '00:27', '00:34'];
+    var sbbHasSound = [true, true, true, true, true];
+    var sbbActiveIndex = 0;
+    var sbbHasStarted = false;
+    var sbbSoundOn = true;
+    var sbbInViewport = true;
+    var sbbResumeOnReturn = false;
+    var sbbVideoFiveContext = sbbVideoFiveCanvas.getContext('2d', { alpha: false });
+    var sbbVideoFiveGround = getComputedStyle(sbbVideoFiveSlot).backgroundColor;
+    var drawSbbVideoFiveTile = function (context, video, x, y, width, height) {
+      var sourceWidth = video.videoWidth;
+      var sourceHeight = video.videoHeight;
+      if (!sourceWidth || !sourceHeight) { return; }
+      var sourceRatio = sourceWidth / sourceHeight;
+      var targetRatio = width / height;
+      var cropX = 0;
+      var cropY = 0;
+      var cropWidth = sourceWidth;
+      var cropHeight = sourceHeight;
+      if (sourceRatio > targetRatio) {
+        cropWidth = sourceHeight * targetRatio;
+        cropX = (sourceWidth - cropWidth) / 2;
+      } else {
+        cropHeight = sourceWidth / targetRatio;
+        cropY = (sourceHeight - cropHeight) / 2;
+      }
+      context.drawImage(video, cropX, cropY, cropWidth, cropHeight, x, y, width, height);
+    };
+    var syncSbbVideoFiveMosaic = function (mediaTime) {
+      var time = typeof mediaTime === 'number' ? mediaTime : sbbVideoFive.currentTime;
+      var width = Math.max(1, Math.round(sbbVideoFiveSlot.clientWidth));
+      var height = Math.max(1, Math.round(sbbVideoFiveSlot.clientHeight));
+      if (sbbVideoFiveCanvas.width !== width || sbbVideoFiveCanvas.height !== height) {
+        sbbVideoFiveCanvas.width = width;
+        sbbVideoFiveCanvas.height = height;
+      }
+      if (!sbbVideoFiveContext || sbbVideoFive.readyState < 2) { return; }
+      var visibleTiles = Math.min(4, 1 + Math.floor(Math.max(0, time - 1) / 6));
+      var tileWidth = width / 4;
+      sbbVideoFiveContext.fillStyle = sbbVideoFiveGround;
+      sbbVideoFiveContext.fillRect(0, 0, width, height);
+      for (var tile = 0; tile < visibleTiles; tile += 1) {
+        drawSbbVideoFiveTile(sbbVideoFiveContext, sbbVideoFive, tile * tileWidth, 0, tileWidth, height);
+      }
+    };
+    var sbbVideoFiveFrameRequest = null;
+    var stopSbbVideoFiveFrames = function () {
+      if (sbbVideoFiveFrameRequest !== null && typeof sbbVideoFive.cancelVideoFrameCallback === 'function') {
+        sbbVideoFive.cancelVideoFrameCallback(sbbVideoFiveFrameRequest);
+      }
+      sbbVideoFiveFrameRequest = null;
+    };
+    var watchSbbVideoFiveFrames = function () {
+      stopSbbVideoFiveFrames();
+      if (typeof sbbVideoFive.requestVideoFrameCallback !== 'function') { return; }
+      var onFrame = function (_now, metadata) {
+        syncSbbVideoFiveMosaic(metadata.mediaTime);
+        if (!sbbVideoFive.paused && !sbbVideoFive.ended) {
+          sbbVideoFiveFrameRequest = sbbVideoFive.requestVideoFrameCallback(onFrame);
+        } else {
+          sbbVideoFiveFrameRequest = null;
+        }
+      };
+      sbbVideoFiveFrameRequest = sbbVideoFive.requestVideoFrameCallback(onFrame);
+    };
+    var formatSbbTime = function (seconds) {
+      var wholeSeconds = Math.max(0, Math.ceil(seconds));
+      var minutes = Math.floor(wholeSeconds / 60);
+      var remainder = wholeSeconds % 60;
+      return String(minutes).padStart(2, '0') + ':' + String(remainder).padStart(2, '0');
+    };
+    var syncSbbDuration = function () {
+      var activeVideo = sbbVideos[sbbActiveIndex];
+      if (isFinite(activeVideo.duration) && activeVideo.duration > 0) {
+        var remaining = formatSbbTime(activeVideo.duration - activeVideo.currentTime);
+        if (sbbDuration.textContent !== remaining) { sbbDuration.textContent = remaining; }
+        return;
+      }
+      var fallback = sbbDurations[sbbActiveIndex];
+      if (sbbDuration.textContent !== fallback) { sbbDuration.textContent = fallback; }
+    };
+    var syncSbbControls = function () {
+      var activeVideo = sbbVideos[sbbActiveIndex];
+
+      sbbPlay.textContent = activeVideo.paused ? '▶' : 'Ⅱ';
+      sbbPlay.setAttribute('aria-label', (activeVideo.paused ? 'Play' : 'Pause') + ' video ' + (sbbActiveIndex + 1));
+      var hasSound = sbbHasSound[sbbActiveIndex];
+      sbbSound.disabled = !hasSound;
+      sbbSound.setAttribute('aria-label', hasSound
+        ? (sbbSoundOn ? 'Turn sound off' : 'Turn sound on')
+        : 'Selected video has no sound');
+      sbbSound.setAttribute('aria-pressed', hasSound && sbbSoundOn ? 'true' : 'false');
+      sbbBack.disabled = sbbActiveIndex === 0;
+      sbbForward.disabled = sbbActiveIndex === sbbVideos.length - 1;
+      sbbCount.textContent = '0' + (sbbActiveIndex + 1) + ' / 0' + sbbVideos.length;
+      sbbTitle.textContent = sbbTitles[sbbActiveIndex];
+      syncSbbDuration();
+    };
+    var playActiveSbbVideo = function () {
+      var activeVideo = sbbVideos[sbbActiveIndex];
+      if (!sbbInViewport) {
+        if (sbbHasStarted) { sbbResumeOnReturn = true; }
+        return;
+      }
+      var isFirstStart = !sbbHasStarted;
+      if (isFirstStart) {
+        activeVideo.currentTime = 0;
+        sbbHasStarted = true;
+      }
+      /* Et eksplisitt Play-klikk kan starte lyd lovlig i browseren.
+         Første film skal derfor ikke se ut som den spiller musikk
+         mens den i praksis fortsatt står i initial mute-state. */
+      if (isFirstStart && sbbHasSound[sbbActiveIndex]) {
+        sbbSoundOn = true;
+      }
+      activeVideo.volume = 1;
+      activeVideo.muted = sbbHasSound[sbbActiveIndex] ? !sbbSoundOn : true;
+      activeVideo.classList.add('is-active');
+      sbbStill.classList.add('is-hidden');
+      activeVideo.dataset.userPaused = 'false';
+      sbbResumeOnReturn = false;
+      activeVideo.play().catch(function () {});
+    };
+    var selectSbbVideo = function (nextIndex, continuePlayback) {
+      var previousVideo = sbbVideos[sbbActiveIndex];
+      var wasPlaying = continuePlayback === true || !previousVideo.paused;
+      previousVideo.dataset.userPaused = 'true';
+      previousVideo.pause();
+      previousVideo.currentTime = 0;
+      if (previousVideo === sbbVideoFive) {
+        stopSbbVideoFiveFrames();
+      }
+      previousVideo.classList.remove('is-active');
+      previousVideo.closest('.card__col').classList.remove('is-selected-slot');
+
+      sbbActiveIndex = Math.max(0, Math.min(sbbVideos.length - 1, nextIndex));
+      var activeVideo = sbbVideos[sbbActiveIndex];
+      activeVideo.closest('.card__col').classList.add('is-selected-slot');
+      activeVideo.dataset.userPaused = 'true';
+      activeVideo.pause();
+      activeVideo.currentTime = 0;
+      if (activeVideo === sbbVideoFive) { syncSbbVideoFiveMosaic(); }
+      activeVideo.muted = sbbHasSound[sbbActiveIndex] ? !sbbSoundOn : true;
+      if (sbbHasStarted) { activeVideo.classList.add('is-active'); }
+      if (wasPlaying) { playActiveSbbVideo(); }
+      syncSbbControls();
+    };
+    var resetSbbPlaylist = function () {
+      sbbVideos.forEach(function (video) {
+        video.dataset.userPaused = 'true';
+        video.pause();
+        video.currentTime = 0;
+        video.classList.remove('is-active');
+        video.closest('.card__col').classList.remove('is-selected-slot');
+        video.defaultMuted = false;
+        video.muted = false;
+        video.volume = 1;
+      });
+      sbbActiveIndex = 0;
+      sbbHasStarted = false;
+      sbbSoundOn = true;
+      sbbResumeOnReturn = false;
+      stopSbbVideoFiveFrames();
+      if (sbbVideoFiveContext) {
+        sbbVideoFiveContext.clearRect(0, 0, sbbVideoFiveCanvas.width, sbbVideoFiveCanvas.height);
+      }
+      sbbVideos[0].closest('.card__col').classList.add('is-selected-slot');
+      sbbStill.classList.remove('is-hidden');
+      syncSbbControls();
+    };
+    sbbPlay.addEventListener('click', function () {
+      var activeVideo = sbbVideos[sbbActiveIndex];
+      if (activeVideo.paused) {
+        playActiveSbbVideo();
+      } else {
+        sbbResumeOnReturn = false;
+        activeVideo.dataset.userPaused = 'true';
+        activeVideo.pause();
+      }
+      syncSbbControls();
+    });
+    sbbBack.addEventListener('click', function () {
+      selectSbbVideo(sbbActiveIndex - 1);
+    });
+    sbbForward.addEventListener('click', function () {
+      selectSbbVideo(sbbActiveIndex + 1);
+    });
+    sbbSound.addEventListener('click', function () {
+      var activeVideo = sbbVideos[sbbActiveIndex];
+      if (!sbbHasSound[sbbActiveIndex]) { return; }
+      sbbSoundOn = !sbbSoundOn;
+      activeVideo.volume = 1;
+      activeVideo.muted = !sbbSoundOn;
+      syncSbbControls();
+    });
+    sbbVideos.forEach(function (video, index) {
+      video.defaultMuted = false;
+      video.muted = false;
+      video.volume = 1;
+      video.addEventListener('play', syncSbbControls);
+      video.addEventListener('pause', syncSbbControls);
+      video.addEventListener('volumechange', syncSbbControls);
+      video.addEventListener('loadedmetadata', function () {
+        if (index === sbbActiveIndex) { syncSbbDuration(); }
+      });
+      video.addEventListener('timeupdate', function () {
+        if (index === sbbActiveIndex) { syncSbbDuration(); }
+      });
+      video.addEventListener('ended', function () {
+        if (index !== sbbActiveIndex) { return; }
+        if (sbbActiveIndex === sbbVideos.length - 1) {
+          resetSbbPlaylist();
+          return;
+        }
+        selectSbbVideo(sbbActiveIndex + 1, true);
+      });
+    });
+    sbbVideoFive.addEventListener('play', watchSbbVideoFiveFrames);
+    sbbVideoFive.addEventListener('pause', function () {
+      stopSbbVideoFiveFrames();
+      syncSbbVideoFiveMosaic();
+    });
+    sbbVideoFive.addEventListener('timeupdate', function () {
+      if (typeof sbbVideoFive.requestVideoFrameCallback !== 'function') {
+        syncSbbVideoFiveMosaic();
+      }
+    });
+    sbbVideoFive.addEventListener('loadeddata', syncSbbVideoFiveMosaic);
+    sbbVideoFive.addEventListener('seeked', syncSbbVideoFiveMosaic);
+    window.addEventListener('resize', function () { syncSbbVideoFiveMosaic(); }, { passive: true });
+    if ('IntersectionObserver' in window) {
+      var sbbViewportObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.target !== sbbVideoOne.closest('.card--sbb')) { return; }
+          sbbInViewport = entry.isIntersecting;
+          var activeVideo = sbbVideos[sbbActiveIndex];
+          if (!sbbInViewport) {
+            if (!activeVideo.paused) {
+              sbbResumeOnReturn = true;
+              activeVideo.pause();
+            }
+            return;
+          }
+          if (sbbResumeOnReturn && sbbHasStarted) { playActiveSbbVideo(); }
+        });
+      }, { threshold: 0 });
+      sbbViewportObserver.observe(sbbVideoOne.closest('.card--sbb'));
+    }
+    syncSbbControls();
+  }
 
   var nav = document.querySelector('.nav');
   var heroEl = document.querySelector('.hero');
@@ -1864,7 +2379,9 @@ body.ready .rl { opacity: 1; transform: none; }
         var dy = y - navLastY;
         navUpAcc = dy > 0 ? 0 : navUpAcc - dy;
         var released = heroEl.getBoundingClientRect().bottom <= navPad + 2;
-        if (!released || y <= 40) { nav.classList.remove('is-hidden'); }
+        /* Forside-unntak: naven forsvinner på første ned-scroll.
+           120px opp-scroll for å hente den tilbake beholdes.   */
+        if (y <= 0) { nav.classList.remove('is-hidden'); }
         else if (dy > 0) { nav.classList.add('is-hidden'); }
         else if (navUpAcc >= 120) { nav.classList.remove('is-hidden'); }
         nav.classList.toggle('is-paper', released);

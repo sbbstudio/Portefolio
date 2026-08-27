@@ -1,0 +1,17 @@
+/* Rune Portfolio — canonical NAV typography.
+   Change the desktop or mobile token here and every page follows. */
+:root {
+  --nav-type-size: var(--t-body, 1.125rem);
+  --nav-type-size-mobile: var(--t-meta, .9375rem);
+}
+
+.nav .cell,
+.nav .nav__jumps {
+  font-size: var(--nav-type-size);
+}
+
+@media (max-width: 1023px) {
+  .nav .cell {
+    font-size: var(--nav-type-size-mobile);
+  }
+}
