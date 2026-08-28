@@ -765,7 +765,7 @@ body.ready .rl { opacity: 1; transform: none; }
 }
 .card--sbb .card__box { z-index: 3; }
 
-/* Filmvelger i rute 8: ikonbasert lyd, transport i sentrum
+/* Filmvelger i rute 8: ikonbasert lyd, transport øverst til høyre
    og filmnummer/tittel/lengde på nederste tekstbaseline.      */
 .sbb__controls {
   grid-column: 4 / 5;
@@ -786,14 +786,14 @@ body.ready .rl { opacity: 1; transform: none; }
   border: 0;
   margin: 0;
   padding: 0;
-  background: rgba(0, 0, 0, .66);
+  background: transparent;
   color: var(--ink);
   font: inherit;
   font-size: var(--t-fine);
   line-height: 1;
   cursor: pointer;
   opacity: .78;
-  transition: opacity .25s var(--ez), background-color .25s var(--ez);
+  transition: opacity .25s var(--ez), transform .25s var(--ez);
   pointer-events: auto;
 }
 .sbb__control:hover,
@@ -801,19 +801,11 @@ body.ready .rl { opacity: 1; transform: none; }
 .sbb__control:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
-  background: rgba(0, 0, 0, .88);
 }
 .sbb__control:disabled { cursor: default; opacity: .28; }
 
 .sbb__sound {
-  grid-column: 1 / 2;
-  grid-row: 1 / 2;
-  align-self: start;
-  justify-self: start;
-  width: 34px;
-  height: 34px;
   padding: 0;
-  border-radius: 50%;
   display: grid;
   place-items: center;
 }
@@ -832,28 +824,43 @@ body.ready .rl { opacity: 1; transform: none; }
 .sbb__sound:disabled .sbb__sound-slash { display: block; }
 .sbb__transport {
   grid-column: 1 / -1;
-  grid-row: 2 / 3;
-  align-self: center;
-  justify-self: center;
+  grid-row: 1 / 2;
+  align-self: start;
+  justify-self: end;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   pointer-events: auto;
 }
 .sbb__transport .sbb__control {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
+  width: 22px;
+  height: 22px;
   display: grid;
   place-items: center;
   letter-spacing: 0;
 }
-.sbb__transport .sbb__control--play {
-  width: 48px;
-  height: 48px;
-  font-size: 17px;
-  background: rgba(0, 0, 0, .78);
+.sbb__transport .sbb__control:hover { transform: scale(1.06); }
+.sbb__transport svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  fill: currentColor;
 }
+.sbb__transport .sbb__control--play {
+  width: 22px;
+  height: 22px;
+}
+.sbb__control--play + .sbb__control,
+.sbb__transport [data-sbb-forward] + .sbb__sound { margin-left: 8px; }
+.sbb__transport .sbb__sound svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke-width: 1.7;
+}
+.sbb__control--play .sbb__icon--pause { display: none; }
+.sbb__control--play.is-playing .sbb__icon--play { display: none; }
+.sbb__control--play.is-playing .sbb__icon--pause { display: block; }
 .sbb__meta {
   grid-column: 1 / -1;
   grid-row: 3 / 4;
@@ -1755,17 +1762,32 @@ body.ready .rl { opacity: 1; transform: none; }
           <img src="assets/opt/sbb-musikkfest-cover.webp?v=2" alt="Publikum og DJ under Musikkfest 2024" loading="lazy" decoding="async" width="1600" height="1202" />
         </div>
         <div class="sbb__controls" role="group" aria-label="SBB film selector">
-          <button class="sbb__control sbb__sound" type="button" data-sbb-sound aria-controls="sbb-tiktok-ad sbb-done sbb-kalk23 sbb-fight-club sbb-story-3-musikkfest" aria-label="Turn sound off" aria-pressed="true">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M4 9h4l5-4v14l-5-4H4z"></path>
-              <path class="sbb__sound-wave" d="M16 9c1 1 1 5 0 6M19 7c2 2 2 8 0 10"></path>
-              <path class="sbb__sound-slash" d="M3 3l18 18"></path>
-            </svg>
-          </button>
           <div class="sbb__transport">
-            <button class="sbb__control" type="button" data-sbb-back aria-controls="sbb-tiktok-ad sbb-done sbb-kalk23 sbb-fight-club sbb-story-3-musikkfest" aria-label="Previous video" disabled>&#124;&#9664;</button>
-            <button class="sbb__control sbb__control--play" type="button" data-sbb-play aria-controls="sbb-tiktok-ad sbb-done sbb-kalk23 sbb-fight-club sbb-story-3-musikkfest" aria-label="Play selected video">&#9654;</button>
-            <button class="sbb__control" type="button" data-sbb-forward aria-controls="sbb-tiktok-ad sbb-done sbb-kalk23 sbb-fight-club sbb-story-3-musikkfest" aria-label="Next video">&#9654;&#124;</button>
+            <button class="sbb__control sbb__control--play" type="button" data-sbb-play aria-controls="sbb-tiktok-ad sbb-done sbb-kalk23 sbb-fight-club sbb-story-3-musikkfest" aria-label="Play selected video">
+              <svg class="sbb__icon--play" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
+                <path d="M5 3 27 15 5 27z"></path>
+              </svg>
+              <svg class="sbb__icon--pause" viewBox="0 0 30 30" aria-hidden="true" focusable="false">
+                <path d="M6 3h7v24H6zM17 3h7v24h-7z"></path>
+              </svg>
+            </button>
+            <button class="sbb__control" type="button" data-sbb-back aria-controls="sbb-tiktok-ad sbb-done sbb-kalk23 sbb-fight-club sbb-story-3-musikkfest" aria-label="Previous video">
+              <svg viewBox="0 0 30 30" aria-hidden="true" focusable="false">
+                <path d="M14 4 2 15l12 11zM28 4 16 15l12 11z"></path>
+              </svg>
+            </button>
+            <button class="sbb__control" type="button" data-sbb-forward aria-controls="sbb-tiktok-ad sbb-done sbb-kalk23 sbb-fight-club sbb-story-3-musikkfest" aria-label="Next video">
+              <svg viewBox="0 0 30 30" aria-hidden="true" focusable="false">
+                <path d="m2 4 12 11L2 26zM16 4l12 11-12 11z"></path>
+              </svg>
+            </button>
+            <button class="sbb__control sbb__sound" type="button" data-sbb-sound aria-controls="sbb-tiktok-ad sbb-done sbb-kalk23 sbb-fight-club sbb-story-3-musikkfest" aria-label="Turn sound off" aria-pressed="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 9h4l5-4v14l-5-4H4z"></path>
+                <path class="sbb__sound-wave" d="M16 9c1 1 1 5 0 6M19 7c2 2 2 8 0 10"></path>
+                <path class="sbb__sound-slash" d="M3 3l18 18"></path>
+              </svg>
+            </button>
           </div>
           <div class="sbb__meta" aria-live="polite">
             <span data-sbb-count>01 / 05</span>
@@ -2192,7 +2214,8 @@ body.ready .rl { opacity: 1; transform: none; }
     var syncSbbControls = function () {
       var activeVideo = sbbVideos[sbbActiveIndex];
 
-      sbbPlay.textContent = activeVideo.paused ? '▶' : 'Ⅱ';
+      sbbPlay.classList.toggle('is-playing', !activeVideo.paused);
+      sbbPlay.setAttribute('aria-pressed', activeVideo.paused ? 'false' : 'true');
       sbbPlay.setAttribute('aria-label', (activeVideo.paused ? 'Play' : 'Pause') + ' video ' + (sbbActiveIndex + 1));
       var hasSound = sbbHasSound[sbbActiveIndex];
       sbbSound.disabled = !hasSound;
@@ -2200,8 +2223,6 @@ body.ready .rl { opacity: 1; transform: none; }
         ? (sbbSoundOn ? 'Turn sound off' : 'Turn sound on')
         : 'Selected video has no sound');
       sbbSound.setAttribute('aria-pressed', hasSound && sbbSoundOn ? 'true' : 'false');
-      sbbBack.disabled = sbbActiveIndex === 0;
-      sbbForward.disabled = sbbActiveIndex === sbbVideos.length - 1;
       sbbCount.textContent = '0' + (sbbActiveIndex + 1) + ' / 0' + sbbVideos.length;
       sbbTitle.textContent = sbbTitles[sbbActiveIndex];
       syncSbbDuration();
@@ -2290,10 +2311,10 @@ body.ready .rl { opacity: 1; transform: none; }
       syncSbbControls();
     });
     sbbBack.addEventListener('click', function () {
-      selectSbbVideo(sbbActiveIndex - 1);
+      selectSbbVideo((sbbActiveIndex - 1 + sbbVideos.length) % sbbVideos.length);
     });
     sbbForward.addEventListener('click', function () {
-      selectSbbVideo(sbbActiveIndex + 1);
+      selectSbbVideo((sbbActiveIndex + 1) % sbbVideos.length);
     });
     sbbSound.addEventListener('click', function () {
       var activeVideo = sbbVideos[sbbActiveIndex];
