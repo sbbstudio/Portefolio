@@ -246,7 +246,28 @@ body {
   padding-bottom: var(--cell);
   border-bottom: var(--hair) solid rgba(5, 5, 5, .14);
 }
-.nav .cell { line-height: 1.3; letter-spacing: -.012em; font-weight: 400; }
+.nav .cell {
+  position: relative;
+  line-height: 1.3;
+  letter-spacing: -.012em;
+  font-weight: 400;
+}
+
+/* Inset grid dividers: markerer NAV-ens fire kolonner uten å
+   lukke dem inne som tabellceller. */
+.nav .cell + .cell::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(var(--cell) * .5);
+  bottom: calc(var(--cell) * .5);
+  width: var(--hair);
+  background: rgba(255, 255, 255, .2);
+  pointer-events: none;
+}
+.nav.is-paper .cell + .cell::before {
+  background: rgba(0, 0, 0, .16);
+}
 
 .nav a { text-decoration: none; color: #000000; transition: color .3s var(--ez); }
 .nav.is-paper a { color: #000000; }
@@ -1577,6 +1598,7 @@ body.ready .rl { opacity: 1; transform: none; }
    (sessionStorage); Continue slipper deg inn.                  */
 .splash { display: none; }
 @media (max-width: 1023px) {
+  .nav .cell + .cell::before { display: none; }
   .splash {
     position: fixed; inset: 0; z-index: 200;
     display: flex; flex-direction: column; justify-content: space-between;
