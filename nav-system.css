@@ -1,8 +1,19 @@
-/* Rune Portfolio — canonical NAV typography.
-   Change the desktop or mobile token here and every page follows. */
+/* Rune Portfolio — canonical NAV visual system.
+   Shared rules load after each page's local CSS so NAV changes made
+   here propagate across the homepage and every subpage. */
 :root {
   --nav-type-size: var(--t-body, 1.125rem);
   --nav-type-size-mobile: var(--t-meta, .9375rem);
+  --nav-foreground: #FFFFFF;
+  --nav-paper-foreground: #000000;
+  --nav-mobile-foreground: #000000;
+  --nav-divider: rgba(255, 255, 255, .2);
+  --nav-paper-divider: rgba(0, 0, 0, .16);
+}
+
+html[data-nav-theme="ink"] {
+  --nav-foreground: #000000;
+  --nav-divider: rgba(0, 0, 0, .16);
 }
 
 .nav .cell,
@@ -10,8 +21,50 @@
   font-size: var(--nav-type-size);
 }
 
+.nav .cell {
+  position: relative;
+}
+
+.nav a,
+.nav .nav__jumps button {
+  color: var(--nav-foreground);
+}
+
+.nav.is-paper a,
+.nav.is-paper .nav__jumps button {
+  color: var(--nav-paper-foreground);
+}
+
+/* Inset grid dividers: one shared treatment at each desktop
+   column boundary, open at the top and bottom. */
+.nav .cell + .cell::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(var(--cell) * .5);
+  bottom: calc(var(--cell) * .5);
+  width: var(--hair, 1px);
+  background: var(--nav-divider);
+  pointer-events: none;
+}
+
+.nav.is-paper .cell + .cell::before {
+  background: var(--nav-paper-divider);
+}
+
 @media (max-width: 1023px) {
   .nav .cell {
     font-size: var(--nav-type-size-mobile);
+  }
+
+  .nav a,
+  .nav.is-paper a,
+  .nav .nav__jumps button,
+  .nav.is-paper .nav__jumps button {
+    color: var(--nav-mobile-foreground);
+  }
+
+  .nav .cell + .cell::before {
+    display: none;
   }
 }
