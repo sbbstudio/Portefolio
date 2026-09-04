@@ -8,6 +8,8 @@
 <!-- LCP: hero-bakgrunnen er CSS-bg og kan ikke få loading-attributt —
      preload med høy prioritet er hero-lasten. ALDRI lazy (perf-task). -->
 <link rel="preload" as="image" href="assets/opt/hero-placeholder.webp" type="image/webp" fetchpriority="high">
+<!-- CEO 09-04: contact-tåken er CSS-bg i den sticky modulen — preload så den står klar når scrollen når bunnen. -->
+<link rel="preload" as="image" href="assets/opt/contact-fog.webp" type="image/webp" media="(min-width: 1024px)">
 <style>
 /* ============================================================
    LAB — frittstående. Delt NAV-stil; ingen JS-deps eller build.
@@ -1147,8 +1149,27 @@ body.ready .rl { opacity: 1; transform: none; }
   grid-template-rows: repeat(4, minmax(0, 1fr));
 }
 
-/* H2 til topps i tekstraden (rad 2, rute 1–2), body/CTA samme rad. */
-.contact__h { grid-column: 1 / 3; grid-row: 2 / 3; align-self: start; }
+/* CEO 09-04: sticky modul + bilde som krymper inn i griden.
+   Wrapperen er 3 bokser høy; modulen (2 bokser) låser på --pad
+   og scrollen over den første boksen driver bildet (rAF-skript
+   nederst): tåken starter som hele øvre modulhalvdel og lander
+   som rute 13–14 (kol 1–2, rad 3) — modulen (1.85) og de to
+   rutene (1.85) deler forhold, så kantene treffer gridlinjene. */
+.contact-reveal { position: relative; height: calc(var(--box) * 3); }
+.contact { position: sticky; top: var(--pad); height: calc(var(--box) * 2); isolation: isolate; }
+.contact::before { background: none; }   /* lysfeltet ut — tåken er lyset */
+.contact-bg {
+  position: absolute; left: 0; right: 0; top: 0; height: 50%;
+  z-index: -1; pointer-events: none;
+  background: #0b0b0b url("assets/opt/contact-fog.jpg") center bottom / cover no-repeat;
+  background: #0b0b0b image-set(url("assets/opt/contact-fog.webp") type("image/webp"), url("assets/opt/contact-fog.jpg") type("image/jpeg")) center bottom / cover no-repeat;
+  transform-origin: 0 0; will-change: transform;
+}
+
+/* CEO 09-04: H2 midtstilt i rad 1 (kol 2–3); avsnitt under i
+   rad 2, CTA i rute 8. Avsnitt og CTA er skjult til skriptet
+   slipper dem inn sammen etter én rad scroll (p ≥ .86).        */
+.contact__h { grid-column: 2 / 4; grid-row: 1 / 2; align-self: center; justify-self: center; text-align: center; }
 .contact__h h2 { text-box: trim-both cap alphabetic; }
 .contact__h h2 {
   margin: 0;
@@ -1157,6 +1178,7 @@ body.ready .rl { opacity: 1; transform: none; }
   letter-spacing: -.032em;
   font-weight: 500;
   max-width: 20ch;
+  margin: 0 auto;   /* CEO 09-04: midtstilt i cellen */
 }
 
 /* Bokstav-splittet reveal: hvert ord i egen nowrap-span, hvert
@@ -1214,15 +1236,22 @@ body.ready .rl { opacity: 1; transform: none; }
   to   { transform: translateX(-50%); }
 }
 
-/* CEO 08-11 r2: alle tre avsnitt samlet i rute 7; CTA til
-   rute 8, topp/høyre.                                          */
-.contact__body { grid-column: 3 / 4; grid-row: 2 / 3; align-self: start; }
-/* CEO 08-11: avsnitt 1 på body 1 (18) — samme to-trinns
-   hierarki som frost-ruta på how-i-work; resten body 2 (16).   */
-.contact__body p { margin: 0 0 14px; font-size: var(--t-body); line-height: 1.5; color: var(--ink-2); max-width: 38ch; }
-.contact__body p + p { font-size: var(--t-base); line-height: 1.6; }
+/* CEO 09-04: ett avsnitt (lede) sentrert i rad 2, kol 2–3 —
+   erstatter de tre brødtekst-avsnittene (08-11).               */
+.contact__lede {
+  grid-column: 2 / 4; grid-row: 2 / 3;
+  align-self: center; justify-self: center; text-align: center;
+  padding: var(--cell); min-width: 0;
+  opacity: 0; transform: translateY(8px); will-change: opacity, transform;
+}
+/* = .sec-center p på how-i-work.html */
+.contact__lede p { margin: 0 auto; font-size: var(--t-h4); line-height: 1.4; letter-spacing: -.012em; font-weight: 500; color: var(--ink); max-width: 44ch; }
 
-.contact__cta { grid-column: 4 / 5; grid-row: 2 / 3; align-self: start; text-align: right; }
+/* CEO 09-04: topp/høyre i rute 8, kommer inn sammen med avsnittet. */
+.contact__cta {
+  grid-column: 4 / 5; grid-row: 2 / 3; align-self: start; text-align: right;
+  opacity: 0; transform: translateY(12px); will-change: opacity, transform;
+}
 .contact__cta a {
   text-decoration: none;
   font-size: var(--t-h4);
@@ -1230,6 +1259,14 @@ body.ready .rl { opacity: 1; transform: none; }
   letter-spacing: -.012em;
   font-weight: 500;
   color: var(--ink);
+}
+/* CEO 09-04: teksten inverterer selv — hvit + difference gir
+   mørk på tåke, hvit på svart. Samme spesifisitet som
+   fargereglene over, senere i kilden → vinner uten !important. */
+.contact__h h2, .contact__lede p, .contact__cta a { color: #fff; mix-blend-mode: difference; }
+@media (prefers-reduced-motion: reduce) {
+  .contact-bg { transform: translateY(100%) scale(.5); }
+  .contact__lede, .contact__cta { opacity: 1; transform: none; }
 }
 .contact__cta .arrow {
   display: inline-block;
@@ -1244,18 +1281,8 @@ body.ready .rl { opacity: 1; transform: none; }
 /* CEO 08-11 r8: kortet fyller ruta — navnet til topps, lenke-
    blokken hviler på rutas egen midtlinje ovenfra («litt over
    midten»), © alene mot bunnen.                                */
-/* CEO 08-13: rune-flyr-klippet fyller rute 1–2 i kolofonraden;
-   videokantene ER gridlinjene (kortvideoregelen).              */
-.contact__reel {
-  grid-column: 1 / 3; grid-row: 3 / 4;
-  position: relative; overflow: hidden;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, .55);
-}
-.contact__reel video {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover; display: block;
-}
+/* CEO 09-04: rune-flyr-reelen (08-13) UT — tåkebildet lander
+   i rute 13–14 i stedet.                                        */
 .contact__colophon {
   grid-column: 4 / 5; grid-row: 3 / 4; align-self: stretch;
   display: grid; grid-template-rows: repeat(2, 1fr);
@@ -1375,6 +1402,14 @@ body.ready .rl { opacity: 1; transform: none; }
   /* Modulene trenger posisjon for .mline (mobilregelen over
      setter .card static — denne kommer etter og vinner).       */
   .approach, .work, .contact, .card { position: relative; }
+  /* CEO 09-04-modulen er desktop-geometri: i flyt slipper vi
+     wrapper-/modulhøyden, tåken og blend-inverteringen, og
+     lede/CTA står synlige uten scroll-driver (skriptet avbryter
+     når .contact ikke er sticky).                              */
+  .contact-reveal, .contact { height: auto; }
+  .contact-bg { display: none; }
+  .contact__lede, .contact__cta { opacity: 1; transform: none; }
+  .contact__h h2, .contact__lede p, .contact__cta a { color: var(--ink); mix-blend-mode: normal; }
   /* Kolofonens grid-area 1/1-stabling (navn + lenkeblokk i
      samme rute) er desktop-geometri — i flyt blir det overlapp.
      Kolofonmodul som how-i-work rev 3: navnelabel, lenkene som
@@ -1467,8 +1502,6 @@ body.ready .rl { opacity: 1; transform: none; }
   /* Bleed-klippene (Morfar, Video Seksjon 2) er landskap —
      16:9-flate i stedet for portrettbeskjæring.               */
   .card--bleed .card__col { aspect-ratio: 16 / 9; max-height: none; }
-  /* Kolofon-reelen i flyt: klippets eget format styrer høyden. */
-  .contact__reel { aspect-ratio: 1660 / 1244; }
   .contact__ticker { min-height: 72px; }
   /* Tickerens desktop-størrelse er geometri (row/2 ≈ 200px) —
      på mobil finnes ikke modulen; ned på skalaen: 45.          */
@@ -1898,8 +1931,9 @@ body.ready .rl { opacity: 1; transform: none; }
   </section>
 
   <!-- ══ 04 · CONTACT — CEO-copy 08-10, ordrett ═════════════ -->
-  <section class="contact" id="contact">
+  <div class="contact-reveal"><section class="contact" id="contact">
     <i class="mline" aria-hidden="true"></i>
+    <div class="contact-bg" aria-hidden="true"></div>
     <div class="cols">
       <div class="cell contact__ticker" aria-hidden="true">
         <div class="ticker__track">
@@ -1912,19 +1946,11 @@ body.ready .rl { opacity: 1; transform: none; }
         <h2 class="split">I built the system alone. The next step is together.</h2>
       </div>
 
-      <div class="cell contact__body">
-        <p class="iv" style="--d:0ms">I’ve valued the time I’ve spent working on my own. It gave me the freedom to pursue every question, learn across disciplines and build a way of working I trust.</p>
-        <p class="iv" style="--d:120ms">But a way of working proves its value when it works for more than one person. I want to see what happens when other people challenge it, build on it and make it their own.</p>
-        <p class="iv" style="--d:240ms">Now I’m ready to bring that way of working to the right company and see how far we can take it together.</p>
-      </div>
+      <!-- CEO 09-04: ett avsnitt, sentrert under H2. -->
+      <div class="cell contact__lede"><p>A way of working proves its value when it works for more than one person. The system is built. What it becomes next depends on the people I build it with.</p></div>
 
       <div class="cell contact__cta"><a href="contact.html">Contact <span class="arrow">→</span></a></div>
 
-      <!-- CEO 08-13: rune-flyr M1 i rute 1–2 av kolofonraden —
-           kantene på gridlinjene, samme regel som kortvideoene. -->
-      <div class="contact__reel" aria-hidden="true">
-        <video src="assets/opt/rune-flyr-m1.mp4" poster="assets/opt/rune-flyr-m1-poster.jpg" muted loop playsinline preload="none"></video>
-      </div>
       <div class="cell contact__colophon">
         <div class="footer__name">Rune Øverland</div>
         <div class="colo__mid">
@@ -1946,7 +1972,7 @@ body.ready .rl { opacity: 1; transform: none; }
         <span>&copy; 2026</span>
       </div>
     </div>
-  </section>
+  </section></div>
 
 </div>
 
@@ -2086,9 +2112,8 @@ body.ready .rl { opacity: 1; transform: none; }
      Aktivt jump-tall = siste seksjon hvis topp har passert 45 %
      av skjermen. Klikk scroller til seksjonstopp på 10px-linja. */
   /* ── VIDEOENE — lazy: preload="none" + poster i markup; spiller
-     først når de faktisk står i viewporten (perf-task). Kolofon-
-     reelen beholder CEO-terskelen 50 % (08-13); kortvideoene
-     (sbb/morfar, tidligere autoplay) fyrer ved 25 % og pauser
+     først når de faktisk står i viewporten (perf-task). Kort-
+     videoene (sbb/morfar, tidligere autoplay) fyrer ved 25 % og pauser
      utenfor — visuelt identisk med autoplay, uten å laste ~4 MB
      ved sidelast.                                              */
   function lazyPlay(els, threshold) {
@@ -2110,7 +2135,6 @@ body.ready .rl { opacity: 1; transform: none; }
     }
   }
   lazyPlay(Array.prototype.slice.call(document.querySelectorAll('.card:not(.card--sbb) .card__col video')), .25);
-  lazyPlay(Array.prototype.slice.call(document.querySelectorAll('.contact__reel video')), .25);
 
   /* SBB: transporten velger mellom fem romlige videoflater. */
   var sbbVideoOne = document.getElementById('sbb-tiktok-ad');
@@ -2520,6 +2544,48 @@ body.ready .rl { opacity: 1; transform: none; }
   }
 
 })();
+
+  /* ── CONTACT · sticky modul, bilde som krymper inn i griden (CEO 09-04).
+     Bevegelsen følger scroll direkte (rAF). p = 0..1 over den første
+     boksen etter at modulen låser: bildet glir fra øvre modulhalvdel
+     ned til rute 13–14 (translate 100 %, scale .5); avsnitt og CTA
+     kommer inn sammen ved p ≥ .86. Loopen kjører kun mens
+     wrapperen er i/ved viewporten (IO, 100 % rootMargin). */
+  (function () {
+    var wrap = document.querySelector('.contact-reveal');
+    var bg = document.querySelector('.contact-bg');
+    var lede = document.querySelector('.contact__lede');
+    var cta = document.querySelector('.contact__cta');
+    if (!wrap || !bg || !lede) { return; }
+    if (getComputedStyle(wrap.firstElementChild).position !== 'sticky') { return; }   /* mobil: flyt, ingen driver */
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) { return; }
+    function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+    var last = -1, raf = 0, running = false;
+    function tick() {
+      var r = wrap.getBoundingClientRect();
+      var box = r.height / 3;
+      var p = clamp01(-r.top / box);
+      if (p !== last) {
+        last = p;
+        bg.style.transform = 'translate3d(0,' + (p * 100) + '%,0) scale(' + (1 - p * .5) + ')';
+        var q = clamp01((p - .86) / .14);
+        lede.style.opacity = q;
+        lede.style.transform = 'translate3d(0,' + ((1 - q) * 8) + 'px,0)';
+        if (cta) {   /* CEO 09-04: CTA kommer inn samtidig med avsnittet — samme faktor */
+          cta.style.opacity = q;
+          cta.style.transform = 'translate3d(0,' + ((1 - q) * 12) + 'px,0)';
+        }
+      }
+      raf = running ? requestAnimationFrame(tick) : 0;
+    }
+    function start() { if (!running) { running = true; raf = requestAnimationFrame(tick); } }
+    function stop() { running = false; if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) { start(); } else { stop(); } });
+      }, { rootMargin: '100% 0px' }).observe(wrap);
+    } else { start(); }
+  })();
 </script>
 
 <script>
