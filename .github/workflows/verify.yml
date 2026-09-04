@@ -1,0 +1,21 @@
+name: Verify portfolio
+
+on:
+  pull_request:
+    branches: [live]
+  push:
+    branches: [live]
+
+permissions:
+  contents: read
+
+jobs:
+  analytics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --check assets/js/analytics.js
+      - run: node --test tests/analytics.test.cjs
