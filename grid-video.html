@@ -361,9 +361,8 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
    emulerer seatCapTrims() trimmen med målte negative marginer. */
 .captrim { text-box: trim-both cap alphabetic; }
 
-/* CEO 08-16: «Fullstack engineer.» og CTA-en på SAMME trinn —
-   t-h4 (21). Hierarki: 1 = samlet avsnitt (30/500), 2 =
-   Fullstack/CTA (21/500), 3 = Ads-lista (15/400).              */
+/* Heading hierarchy: statement 30/500, title 21/500, list 15/400.
+   Content actions use the shared cta-system.css scale.        */
 .hero__display h1 {
   margin: 0;
   font-size: var(--t-h4);
@@ -402,12 +401,6 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
    blokk mot høyre, cellas 20px er hele avstanden fra streken.  */
 .hero__cta a {
   display: block; width: fit-content; margin-left: auto;
-  /* CEO 08-16: CTA på samme trinn som «Fullstack engineer.»
-     — t-h4 (21); sto på t-meta 15.                             */
-  font-size: var(--t-h4);
-  line-height: 1.2;
-  letter-spacing: -.012em;
-  font-weight: 500;
   color: var(--ink);
   text-decoration: none;
 }
@@ -531,7 +524,7 @@ body.ready .rl { opacity: 1; transform: none; }
 /* CEO 08-12 r11: placeholderen UT — kun det OBLIGATORISKE
    kortet (card__box i rute 7) står igjen på ren sort flate,
    som på de andre work-seksjonene.                             */
-.card--nyme .card__body { margin-top: auto; }
+.card--nyme .card__body { margin-top: auto; color: var(--ink); }
 .card--nyme .card__link { margin-top: 6px; border-bottom: none; padding-bottom: 0; }
 /* CEO 08-12: placeholder-bildet tilbake — KUN i rute 7. */
 .card--nyme .nyme__ph {
@@ -1254,10 +1247,6 @@ body.ready .rl { opacity: 1; transform: none; }
 }
 .contact__cta a {
   text-decoration: none;
-  font-size: var(--t-h4);
-  line-height: 1.3;
-  letter-spacing: -.012em;
-  font-weight: 500;
   color: var(--ink);
 }
 /* CEO 09-04: teksten inverterer selv — hvit + difference gir
@@ -1390,6 +1379,14 @@ body.ready .rl { opacity: 1; transform: none; }
   .nav.is-paper { padding-top: 0; padding-bottom: 0; }
   .hero { background-attachment: scroll; }  /* fixed-bg jank på mobil */
   .hero, .card, .contact .cols { height: auto; min-height: 100vh; position: static; }
+  /* Keep the mobile scrim inside the hero and behind its text. */
+  .hero { position: relative; }
+  .hero::before {
+    z-index: -1;
+    background: linear-gradient(180deg,
+      rgba(0, 0, 0, .62) 0%, rgba(0, 0, 0, .62) 60%, rgba(0, 0, 0, .52) 100%);
+  }
+  .hero__aside dd { color: rgba(255, 255, 255, .85); }
   .cols {
     position: static !important;
     display: flex; flex-direction: column; gap: 40px;
@@ -1461,7 +1458,10 @@ body.ready .rl { opacity: 1; transform: none; }
   .hero__cta { text-align: left; }
   .hero__cta a { margin-left: 0; }
   /* CEO 08-16 (4): How I work mot heroens bunn.                */
-  .hero .cols { min-height: calc(100vh - var(--pad) * 2) !important; padding-bottom: calc(var(--cell) * 2); }
+  .hero .cols {
+    min-height: calc(100vh - var(--pad) * 2) !important;
+    padding-bottom: calc(var(--cell) * 2);
+  }
   .hero__cta { margin-top: auto; }
   .card--nyme .nyme__ph img { position: static; height: auto; }
   /* Stablet statement på mobil: APPLICATION, i flyt rett etter
@@ -1640,6 +1640,7 @@ body.ready .rl { opacity: 1; transform: none; }
 }
 </style>
 <link rel="stylesheet" href="nav-system.css">
+<link rel="stylesheet" href="cta-system.css">
 </head>
 <body>
 <div class="splash" id="splash" hidden>
@@ -1745,8 +1746,8 @@ body.ready .rl { opacity: 1; transform: none; }
       </div>
       <div class="nyme__line nyme__starts iv" style="--lc:2;--le:4;--lv:flex-end;--lj:center;--d:220ms"><p>STARTS WITH</p></div>
       <div class="nyme__line nyme__job iv" style="--lc:3;--lv:flex-start;--lj:flex-end;--d:300ms"><p>THE JOB.</p></div>
-      <div class="nyme__statement" aria-label="The application, starts with the job.">
-        <p class="nyme__statement-lead"><span>THE</span><span>APPLICATION,</span></p>
+      <div class="nyme__statement" aria-label="The application starts with the job.">
+        <p class="nyme__statement-lead"><span>THE</span><span>APPLICATION</span></p>
         <p class="nyme__statement-rest">STARTS WITH THE JOB.</p>
       </div>
       <div class="card__box iv" style="--d:120ms">

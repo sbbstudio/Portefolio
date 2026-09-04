@@ -1,0 +1,19 @@
+/* Shared content-action typography. Navigation and card text keep their own roles. */
+:root {
+  --cta-type-size: var(--t-meta, .9375rem);
+  --cta-line-height: 1.6;
+  --cta-weight: 400;
+}
+
+.hero__cta a,
+.nyme__cta a,
+.kz__cta a,
+.intro__cta a,
+.contact__cta a,
+.close__cta a,
+.contact__form button {
+  font-size: var(--cta-type-size);
+  line-height: var(--cta-line-height);
+  font-weight: var(--cta-weight);
+  letter-spacing: 0;
+}
