@@ -15,7 +15,12 @@ branch directly and does not run the JavaScript build. Node 22 or later is recom
 
 The GLB and camera track are in `models/atelier/`; Draco decoders are local in
 `decoders/draco/`. No Blender sources or third-party model-generation credentials
-are shipped. The 3D module/model are fetched only when section 2 becomes visible.
+are shipped. On a normal entrance the model is preloaded while JavaScript imports, and the
+percentage loader waits for decoding and the first complete rendered frame. The
+prepared canvas is reused on first scroll. Direct content hash links bypass this
+work. Failures release the entrance; a 15-second bound prevents a stalled module
+from locking the page. Scene invalidation follows progress changes rather than
+every scroll event outside the scene.
 
 ## Verification and release
 

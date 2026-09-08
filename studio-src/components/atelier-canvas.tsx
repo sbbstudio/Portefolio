@@ -58,9 +58,15 @@ class SceneBoundary extends Component<{ children: ReactNode; onError: () => void
   render() { return this.state.failed ? null : this.props.children }
 }
 
-function NoWebGL({ onLoad }: Pick<Props, 'onLoad'>) {
-  useEffect(() => onLoad(ERROR), [onLoad])
-  return null
+// Canvas fallback children mount even when the browser supports canvas; they
+// must never report an error through an effect. Probe once before loading instead.
+function supportsWebGL() {
+  try {
+    const context = document.createElement('canvas').getContext('webgl2')
+    if (!context) return false
+    context.getExtension('WEBGL_lose_context')?.loseContext()
+    return true
+  } catch { return false }
 }
 
 function RenderBudget() {
@@ -212,6 +218,7 @@ export default function AtelierCanvas({ still, onLoad }: Props) {
     return opening
   }, [asset])
   useEffect(() => {
+    if (!supportsWebGL()) { onLoad(ERROR); return }
     const controller = new AbortController()
     const draco = new DRACOLoader().setDecoderPath('/decoders/draco/').setWorkerLimit(2)
     const loader = new GLTFLoader().setDRACOLoader(draco)
@@ -239,7 +246,7 @@ export default function AtelierCanvas({ still, onLoad }: Props) {
     <SceneBoundary onError={() => onLoad(ERROR)}>
       <Canvas orthographic camera={camera} frameloop="demand"
         dpr={[1, 1.5]} shadows="percentage" gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
-        fallback={<NoWebGL onLoad={onLoad} />}
+        fallback={<span>Your browser cannot display the 3D studio.</span>}
         onCreated={({ gl }) => { gl.setClearColor('#0b0b0d'); gl.toneMapping = THREE.ACESFilmicToneMapping; gl.toneMappingExposure = 1; gl.transmissionResolutionScale = .5 }}>
         <RenderBudget />
         <ambientLight intensity={.35} />

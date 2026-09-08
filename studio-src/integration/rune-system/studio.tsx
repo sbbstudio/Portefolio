@@ -17,6 +17,12 @@ function Studio({ host }: { host: HTMLElement }) {
   const onLoad = useCallback((value: LoadState) => setLoad(value), [])
   const source = document.querySelector<HTMLTemplateElement>('#studio-copy-template')!.content
 
+  useLayoutEffect(() => {
+    host.dataset.loadPhase = load.phase
+    // Notify only after React has committed readiness to the stage.
+    document.dispatchEvent(new CustomEvent('studio:load', { detail: load }))
+  }, [host, load])
+
   useEffect(() => {
     const skip = () => flushSync(() => setSkipped(true))
     host.addEventListener('studio:skip', skip)
@@ -25,6 +31,7 @@ function Studio({ host }: { host: HTMLElement }) {
 
   useLayoutEffect(() => {
     let frame = 0
+    let renderedProgress = -1
     const update = () => {
       frame = 0
       const el = section.current
@@ -48,7 +55,11 @@ function Studio({ host }: { host: HTMLElement }) {
       stage.current?.style.setProperty('--studio-copy', String(reveal))
       stage.current?.setAttribute('data-complete', String(reveal > 0))
       if (copy.current) { copy.current.inert = reveal === 0; copy.current.setAttribute('aria-hidden', String(reveal === 0)) }
-      window.dispatchEvent(new Event(ATELIER_INVALIDATE))
+      // Keep the prepared canvas idle while scrolling the hero or later projects.
+      if (scrollState.p !== renderedProgress) {
+        renderedProgress = scrollState.p
+        window.dispatchEvent(new Event(ATELIER_INVALIDATE))
+      }
     }
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update) }
     window.addEventListener('scroll', schedule, { passive: true })

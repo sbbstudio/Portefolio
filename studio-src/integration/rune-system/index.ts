@@ -9,6 +9,7 @@ async function mount() {
     mountStudio(host)
   } catch {
     requested = false
+    document.dispatchEvent(new CustomEvent('studio:load', { detail: { phase: 'error', loaded: 0, total: 0 } }))
     const status = host.querySelector('[role="status"]')
     if (status) status.textContent = 'The studio couldn’t load. You can continue to the text below.'
   }
@@ -71,6 +72,10 @@ if (['#work', '#contact', '#approach-copy'].includes(location.hash)) {
   host.dataset.skipped = 'true'
   requestAnimationFrame(() => document.querySelector(location.hash)?.scrollIntoView({ behavior: 'instant' }))
 }
+
+// Prepare the actual canvas during the entrance, then keep it mounted for first scroll.
+// Direct content links retain their fast path without downloading the scene.
+if (host.dataset.skipped !== 'true') void mount()
 
 // Restore the source contact reveal, whose text/CTA are hidden in canonical CSS until this runs.
 const contactWrap = document.querySelector<HTMLElement>('.contact-reveal')!
