@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": [
+      "dom",
+      "es2020"
+    ],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "types": [
+      "node"
+    ],
+    "skipLibCheck": true,
+    "noEmit": true,
+    "paths": {
+      "@/*": [
+        "./studio-src/*"
+      ]
+    }
+  },
+  "include": [
+    "studio-src"
+  ]
+}

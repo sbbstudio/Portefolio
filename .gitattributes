@@ -1,0 +1,2 @@
+# esbuild output embeds upstream GLSL strings; preserve their whitespace exactly.
+studio/runtime/*.js -whitespace linguist-generated=true

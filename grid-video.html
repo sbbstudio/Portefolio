@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="en" data-nav-theme="ink">
+<html lang="en" data-nav-theme="light">
 <head>
+<script src="studio/entry-boot.js?v=1"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rune Øverland — Creative Fullstack Engineer</title>
 <link rel="icon" href="favicon.ico?v=r1" sizes="16x16 32x32 48x48">
 <!-- LCP: hero-bakgrunnen er CSS-bg og kan ikke få loading-attributt —
      preload med høy prioritet er hero-lasten. ALDRI lazy (perf-task). -->
-<link rel="preload" as="image" href="assets/opt/hero-placeholder.webp" type="image/webp" fetchpriority="high">
 <!-- CEO 09-04: contact-tåken er CSS-bg i den sticky modulen — preload så den står klar når scrollen når bunnen. -->
 <link rel="preload" as="image" href="assets/opt/contact-fog.webp" type="image/webp" media="(min-width: 1024px)">
 <style>
@@ -306,21 +306,7 @@ a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .hero {
   position: relative;
   height: var(--box);
-  /* PLACEHOLDER — byttes til video. Finten heter fixed-background
-     reveal (curtain): background-attachment: fixed fester bildet
-     til viewporten — bildet står bom stille mens siden scroller
-     over det. Ikke parallax (der flytter bildet seg i annen fart). */
-  background-color: var(--ground);
-  /* Optimalisert hero (perf-task): webp via image-set, jpg-fallback.
-     Samme motiv, samme geometri — byttet er visuelt usynlig.         */
-  background-image: url("assets/opt/hero-placeholder.jpg");
-  background-image: image-set(
-    url("assets/opt/hero-placeholder.webp") type("image/webp"),
-    url("assets/opt/hero-placeholder.jpg") type("image/jpeg"));
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  background: var(--ground);
   overflow: hidden;
 }
 /* Lyskilden er erstattet av fotoet; svak bunn-scrim seter den
@@ -928,9 +914,7 @@ body.ready .rl { opacity: 1; transform: none; }
 .jelsa-terreng {
   position: absolute; inset: 0; z-index: 0;
   pointer-events: none;
-  background-image: image-set(
-    url("assets/jelsa/terreng-naer.avif") type("image/avif"),
-    url("assets/jelsa/terreng-naer.webp") type("image/webp"));
+  background-image: url("assets/jelsa/terreng-naer.webp");
   background-size: cover;
   background-position: 50% 50%;
   opacity: var(--terreng, 0);
@@ -1641,25 +1625,18 @@ body.ready .rl { opacity: 1; transform: none; }
 </style>
 <link rel="stylesheet" href="nav-system.css">
 <link rel="stylesheet" href="cta-system.css">
-</head>
-<body>
-<div class="splash" id="splash" hidden>
-  <div class="splash__name">Rune &Oslash;verland</div>
-  <p class="splash__note">This website is designed for&nbsp;desktop.</p>
-  <button class="splash__enter" type="button">Continue <span class="arrow">&rarr;</span></button>
+<link rel="stylesheet" href="studio/integration.css?v=1"></head>
+<body class="ready" id="top">
+<div class="entry-loader">
+  <div class="entry-loader__panel" role="progressbar" aria-label="Loading portfolio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div class="entry-loader__percent" aria-hidden="true">0%</div>
+    <div class="entry-loader__track" aria-hidden="true"><i class="entry-loader__signal"></i></div>
+  </div>
 </div>
 
 <div class="page">
 
   <!-- Grid — ruller med innholdet, repeterer hver halve modul -->
-  <div class="grid" aria-hidden="true">
-    <i class="v v1"></i><i class="v v2"></i><i class="v v3"></i>
-    <div class="rows"></div>
-    <div class="nodes n1"></div><div class="nodes n2"></div><div class="nodes n3"></div>
-  </div>
-
-  <!-- ══ 01 · HERO ══════════════════════════════════════════ -->
-  <!-- ══ NAV — samme system som how-i-work (CEO 08-12) ══════ -->
   <nav class="nav" aria-label="Main">
     <div class="cell nav__name"><a href="grid-video.html">Rune &Oslash;verland</a></div>
     <div class="cell nav__links">
@@ -1668,14 +1645,18 @@ body.ready .rl { opacity: 1; transform: none; }
       <a href="how-i-work.html">How I work</a>
     </div>
     <div class="cell nav__jumps" aria-label="Sections on this page">
-      <button type="button" data-jump="1"><span class="jno">01</span><span class="jt">Approach</span></button>
-      <button type="button" data-jump="2"><span class="jno">02</span><span class="jt">Work</span></button>
-      <button type="button" data-jump="3"><span class="jno">03</span><span class="jt">Contact</span></button>
+      <a href="#approach"><span class="jno">01</span><span class="jt">Approach</span></a>
+      <a href="#work" data-studio-exit><span class="jno">02</span><span class="jt">Work</span></a>
+      <a href="#contact" data-studio-exit><span class="jno">03</span><span class="jt">Contact</span></a>
     </div>
     <div class="cell nav__cta"><a href="contact.html">Contact</a></div>
   </nav>
 
-  <section class="hero" id="hero">
+  <section class="hero" id="hero"><div class="grid" aria-hidden="true">
+    <i class="v v1"></i><i class="v v2"></i><i class="v v3"></i>
+    <div class="rows"></div>
+    <div class="nodes n1"></div><div class="nodes n2"></div><div class="nodes n3"></div>
+  </div>
     <div class="cols">
       <div class="cell hero__display">
         <h1 class="split">Fullstack engineer.</h1>
@@ -1706,22 +1687,23 @@ body.ready .rl { opacity: 1; transform: none; }
   </section>
 
   <!-- ══ 02 · APPROACH — 100vh, ingen sticky ════════════════ -->
-  <section class="approach" id="approach">
-    <i class="mline" aria-hidden="true"></i>
-    <div class="cols">
-      <div class="cell appr__top iv" style="--d:0ms">
-        <div class="appr__media">
-          <p class="card__say appr__cap">Copenhagen</p>
-          <div class="appr__frame"><img src="assets/opt/appr-rute7.webp" alt="København — Marmorkirken fra Amalienborg" loading="lazy" decoding="async" width="540" height="720"></div>
-        </div>
-        <h2>The system comes with me.</h2>
-        <p>I don’t start from zero. Every project leaves behind a better way to work&nbsp;— clearer decisions, reusable components and stronger checks. The next one starts from there.</p>
-      </div>
-    </div>
-  </section>
+<div id="approach" aria-label="Approach">
+  <template id="studio-copy-template"><h2>The system comes with me.</h2><p>I don’t start from zero. Every project leaves behind a better way to work&nbsp;— clearer decisions, reusable components and stronger checks. The next one starts from there.</p></template>
+  <div id="studio-root">
+    <section class="studio-journey studio-placeholder"><div class="studio-stage">
+      <a class="studio-skip" href="#approach-copy" data-studio-exit>Skip animation ↘</a>
+      <div class="studio-loading"><p role="status">Scroll to step inside the studio.</p></div>
+      <span class="studio-explore">Explore with scroll ↓</span>
+      <div id="approach-copy" class="studio-endcopy" tabindex="-1"><h2>The system comes with me.</h2><p>I don’t start from zero. Every project leaves behind a better way to work&nbsp;— clearer decisions, reusable components and stronger checks. The next one starts from there.</p></div>
+      <button class="studio-restart" data-studio-restart>Replay animation ↻</button>
+    </div></section>
+  </div>
+</div>
+
+
 
   <!-- ══ 03 · WORK — én komponent per prosjekt ══════════════ -->
-  <section class="work" id="work">
+  <section class="work" id="work" tabindex="-1">
     <i class="mline" aria-hidden="true"></i>
 
     <!-- NYME (CEO 08-11): ÉN modul — heroens grammatikk. Toppraden
@@ -1730,7 +1712,11 @@ body.ready .rl { opacity: 1; transform: none; }
          Ni-trinns-kjeden bor på undersiden: nyme.html.
          CEO 08-12 r11: kun det obligatoriske kortet på ren sort
          flate. r13: V-form i topraden; kortet til RUTE 5.       -->
-    <article class="card card--nyme" style="--bc:1;--br:2">
+    <article class="card card--nyme" style="--bc:1;--br:2"><div class="grid" aria-hidden="true">
+    <i class="v v1"></i><i class="v v2"></i><i class="v v3"></i>
+    <div class="rows"></div>
+    <div class="nodes n1"></div><div class="nodes n2"></div><div class="nodes n3"></div>
+  </div>
       <i class="mline" aria-hidden="true"></i>
       <!-- r13: V-formen — THE topp/venstre, APPLICATION som
            ticker over midjen, STARTS WITH bunn/senter,
@@ -1774,7 +1760,11 @@ body.ready .rl { opacity: 1; transform: none; }
 
     <!-- SBB design-test 08-27: fem valgbare filmer med hver sin
          gridfigur; kortet og kontrollen blir i rute 7 og 8. -->
-    <article class="card card--sbb" style="--bc:3;--br:2;--vc:2;--vr:1">
+    <article class="card card--sbb" style="--bc:3;--br:2;--vc:2;--vr:1"><div class="grid" aria-hidden="true">
+    <i class="v v1"></i><i class="v v2"></i><i class="v v3"></i>
+    <div class="rows"></div>
+    <div class="nodes n1"></div><div class="nodes n2"></div><div class="nodes n3"></div>
+  </div>
       <i class="mline" aria-hidden="true"></i>
       <div class="sbb__stage">
         <div class="card__col card__col--done">
@@ -1857,7 +1847,11 @@ body.ready .rl { opacity: 1; transform: none; }
          Media = SJU ruter, sju ekte undersider i sporrekkefølge
          (card__box i rute 4). Veggen står dempet; hover løfter
          ruta til 100 % opacity.                                -->
-    <article class="card card--jelsa" id="work-jelsa" style="--bc:4;--br:2;--terreng:.45">
+    <article class="card card--jelsa" id="work-jelsa" style="--bc:4;--br:2;--terreng:.45"><div class="grid" aria-hidden="true">
+    <i class="v v1"></i><i class="v v2"></i><i class="v v3"></i>
+    <div class="rows"></div>
+    <div class="nodes n1"></div><div class="nodes n2"></div><div class="nodes n3"></div>
+  </div>
       <i class="mline" aria-hidden="true"></i>
       <div class="card__media" aria-hidden="true"></div>
       <i class="jelsa-terreng" aria-hidden="true"></i>
@@ -1891,7 +1885,11 @@ body.ready .rl { opacity: 1; transform: none; }
       </div>
     </article>
 
-    <article class="card card--bleed card--kzai" id="work-kzai" style="--bc:3;--br:2">
+    <article class="card card--bleed card--kzai" id="work-kzai" style="--bc:3;--br:2"><div class="grid" aria-hidden="true">
+    <i class="v v1"></i><i class="v v2"></i><i class="v v3"></i>
+    <div class="rows"></div>
+    <div class="nodes n1"></div><div class="nodes n2"></div><div class="nodes n3"></div>
+  </div>
       <i class="mline" aria-hidden="true"></i>
       <div class="card__col">
         <video src="assets/opt/morfar.mp4" poster="assets/opt/morfar-poster.jpg" muted loop playsinline preload="none"></video>
@@ -1932,7 +1930,11 @@ body.ready .rl { opacity: 1; transform: none; }
   </section>
 
   <!-- ══ 04 · CONTACT — CEO-copy 08-10, ordrett ═════════════ -->
-  <div class="contact-reveal"><section class="contact" id="contact">
+  <div class="contact-reveal"><section class="contact" id="contact" tabindex="-1"><div class="grid" aria-hidden="true">
+    <i class="v v1"></i><i class="v v2"></i><i class="v v3"></i>
+    <div class="rows"></div>
+    <div class="nodes n1"></div><div class="nodes n2"></div><div class="nodes n3"></div>
+  </div>
     <i class="mline" aria-hidden="true"></i>
     <div class="contact-bg" aria-hidden="true"></div>
     <div class="cols">
@@ -1957,7 +1959,7 @@ body.ready .rl { opacity: 1; transform: none; }
         <div class="colo__mid">
           <nav class="footer__nav" aria-label="Footer">
             <a href="#approach">Approach</a>
-            <a href="#work">Work</a>
+            <a href="#work" data-studio-exit>Work</a>
             <a href="how-i-work.html">How I work</a>
             <a href="contact.html">Contact</a>
           </nav>
@@ -2406,55 +2408,7 @@ body.ready .rl { opacity: 1; transform: none; }
     syncSbbControls();
   }
 
-  var nav = document.querySelector('.nav');
-  var heroEl = document.querySelector('.hero');
-  var navJumps = Array.prototype.slice.call(document.querySelectorAll('.nav__jumps button'));
-  var navTargets = ['approach', 'work', 'contact'].map(function (id) { return document.getElementById(id); });
-  var navPad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pad')) || 10;
-  if (nav && heroEl) {
-    /* CEO 08-13: nav-en var for sensitiv — ethvert 1px-tikk
-       oppover hentet den frem. Nå må man TJENE den tilbake:
-       120px akkumulert opp-scroll før den viser seg, og
-       tellingen nullstilles straks retningen snur nedover.     */
-    var navLastY = window.scrollY, navTick = false, navUpAcc = 0;
-    var onNavScroll = function () {
-      if (navTick) { return; }
-      navTick = true;
-      requestAnimationFrame(function () {
-        navTick = false;
-        var y = window.scrollY;
-        var dy = y - navLastY;
-        navUpAcc = dy > 0 ? 0 : navUpAcc - dy;
-        var released = heroEl.getBoundingClientRect().bottom <= navPad + 2;
-        /* Forside-unntak: naven forsvinner på første ned-scroll.
-           120px opp-scroll for å hente den tilbake beholdes.   */
-        if (y <= 0) { nav.classList.remove('is-hidden'); }
-        else if (dy > 0) { nav.classList.add('is-hidden'); }
-        else if (navUpAcc >= 120) { nav.classList.remove('is-hidden'); }
-        nav.classList.toggle('is-paper', released);
-        navLastY = y;
-        var active = 0;
-        navTargets.forEach(function (el, i) {
-          if (el && el.getBoundingClientRect().top <= window.innerHeight * 0.45) { active = i + 1; }
-        });
-        navJumps.forEach(function (b) {
-          b.classList.toggle('is-here', parseInt(b.dataset.jump, 10) === active);
-        });
-      });
-    };
-    window.addEventListener('scroll', onNavScroll, { passive: true });
-    onNavScroll();
-    navJumps.forEach(function (b) {
-      b.addEventListener('click', function () {
-        var el = navTargets[parseInt(b.dataset.jump, 10) - 1];
-        if (!el) { return; }
-        window.scrollTo({
-          top: el.getBoundingClientRect().top + window.scrollY - navPad,
-          behavior: reduce ? 'auto' : 'smooth'
-        });
-      });
-    });
-  }
+  // Navigation is driven by the studio module.
 
   /* ── TERRENGPLATE-TUNER ──────────────────────────────────────
      Bare på ?tune. Den rene adressen viser flaten slik den blir,
@@ -2546,47 +2500,7 @@ body.ready .rl { opacity: 1; transform: none; }
 
 })();
 
-  /* ── CONTACT · sticky modul, bilde som krymper inn i griden (CEO 09-04).
-     Bevegelsen følger scroll direkte (rAF). p = 0..1 over den første
-     boksen etter at modulen låser: bildet glir fra øvre modulhalvdel
-     ned til rute 13–14 (translate 100 %, scale .5); avsnitt og CTA
-     kommer inn sammen ved p ≥ .86. Loopen kjører kun mens
-     wrapperen er i/ved viewporten (IO, 100 % rootMargin). */
-  (function () {
-    var wrap = document.querySelector('.contact-reveal');
-    var bg = document.querySelector('.contact-bg');
-    var lede = document.querySelector('.contact__lede');
-    var cta = document.querySelector('.contact__cta');
-    if (!wrap || !bg || !lede) { return; }
-    if (getComputedStyle(wrap.firstElementChild).position !== 'sticky') { return; }   /* mobil: flyt, ingen driver */
-    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) { return; }
-    function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
-    var last = -1, raf = 0, running = false;
-    function tick() {
-      var r = wrap.getBoundingClientRect();
-      var box = r.height / 3;
-      var p = clamp01(-r.top / box);
-      if (p !== last) {
-        last = p;
-        bg.style.transform = 'translate3d(0,' + (p * 100) + '%,0) scale(' + (1 - p * .5) + ')';
-        var q = clamp01((p - .86) / .14);
-        lede.style.opacity = q;
-        lede.style.transform = 'translate3d(0,' + ((1 - q) * 8) + 'px,0)';
-        if (cta) {   /* CEO 09-04: CTA kommer inn samtidig med avsnittet — samme faktor */
-          cta.style.opacity = q;
-          cta.style.transform = 'translate3d(0,' + ((1 - q) * 12) + 'px,0)';
-        }
-      }
-      raf = running ? requestAnimationFrame(tick) : 0;
-    }
-    function start() { if (!running) { running = true; raf = requestAnimationFrame(tick); } }
-    function stop() { running = false; if (raf) { cancelAnimationFrame(raf); raf = 0; } }
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) { if (e.isIntersecting) { start(); } else { stop(); } });
-      }, { rootMargin: '100% 0px' }).observe(wrap);
-    } else { start(); }
-  })();
+  // Contact reveal is driven by the studio module.
 </script>
 
 <script>
@@ -2660,26 +2574,9 @@ body.ready .rl { opacity: 1; transform: none; }
 })();
 </script>
 
-<script>
-/* Splash — kun mobil, én gang per besøk. */
-(function () {
-  var s = document.getElementById('splash');
-  if (!s || !window.matchMedia('(max-width: 1023px)').matches) return;
-  var seen = false;
-  try { seen = !!sessionStorage.getItem('splashSeen'); } catch (e) {}
-  if (seen) return;
-  s.hidden = false;
-  document.documentElement.style.overflow = 'hidden';
-  s.querySelector('.splash__enter').addEventListener('click', function () {
-    try { sessionStorage.setItem('splashSeen', '1'); } catch (e) {}
-    s.classList.add('is-out');
-    document.documentElement.style.overflow = '';
-    setTimeout(function () { s.hidden = true; }, 550);
-  });
-})();
-</script>
+
 <!-- Cloudflare Web Analytics (CEO 09-04) -->
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "111e05e03c3f411fa8ebbbd04b820e76"}'></script>
 <script defer src="assets/js/analytics.js"></script>
-</body>
+<script type="module" src="studio/runtime/index.js?v=1"></script><noscript><style>.studio-journey {height:100svh}.studio-endcopy {opacity:1;visibility:visible}.studio-loading,.studio-skip,.studio-explore {display:none}</style></noscript></body>
 </html>

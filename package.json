@@ -1,0 +1,23 @@
+{
+  "name": "rune-portfolio-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build-studio.mjs"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "three": "0.185.1",
+    "@react-three/fiber": "9.7.0",
+    "@react-three/drei": "10.7.8"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "@types/node": "26.5.0"
+  }
+}
